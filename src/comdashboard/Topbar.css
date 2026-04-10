@@ -1,0 +1,135 @@
+/* ===== TOPBAR ===== */
+.topbar {
+  height: 60px;
+  width: calc(100% - 240px); 
+  margin-left: 240px;        
+  background-color: #3e2723; /* blanc clair */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  transition: width 0.3s, margin-left 0.3s;
+}
+
+.topbar.collapsed {
+  width: calc(100% - 80px);  
+  margin-left: 80px;
+}
+
+.topbarConteneur {
+  height: 100%;
+  padding: 0 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 26px;
+  color: #ffa94d; /* orange */
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.logo:hover {
+  color: #ffa94d; /* orange plus clair */
+}
+
+.topleft {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.menuIcon {
+  color: #ffa94d;
+  font-size: 28px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.menuIcon:hover {
+  transform: scale(1.1);
+}
+
+.topright {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.topbarIconsContainer {
+  position: relative;
+  cursor: pointer;
+  color: #dbc0c0; /* icône sombre */
+  font-size: 26px;
+  transition: 0.3s ease;
+}
+
+.topbarIconsContainer:hover {
+  color: #ffa94d;
+  transform: scale(1.1);
+}
+
+.userContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #dbc0c0;
+  
+}
+
+.userIcon {
+  font-size: 28px !important;
+  color: #ffa94d;
+}
+
+.username {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  background-color: #ffffff; /* menu clair */
+  border-radius: 8px;
+  width: 180px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  overflow: hidden;
+  animation: fadeIn 0.2s ease-in-out;
+  z-index: 999;
+}
+
+.dropdownItem {
+  padding: 12px 15px;
+  font-size: 14px;
+  color: #dbc0c0;
+  transition: 0.3s;
+}
+
+.dropdownItem:hover {
+  background-color: #fe7f2d;
+  color: #fff;
+}
+
+.logout {
+  border-top: 1px solid #ddd;
+  color: #ff6b6b;
+}
+
+.logout:hover {
+  background-color: #ff4d4d;
+  color: white;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+

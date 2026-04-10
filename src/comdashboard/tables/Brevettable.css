@@ -1,0 +1,76 @@
+/* Container général */
+/* Container général */
+.container {
+  background-color: #fff;
+  margin: 40px auto;
+  padding: 30px;
+  width: 90%;
+  max-width: 900px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Titre */
+.container h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
+  border-left: 6px solid #ff7f50;
+  padding-left: 12px;
+  text-transform: capitalize;
+  margin-bottom: 20px;
+}
+
+/* Boutons */
+.btn {
+  display: inline-block;
+  padding: 8px 18px;
+  margin: 5px 2px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #fff;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+  border: none;
+}
+
+.btn-add { background-color: #ff7f50; }
+.btn-add:hover { background-color: #ff6633; }
+
+.btn-info { background-color: #17a2b8; }
+.btn-info:hover { background-color: #138496; }
+
+.btn-primary { background-color: #ff7f50; }
+.btn-primary:hover { background-color: #ff6633; }
+
+.btn-danger { background-color: #dc3545; }
+.btn-danger:hover { background-color: #c82333; }
+
+/* Tableau */
+.table-container {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+th, td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #fff5f0;
+  font-weight: 600;
+}
+
+tr:hover {
+  background-color: #fff2e6;
+  transition: 0.2s;
+}

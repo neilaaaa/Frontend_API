@@ -1,0 +1,57 @@
+/* Container */
+/* =========================
+   CONTAINER
+   ========================= */
+.container-view {
+  background-color: #fff; /* fond clair */
+  margin: 40px auto;
+  padding: 30px;
+  width: 80%;
+  max-width: 700px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* TITRE */
+.container-view h1 {
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* DÉTAILS DU BREVET */
+.detail {
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+.detail span {
+  font-weight: 600;
+  color: #ff7f50; /* orange principal */
+}
+
+/* LISTE DES DOCUMENTS */
+ul {
+  margin-top: 10px;
+  padding-left: 20px;
+}
+
+ul li {
+  margin-bottom: 5px;
+  font-size: 15px;
+  color: #333;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .container-view {
+    width: 95%;
+    padding: 20px;
+  }
+
+  .detail {
+    font-size: 15px;
+  }
+}

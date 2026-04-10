@@ -1,0 +1,109 @@
+/* ── Sidebar principale ── */
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar {
+  width: 240px;
+  height: 100vh;
+  background: linear-gradient(180deg, #ff7a00, #ff9a3d);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: width 0.3s;
+  overflow: hidden;
+
+  border-radius: 0 18px 18px 0;
+  box-shadow: 4px 0 15px rgba(0,0,0,0.08);
+}
+
+.sidebar.collapsed {
+  width: 80px;
+}
+
+/* LOGO */
+.sidebarLogo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.sidebarLogo img {
+  width: 50px;
+}
+
+/* MENU */
+.sidebarMenu {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 6px;
+}
+
+/* ITEM */
+.sidebarItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+
+  border-radius: 12px;
+  text-decoration: none;
+
+  color: #fff;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+/* HOVER NORMAL */
+.sidebarItem:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ACTIVE */
+.sidebarItem.active {
+  background: #ffffff;
+  color: #ff7a00;
+  font-weight: 600;
+}
+
+/* ICON */
+.sidebarItem svg {
+  font-size: 20px !important;
+}
+
+/* COLLAPSE */
+.sidebar.collapsed .sidebarItem {
+  justify-content: center;
+}
+
+.sidebar.collapsed .sidebarItem span {
+  display: none;
+}
+
+/* =========================
+   LOGOUT
+========================= */
+
+.sidebarBottom {
+  margin-top: auto;
+  padding: 10px;
+}
+
+.sidebarBottom .sidebarItem {
+  color: #fff;
+  border-radius: 12px;
+  transition: 0.2s;
+}
+
+/* hover normal */
+.sidebarBottom .sidebarItem:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* 🔴 HOVER DÉCONNEXION */
+.sidebarBottom .sidebarItem.logout:hover {
+  background: #ff4d4d;
+  color: #fff;
+}

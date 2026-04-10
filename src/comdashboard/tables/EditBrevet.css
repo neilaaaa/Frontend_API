@@ -1,0 +1,102 @@
+/* Container */
+/* =========================
+   CONTAINER
+   ========================= */
+.container-form {
+  background-color: #fff; /* fond clair */
+  margin: 40px auto;
+  padding: 30px;
+  width: 80%;
+  max-width: 600px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* TITRE */
+.container-form h1 {
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* FORMULAIRE */
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #333;
+}
+
+input, select, textarea {
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #ff7f50; /* orange principal */
+  box-shadow: 0 0 5px rgba(255,127,80,0.4);
+}
+
+/* BOUTON */
+button {
+  width: 140px;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background-color: #ff7f50; /* orange principal */
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background-color: #ff6633; /* hover orange */
+}
+
+/* DOCUMENTS MULTIPLES */
+input[type="file"] {
+  padding: 5px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+/* LISTE DES DOCUMENTS */
+ul {
+  margin-top: 10px;
+  padding-left: 20px;
+}
+
+ul li {
+  margin-bottom: 5px;
+  font-size: 15px;
+  color: #333;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .container-form {
+    width: 95%;
+    padding: 20px;
+  }
+
+  input, select, textarea {
+    font-size: 15px;
+  }
+
+  button {
+    width: 100%;
+    padding: 10px;
+  }
+}

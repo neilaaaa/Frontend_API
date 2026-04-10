@@ -1,0 +1,73 @@
+/* Login container - Mode sombre */
+.login-container {
+  background-color: rgba(21, 20, 25, 0.9); /* fond sombre légèrement transparent */
+  color: #FBFBFB;           /* texte clair */
+  width: 350px;
+  padding: 30px;
+  border-radius: 10px;
+  font-family: sans-serif;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5); /* ombrage plus marqué pour le contraste */
+}
+
+/* Header */
+.login-header h2 {
+  margin: 0;
+  text-align: center;
+  color: #FBFBFB; /* texte clair */
+}
+
+/* Ligne accent */
+.underline {
+  width: 50px;
+  height: 3px;
+  background-color: #F56E0F; /* accent orange conservé */
+  margin: 5px auto 20px auto;
+  border-radius: 2px;
+}
+
+/* Inputs */
+.login-inputs .input {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  background-color: #2a2930; /* fond sombre pour input */
+  border: 1px solid #555;   /* bordure grise foncée */
+  border-radius: 5px;
+  padding: 5px 10px;
+}
+
+.login-inputs .input img {
+  width: 20px;
+  margin-right: 10px;
+  filter: brightness(0) invert(1); /* icônes blanches pour contraste */
+}
+
+.login-inputs .input input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #FBFBFB; /* texte clair */
+  flex: 1;
+  font-size: 14px;
+}
+
+/* Submit Button */
+.submit-container {
+  text-align: center;
+}
+
+.submit-btn {
+  background-color: #F56E0F; /* accent orange conservé */
+  color: #151419;            /* texte sombre sur bouton orange */
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+
+.submit-btn:hover {
+  background-color: #e65c00; /* hover légèrement plus foncé */
+}
