@@ -1,15 +1,13 @@
-import React from "react";
-
-export default function StatCard({ label, value, color, icon }) {
+export default function StatCard({ icon, value, label, trend, trendUp, color }) {
   return (
-    <div className="stat-card" style={{ borderLeft: `6px solid ${color}` }}>
-      <div className="stat-icon">
+    <div className="stat-card">
+      <div className={`stat-icon ic-${color}`}>
         {icon}
       </div>
-
       <div className="stat-info">
-        <h4>{label}</h4>
-        <p>{value}</p>
+        <div className="stat-val">{value}</div>
+        <div className="stat-label">{label}</div>
+        
       </div>
     </div>
   );

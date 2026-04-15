@@ -26,7 +26,7 @@ export default function Brevets() {
 
   return (
     <DataTable
-      title="Brevets"
+      title="List des brevets"
       data={data}
       columns={[
   { key: "num_brevet", label: "N° Brevet" },

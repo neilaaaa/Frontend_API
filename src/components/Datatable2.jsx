@@ -4,6 +4,10 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import "./datatable.css";
 import SearchIcon from '@mui/icons-material/Search';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+
 export default function Datatable2({
   columns = [],
   data = [],
@@ -51,6 +55,11 @@ export default function Datatable2({
     }
   };
 
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+    setPage(1);
+  };
+
   // EXPORT EXCEL
   const exportExcel = () => {
     const ws = XLSX.utils.json_to_sheet(sorted);
@@ -63,13 +72,32 @@ export default function Datatable2({
   const exportPDF = () => {
     const doc = new jsPDF();
     doc.text(title, 10, 10);
-
     autoTable(doc, {
       head: [columns.map((c) => c.label)],
       body: sorted.map((row) => columns.map((c) => row[c.key])),
     });
-
     doc.save(`${exportName}.pdf`);
+  };
+
+  // PAGINATION — numéros à afficher
+  const getPageNumbers = () => {
+    const delta = 2;
+    const range = [];
+    const left = Math.max(1, page - delta);
+    const right = Math.min(totalPages, page + delta);
+
+    for (let i = left; i <= right; i++) {
+      range.push(i);
+    }
+    if (left > 1) {
+      range.unshift("...");
+      range.unshift(1);
+    }
+    if (right < totalPages) {
+      range.push("...");
+      range.push(totalPages);
+    }
+    return range;
   };
 
   return (
@@ -86,24 +114,23 @@ export default function Datatable2({
         {/* HEADER */}
         <div className="dt-header">
           <h2 className="dt-title">{title}</h2>
-
           <div className="dt-actions">
-            <button className="dt-btn" onClick={exportExcel}>Excel</button>
-            <button className="dt-btn" onClick={exportPDF}>PDF</button>
+            <button className="dt-btn-excel" onClick={exportExcel}>Excel</button>
+<button className="dt-btn-pdf" onClick={exportPDF}>PDF</button>
           </div>
         </div>
 
         {/* SEARCH */}
         <div>
-  <SearchIcon sx={{ position: 'relative', right: '-30px', top: '6px' }} />
-  <input
-    className="dt-search"
-    placeholder="Rechercher..."
-    value={search}
-    onChange={(e) => setSearch(e.target.value)}
-    style={{ paddingLeft: '35px' }}
-  />
-</div>
+          <SearchIcon sx={{ position: 'relative', right: '-30px', top: '6px' }} />
+          <input
+            className="dt-search"
+            placeholder="Rechercher..."
+            value={search}
+            onChange={handleSearch}
+            style={{ paddingLeft: '35px' }}
+          />
+        </div>
 
         {/* TABLE */}
         <table className="dt-table">
@@ -119,33 +146,111 @@ export default function Datatable2({
           </thead>
 
           <tbody>
-            {pageData.map((row) => (
-              <tr key={row.id}>
-                {columns.map((c) => (
-                  <td key={c.key}>{row[c.key]}</td>
-                ))}
-
-                <td className="dt-actions-cell">
-                  {onView && (
-                    <button className="dt-btn-icon" onClick={() => onView(row)}>
-                      voir
-                    </button>
-                  )}
-                  {onEdit && (
-                    <button className="dt-btn-icon" onClick={() => onEdit(row)}>
-                      modifier
-                    </button>
-                  )}
-                  {onDelete && (
-                    <button className="dt-btn-icon" onClick={() => onDelete(row)}>
-                      supprimer
-                    </button>
-                  )}
+            {pageData.length === 0 ? (
+              <tr>
+                <td colSpan={columns.length + 1} className="dt-empty">
+                  Aucun résultat trouvé
                 </td>
               </tr>
-            ))}
+            ) : (
+              pageData.map((row) => (
+                <tr key={row.id}>
+                  {columns.map((c) => (
+                    <td key={c.key}>{row[c.key]}</td>
+                  ))}
+                  <td className="dt-actions-cell">
+                    {onView && (
+                      <button
+                        className="dt-btn-icon dt-btn-view"
+                        onClick={() => onView(row)}
+                        title="Voir"
+                      >
+                        <VisibilityIcon fontSize="small" />
+                      </button>
+                    )}
+                    {onEdit && (
+                      <button
+                        className="dt-btn-icon dt-btn-edit"
+                        onClick={() => onEdit(row)}
+                        title="Modifier"
+                      >
+                        <EditIcon fontSize="small" />
+                      </button>
+                    )}
+                    {onDelete && (
+                      <button
+                        className="dt-btn-icon dt-btn-delete"
+                        onClick={() => {
+                          if (window.confirm("Voulez-vous vraiment supprimer cet élément ?")) {
+                            onDelete(row);
+                          }
+                        }}
+                        title="Supprimer"
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
+
+        {/* PAGINATION */}
+        {sorted.length > 0 && (
+          <div className="dt-pagination">
+            <span className="dt-pg-info">
+              {sorted.length} résultat{sorted.length !== 1 ? "s" : ""} — page {page} / {totalPages || 1}
+            </span>
+
+            <button
+              className="dt-pg-btn"
+              onClick={() => setPage(1)}
+              disabled={page === 1}
+            >
+              «
+            </button>
+
+            <button
+              className="dt-pg-btn"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              ‹
+            </button>
+
+            {getPageNumbers().map((p, i) =>
+              p === "..." ? (
+                <span key={`ellipsis-${i}`} className="dt-pg-ellipsis">…</span>
+              ) : (
+                <button
+                  key={p}
+                  className={`dt-pg-btn ${p === page ? "active" : ""}`}
+                  onClick={() => setPage(p)}
+                >
+                  {p}
+                </button>
+              )
+            )}
+
+            <button
+              className="dt-pg-btn"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages}
+            >
+              ›
+            </button>
+
+            <button
+              className="dt-pg-btn"
+              onClick={() => setPage(totalPages)}
+              disabled={page >= totalPages}
+            >
+              »
+            </button>
+          </div>
+        )}
 
       </div>
     </div>

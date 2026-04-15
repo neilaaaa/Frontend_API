@@ -4,6 +4,14 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import "./datatable.css";
 import SearchIcon from '@mui/icons-material/Search';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+
 export default function DataTable({
   columns = [],
   data = [],
@@ -51,6 +59,11 @@ export default function DataTable({
     }
   };
 
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+    setPage(1);
+  };
+
   // EXPORT EXCEL
   const exportExcel = () => {
     const ws = XLSX.utils.json_to_sheet(sorted);
@@ -63,70 +76,174 @@ export default function DataTable({
   const exportPDF = () => {
     const doc = new jsPDF();
     doc.text(title, 10, 10);
-
     autoTable(doc, {
       head: [columns.map((c) => c.label)],
       body: sorted.map((row) => columns.map((c) => row[c.key])),
     });
-
     doc.save(`${exportName}.pdf`);
   };
 
+  // PAGINATION — numéros à afficher
+  const getPageNumbers = () => {
+    const delta = 2;
+    const range = [];
+    const left = Math.max(1, page - delta);
+    const right = Math.min(totalPages, page + delta);
+    for (let i = left; i <= right; i++) range.push(i);
+    if (left > 1) { range.unshift("..."); range.unshift(1); }
+    if (right < totalPages) { range.push("..."); range.push(totalPages); }
+    return range;
+  };
+
   return (
-  <div className="dt-container">
+    <div className="dt-container">
 
-    {/* HEADER */}
-    <div className="dt-header">
-      <h2 className="dt-title">{title}</h2>
-
-      <div className="dt-actions">
-        {onAdd && <button className="dt-btn" onClick={onAdd}>+ Ajouter</button>}
-        <button className="dt-btn" onClick={exportExcel}>Excel</button>
-        <button className="dt-btn" onClick={exportPDF}>PDF</button>
+      {/* HEADER */}
+      <div className="dt-header">
+        <h2 className="dt-title">{title}</h2>
+        <div className="dt-actions">
+          {onAdd && <button className="dt-btn" onClick={onAdd}>+ Ajouter</button>}
+          <button className="dt-btn-excel" onClick={exportExcel}>Excel</button>
+<button className="dt-btn-pdf" onClick={exportPDF}>PDF</button>
+        </div>
       </div>
-    </div>
 
-    {/* SEARCH */}
-    <div>
-  <SearchIcon sx={{ position: 'relative', right: '-30px', top: '6px' }} />
-  <input
-    className="dt-search"
-    placeholder="Rechercher..."
-    value={search}
-    onChange={(e) => setSearch(e.target.value)}
-    style={{ paddingLeft: '35px' }}
-  />
-</div>
-    {/* TABLE */}
-    <table className="dt-table">
-      <thead>
-        <tr>
-          {columns.map((c) => (
-            <th key={c.key} onClick={() => handleSort(c.key)}>
-              {c.label} {sortKey === c.key ? (sortDir === "asc" ? "↑" : "↓") : ""}
-            </th>
-          ))}
-          <th>Actions</th>
-        </tr>
-      </thead>
+      {/* SEARCH */}
+      <div>
+        <SearchIcon sx={{ position: 'relative', right: '-30px', top: '6px' }} />
+        <input
+          className="dt-search"
+          placeholder="Rechercher..."
+          value={search}
+          onChange={handleSearch}
+          style={{ paddingLeft: '35px' }}
+        />
+      </div>
 
-      <tbody>
-        {pageData.map((row) => (
-          <tr key={row.id}>
+      {/* TABLE */}
+      <table className="dt-table">
+        <thead>
+          <tr>
             {columns.map((c) => (
-              <td key={c.key}>{row[c.key]}</td>
+              <th key={c.key} onClick={() => handleSort(c.key)}>
+                {c.label} {sortKey === c.key ? (sortDir === "asc" ? "↑" : "↓") : ""}
+              </th>
             ))}
-
-            <td className="dt-actions-cell">
-              {onView && <button className="dt-btn-icon" onClick={() => onView(row)}>voir</button>}
-              {onEdit && <button className="dt-btn-icon" onClick={() => onEdit(row)}>modifier</button>}
-              {onDelete && <button className="dt-btn-icon" onClick={() => onDelete(row)}>supprimer</button>}
-            </td>
+            <th>Actions</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
 
-  </div>
-);
+        <tbody>
+          {pageData.length === 0 ? (
+            <tr>
+              <td colSpan={columns.length + 1} className="dt-empty">
+                Aucun résultat trouvé
+              </td>
+            </tr>
+          ) : (
+            pageData.map((row) => (
+              <tr key={row.id}>
+                {columns.map((c) => (
+                  <td key={c.key}>{row[c.key]}</td>
+                ))}
+                <td className="dt-actions-cell">
+                  {onView && (
+                    <button
+                      className="dt-btn-icon dt-btn-view"
+                      onClick={() => onView(row)}
+                      title="Voir"
+                    >
+                      <VisibilityIcon fontSize="small" />
+                    </button>
+                  )}
+                  {onEdit && (
+                    <button
+                      className="dt-btn-icon dt-btn-edit"
+                      onClick={() => onEdit(row)}
+                      title="Modifier"
+                    >
+                      <EditIcon fontSize="small" />
+                    </button>
+                  )}
+                  {onDelete && (
+                    <button
+                      className="dt-btn-icon dt-btn-delete"
+                      onClick={() => {
+                        if (window.confirm("Voulez-vous vraiment supprimer cet élément ?")) {
+                          onDelete(row);
+                        }
+                      }}
+                      title="Supprimer"
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+
+      {/* PAGINATION */}
+      {sorted.length > 0 && (
+        <div className="dt-pagination">
+          <span className="dt-pg-info">
+            {sorted.length} résultat{sorted.length !== 1 ? "s" : ""} — page {page} / {totalPages || 1}
+          </span>
+
+          <button
+            className="dt-pg-btn"
+            onClick={() => setPage(1)}
+            disabled={page === 1}
+            title="Première page"
+          >
+            <FirstPageIcon fontSize="small" />
+          </button>
+
+          <button
+            className="dt-pg-btn"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+            title="Page précédente"
+          >
+            <NavigateBeforeIcon fontSize="small" />
+          </button>
+
+          {getPageNumbers().map((p, i) =>
+            p === "..." ? (
+              <span key={`ellipsis-${i}`} className="dt-pg-ellipsis">…</span>
+            ) : (
+              <button
+                key={p}
+                className={`dt-pg-btn ${p === page ? "active" : ""}`}
+                onClick={() => setPage(p)}
+              >
+                {p}
+              </button>
+            )
+          )}
+
+          <button
+            className="dt-pg-btn"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page >= totalPages}
+            title="Page suivante"
+          >
+            <NavigateNextIcon fontSize="small" />
+          </button>
+
+          <button
+            className="dt-pg-btn"
+            onClick={() => setPage(totalPages)}
+            disabled={page >= totalPages}
+            title="Dernière page"
+          >
+            <LastPageIcon fontSize="small" />
+          </button>
+        </div>
+      )}
+
+    </div>
+  );
 }
