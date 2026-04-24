@@ -14,16 +14,10 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleLogin = () => {
-    const res = login(email, password);
-
-    if (res.success) {
-      navigate("/"); // App redirige selon rôle
-    } else {
-      setError(res.message);
-    }
-  };
-
+  const handleLogin =async (e) => {
+    e.preventDefault()
+    await login(email, password)
+  }
   return (
     <Background>
       <div className="login-container">

@@ -156,7 +156,9 @@ export default function Datatable2({
               pageData.map((row) => (
                 <tr key={row.id}>
                   {columns.map((c) => (
-                    <td key={c.key}>{row[c.key]}</td>
+                  <td key={c.key}>
+                    {c.render ? c.render(row[c.key]): row[c.key]}
+                  </td>
                   ))}
                   <td className="dt-actions-cell">
                     {onView && (

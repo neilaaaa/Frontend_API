@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./addBrevet.css"
+import {addBrevet} from "/src/features/brevets/brevetApi.js";
 
 export default function AddBrevet() {
   const navigate = useNavigate();
+  const [loading, setLoading]= useState(false)
+  const [error, setError]=useState("")
 
   const [form, setForm] = useState({
     num_brevet: "",
@@ -12,8 +15,8 @@ export default function AddBrevet() {
     date_depo: "",
     date_sortie: "",
     titulaire: "",
-    nom_inventeur: "",
-    nom_deposant: "",
+    Inventeur: "",
+    Deposant: "",
     status: "EN_ATTENTE",
     documents: [],
   });
@@ -27,25 +30,28 @@ export default function AddBrevet() {
     setForm({ ...form, documents: [...form.documents, ...files] });
   };
 
-  // ✅ SAVE LOCALSTORAGE + AJOUT LISTE
-  const handleSubmit = () => {
-    const existing = JSON.parse(localStorage.getItem("brevets")) || [];
-
-    const newBrevet = {
-      id: Date.now(),
-      ...form,
-    };
-
-    const updatedList = [...existing, newBrevet];
-
-    localStorage.setItem("brevets", JSON.stringify(updatedList));
-
-    navigate("/agent/brevets");
-  };
+    const handleSubmit = async () => {
+      setError("")
+      setLoading(true)
+      try{
+        await addBrevet({
+          ...form, // ...form "déplie" tout le contenu
+          num_brevet: Number(form.num_brevet),
+          num_depot: Number(form.num_depo),
+        })
+        navigate("/agent/brevets")
+      } catch(err){
+        console.log(err)
+        setError("Erreur lors de l'ajout du brevet.")
+      }finally{
+        setLoading(false)
+      }
+    }; 
 
   return (
     <div className="form-container">
       <h2>Ajouter Brevet</h2>
+        {error && <p style={{ color: "red" }}>{error}</p>}
 
       <div className="form-grid">
 
@@ -81,12 +87,12 @@ export default function AddBrevet() {
 
         <div className="form-group">
           <label>Inventeur</label>
-          <input name="nom_inventeur" onChange={handleChange} />
+          <input name="Inventeurs" onChange={handleChange} />
         </div>
 
         <div className="form-group">
           <label>Déposant</label>
-          <input name="nom_deposant" onChange={handleChange} />
+          <input name="Deposants" onChange={handleChange} />
         </div>
 
         <div className="form-group full-width">
@@ -113,9 +119,8 @@ export default function AddBrevet() {
       </div>
 
       <div className="form-actions">
-        {/* ✅ ICI CORRIGÉ */}
-        <button className="btn-save" onClick={handleSubmit}>
-          Enregistrer
+        <button className="btn-save" onClick={handleSubmit} disabled={loading} >
+          {loading ? "Enregistrement..." : "Enregistrer"}
         </button>
 
         <button

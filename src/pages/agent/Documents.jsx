@@ -2,70 +2,53 @@ import { useEffect, useState } from "react";
 import Datatable2 from "../../components/Datatable2";
 import DocumentForm from "./DocumentForm";
 import "./documents.css";
+import { getDocuments, deleteDocument, addDocument, updateDocument } from "../../features/documents/documentApi";
+import { useNavigate } from "react-router-dom";
 
 export default function AgentDocuments() {
+  const navigate = useNavigate();
   const [data, setData] = useState([]);
+  const [error, setError]=useState([]);
+  const [loading, setLoading] = useState([]);
   const [editDoc, setEditDoc] = useState(null);
-  const [viewDoc, setViewDoc] = useState(null);
 
-  useEffect(() => {
-    setData([
-      {
-        id: 1,
-        nom_document: "Mémoire descriptif",
-        type_document: "Mémoire descriptif",
-        brevet_lie: "Brevet FR-2024-001",
-        categorie: "brevet",
-        description: "Description technique complète du brevet",
-        fichier: "memoire_001.pdf",
-        date_ajout: "2024-01-15",
-      },
-      {
-        id: 2,
-        nom_document: "Reçu paiement",
-        type_document: "Reçu paiement",
-        brevet_lie: "Brevet FR-2024-001",
-        categorie: "paiement",
-        description: "Reçu du paiement des taxes",
-        fichier: "recu_001.pdf",
-        date_ajout: "2024-01-20",
-      },
-      {
-        id: 3,
-        nom_document: "Formulaire demande",
-        type_document: "Demande brevet",
-        brevet_lie: "Brevet FR-2024-002",
-        categorie: "demande",
-        description: "Formulaire officiel de demande de brevet",
-        fichier: "demande_002.pdf",
-        date_ajout: "2024-02-10",
-      },
-      {
-        id: 4,
-        nom_document: "Recours administratif",
-        type_document: "Recours",
-        brevet_lie: "Brevet FR-2024-002",
-        categorie: "recours",
-        description: "Document de recours suite au refus",
-        fichier: "recours_002.pdf",
-        date_ajout: "2024-03-01",
-      },
-    ]);
-  }, []);
-
-  const handleSubmit = (doc) => {
-    if (editDoc) {
-      setData((prev) => prev.map((d) => (d.id === editDoc.id ? doc : d)));
-      setEditDoc(null);
-    } else {
-      // doc peut être un seul objet ou plusieurs (ajout multiple)
-      if (Array.isArray(doc)) {
-        setData((prev) => [...prev, ...doc]);
-      } else {
-        setData((prev) => [...prev, doc]);
-      }
+  const load = async () =>{
+    try{
+      setLoading("true");
+      setError("");
+      const res = await getDocuments;
+      setData (res.data.results);  
+    } catch{
+      setError("Erreur chargement des brevets");
+    } finally{
+      setLoading(false);
     }
-  };
+  }
+ 
+
+
+  const handleSubmit = async (doc) => {
+      setError("")
+      setLoading(true)
+      try{
+       if (editDoc) {
+       await updateDocument(editDoc.id, doc)
+       setEditDoc(null)
+       } else {
+        if (Array.isArray(doc)){
+         for (const t of doc){ await addDocument(t)}; 
+        } else {
+        await addDocument(doc);
+        }
+      }
+        await load()
+     }catch{
+      setError("Erreur chargement des brevets");
+    } finally{
+      setLoading(false);
+    }
+
+     }
 
   return (
     <>
@@ -75,8 +58,9 @@ export default function AgentDocuments() {
         data={data}
         columns={[
           { key: "nom_document", label: "Nom document" },
-          { key: "type_document", label: "Type" },
-          { key: "brevet_lie", label: "Brevet lié" },
+          { key: "id_type", label: "Type",
+             render:(value)=> Array.isArray(value)
+             ? value.map(i => `${i.nom_type}`).join(", "): "Aucun" , },
           { key: "categorie", label: "Catégorie" },
           { key: "date_ajout", label: "Date ajout" },
         ]}
@@ -89,7 +73,7 @@ export default function AgentDocuments() {
           />
         }
         onEdit={(row) => setEditDoc(row)}
-        onDelete={(row) => setData((prev) => prev.filter((d) => d.id !== row.id))}
+        onDelete={(row) => setData((prev) => prev.filter((d) => d.id_document !== row.id_document))}
         onView={(row) => setViewDoc(row)}
       />
 

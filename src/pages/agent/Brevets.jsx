@@ -5,41 +5,61 @@ import DataTable from "../../components/Datatable";
 import {
   getBrevets,
   deleteBrevet,
-} from "../../features/brevets/brevetStorage";
+} from "../../features/brevets/brevetApi";
 
 export default function Brevets() {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError]= useState("");
 
-  const load = () => {
-    setData(getBrevets());
+  const load = async () => {
+    try{
+      setLoading(true);
+      setError("");
+      const response = await getBrevets();
+      setData(response.results || response);
+      console.log(data)
+      console.log(response)
+    } catch{
+      setError("Erreur chargement des brevets");
+    } finally{
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     load();
   }, []);
 
-  const handleDelete = (row) => {
-    deleteBrevet(row.id);
-    load();
+  const handleDelete = async (row) => {
+    try{
+      await deleteBrevet(row.id_brevet);
+      load();
+    } catch{
+      setError("Erreur suppression")
+    }
   };
+
+  if (loading) return <p>Chargement...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
     <DataTable
-      title="List des brevets"
+      title="Liste des brevets"
       data={data}
       columns={[
   { key: "num_brevet", label: "N° Brevet" },
   { key: "titre", label: "Titre" },
-  { key: "num_depo", label: "N° Dépôt" },
   { key: "date_depo", label: "Date dépôt" },
   { key: "date_sortie", label: "Date sortie" },
   { key: "titulaire", label: "Titulaire" },
-  { key: "nom_inventeur", label: "Inventeur" },
-  { key: "nom_deposant", label: "Déposant" },
-  { key: "status", label: "Statut" },
-
-  // ✅ NOUVELLE COLONNE DOCUMENTS
+  { key: "id_inv", label: "Inventeurs", 
+    render:(value)=> Array.isArray(value)
+        ? value.map(i => `${i.nom_inv} ${i.prenom_inv}`).join(", ")
+        : "Aucun" ,
+    pdfFormat: (val) => Array.isArray(val)? val.map(i => `${i.nom_inv} ${i.prenom_inv}`).join(", ") : "Aucun"},
+  { key: "statut", label: "Statut" },
   {
     key: "documents",
     label: "Documents",
@@ -47,11 +67,12 @@ export default function Brevets() {
       value && value.length > 0
         ? value.join(", ")
         : "Aucun",
+    pdfExclude: true
   },
 ]}
       onAdd={() => navigate("/agent/brevets/add")}
-      onEdit={(row) => navigate(`/agent/brevets/edit/${row.id}`)}
-      onView={(row) => navigate(`/agent/brevets/view/${row.id}`)}
+      onEdit={(row) => navigate(`/agent/brevets/edit/${row.id_brevet}`)}
+      onView={(row) => navigate(`/agent/brevets/view/${row.id_brevet}`)}
       onDelete={handleDelete}
     />
   );

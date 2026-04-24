@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./editBrevet.css"
-import { getBrevetById, updateBrevet } from "../../features/brevets/brevetStorage";
+import { updateBrevet, getBrevetById } from "../../features/brevets/brevetApi";
+import Brevets from "./Brevets";
 
 export default function EditBrevet() {
   const { id } = useParams();
@@ -9,9 +10,24 @@ export default function EditBrevet() {
 
   const [form, setForm] = useState(null);
 
+  const [loading, setLoading] = useState(true)
+  const [error, setError]=useState()
+
   useEffect(() => {
-    const data = getBrevetById(id);
-    setForm(data);
+    const fetchBrevet = async () => {
+      try{
+        setLoading(true)
+        const data = await getBrevetById(id)
+        setForm(data)
+      } catch{
+        console.log(err)
+        console.log(err.response)
+        setError("brevet Introuvable !")
+      } finally{
+        setLoading(false)
+      }
+    }
+    fetchBrevet()
   }, [id]);
 
   const handleChange = (e) => {
@@ -23,7 +39,22 @@ export default function EditBrevet() {
     setForm({ ...form, documents: [...(form.documents || []), ...files] });
   };
 
-  if (!form) return <p>Loading...</p>;
+  const handleSubmit = async () =>{
+    try {
+      await updateBrevet(id, {
+        ...form,
+        num_brevet: Number(form.num_brevet),
+        num_depo: Number(form.num_depo),
+      })
+      navigate("/agent/brevets")
+    }catch{
+      setError("brevet Introuvable !")
+  }
+}
+
+  if (loading) return <p>Chargement...</p>
+  if (error)   return <p style={{ color: "red" }}>{error}</p>
+  if (!form)   return <p>Brevet introuvable</p>
 
   return (
     <div className="edit-container">
@@ -33,28 +64,28 @@ export default function EditBrevet() {
   <div className="edit-form">
 
     <label>Num brevet</label>
-    <input name="num_brevet" value={form.num_brevet} onChange={handleChange} />
+    <input name="num_brevet" value={form.num_brevet ?? ""} onChange={handleChange} />
 
     <label>Titre</label>
-    <input name="titre" value={form.titre} onChange={handleChange} />
+    <input name="titre" value={form.titre ?? ""} onChange={handleChange} />
 
     <label>Num dépôt</label>
-    <input name="num_depo" value={form.num_depo} onChange={handleChange} />
+    <input name="num_depo" value={form.num_depo ?? ""} onChange={handleChange} />
 
     <label>Date dépôt</label>
-    <input type="date" name="date_depo" value={form.date_depo} onChange={handleChange} />
+    <input type="date" name="date_depo" value={form.date_depo ?? ""} onChange={handleChange} />
 
     <label>Date sortie</label>
-    <input type="date" name="date_sortie" value={form.date_sortie} onChange={handleChange} />
+    <input type="date" name="date_sortie" value={form.date_sortie ?? ""} onChange={handleChange} />
 
     <label>Titulaire</label>
-    <input name="titulaire" value={form.titulaire} onChange={handleChange} />
+    <input name="titulaire" value={form.titulaire ?? ""} onChange={handleChange} />
 
     <label>Inventeur</label>
-    <input name="nom_inventeur" value={form.nom_inventeur} onChange={handleChange} />
+    <input name="nom_inventeur" value={form.nom_inv} onChange={handleChange} />
 
     <label>Déposant</label>
-    <input name="nom_deposant" value={form.nom_deposant} onChange={handleChange} />
+    <input name="nom_deposant" value={form.nom_dep} onChange={handleChange} />
 
     <label>Status</label>
     <select name="status" value={form.status} onChange={handleChange}>

@@ -74,12 +74,16 @@ export default function DataTable({
 
   // EXPORT PDF
   const exportPDF = () => {
+    const pdfColumns = columns.filter((c) => !c.pdfExclude)
     const doc = new jsPDF();
     doc.text(title, 10, 10);
     autoTable(doc, {
-      head: [columns.map((c) => c.label)],
-      body: sorted.map((row) => columns.map((c) => row[c.key])),
-    });
+      head: [pdfColumns.map((c) => c.label)],
+      body: sorted.map(
+        (row) => pdfColumns.map((c) =>{ 
+          const value = row[c.key]
+          return c.pdfFormat ? c.pdfFormat(value):(value ?? "")})
+      ),});
     doc.save(`${exportName}.pdf`);
   };
 
@@ -142,9 +146,11 @@ export default function DataTable({
             </tr>
           ) : (
             pageData.map((row) => (
-              <tr key={row.id}>
+              <tr key={row.id_brevet}>
                 {columns.map((c) => (
-                  <td key={c.key}>{row[c.key]}</td>
+                  <td key={c.key}>
+                    {c.render ? c.render(row[c.key]): row[c.key]}
+                  </td>
                 ))}
                 <td className="dt-actions-cell">
                   {onView && (

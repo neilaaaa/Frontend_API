@@ -1,18 +1,33 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getBrevetById } from "../../features/brevets/brevetStorage";
+import { getBrevetById} from "../../features/brevets/brevetApi";
 import "./viewBrevet.css"
 
 export default function ViewBrevet() {
-  const { id } = useParams();
+  const { id } = useParams() 
   const navigate = useNavigate();
-  const [data, setData] = useState(null);
+  const [data, setData] = useState(null)   // pour stocker le brevet
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
 
   useEffect(() => {
-    setData(getBrevetById(id));
+   const fetch = async () =>{
+    try{
+      const brevet = await getBrevetById(id)
+      setData(brevet)
+      console.log(brevet)
+    } catch{
+      setError("brevet Introuvable !")
+    } finally{
+      setLoading(false);
+    }
+   }
+    fetch()
   }, [id]);
 
-  if (!data) return <p>Loading...</p>;
+  if(loading) return <p> Loading </p>
+  if (error)   return <p style={{ color: "red" }}>{error}</p>
+  if (!data) return <p>Brevet Introuvable</p>;
 
   return (
     <div className="view-container">
@@ -25,9 +40,9 @@ export default function ViewBrevet() {
     <p><b>Date dépôt:</b> {data.date_depo}</p>
     <p><b>Date sortie:</b> {data.date_sortie}</p>
     <p><b>Titulaire:</b> {data.titulaire}</p>
-    <p><b>Inventeur:</b> {data.nom_inventeur}</p>
-    <p><b>Déposant:</b> {data.nom_deposant}</p>
-    <p><b>Status:</b> {data.status}</p>
+    <p><b>Déposant:</b> {data.id_dep?.nom_dep}</p>
+    <p><b>Inventeurs:</b> {data.id_inv?.map(inv=>inv.nom_inv).join(", ")}</p>
+    <p><b>Status:</b> {data.statut}</p>
   </div>
 
   <div className="view-docs">
