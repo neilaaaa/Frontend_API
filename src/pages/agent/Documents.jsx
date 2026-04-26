@@ -8,25 +8,28 @@ import { useNavigate } from "react-router-dom";
 export default function AgentDocuments() {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
-  const [error, setError]=useState([]);
-  const [loading, setLoading] = useState([]);
+  const [error, setError]=useState("");
+  const [loading, setLoading] = useState(false);
   const [editDoc, setEditDoc] = useState(null);
+  const [viewDoc, setViewDoc] = useState(null);
 
   const load = async () =>{
     try{
-      setLoading("true");
+      setLoading(true);
       setError("");
-      const res = await getDocuments;
-      setData (res.data.results);  
+      const res = await getDocuments();
+      setData (res.results || res);  
     } catch{
-      setError("Erreur chargement des brevets");
+      setError("Erreur de chargement des documents");
     } finally{
       setLoading(false);
     }
   }
+
+  useEffect(()=>{
+    load()
+  }, [])
  
-
-
   const handleSubmit = async (doc) => {
       setError("")
       setLoading(true)
@@ -43,12 +46,24 @@ export default function AgentDocuments() {
       }
         await load()
      }catch{
-      setError("Erreur chargement des brevets");
+      setError("Erreur d'enregitrement");
     } finally{
       setLoading(false);
     }
 
      }
+
+    const handleDelete = async (row) =>{
+      try{
+        await deleteDocument(row.id_document)
+        await load()
+      }catch{
+      setError("Erreur de suppression");
+    }
+    }
+
+    if (loading) return <p>Loading...</p>
+    if (error) return <p style={{ color: "red" }}>{error}</p>
 
   return (
     <>
@@ -66,14 +81,14 @@ export default function AgentDocuments() {
         ]}
         form={
           <DocumentForm
-            key={editDoc ? editDoc.id : "new"}
+            key={editDoc ? editDoc.id_document : "new"}
             editData={editDoc}
             onSubmit={handleSubmit}
             onCancel={() => setEditDoc(null)}
           />
         }
         onEdit={(row) => setEditDoc(row)}
-        onDelete={(row) => setData((prev) => prev.filter((d) => d.id_document !== row.id_document))}
+        onDelete= {handleDelete}
         onView={(row) => setViewDoc(row)}
       />
 
@@ -89,7 +104,7 @@ export default function AgentDocuments() {
 }
 
 function ViewDocumentModal({ doc, allDocuments, onClose }) {
-  const docsLies = allDocuments.filter((d) => d.brevet_lie === doc.brevet_lie);
+  const docsLies = allDocuments.filter((d) => d.id_brevet === doc.brevet_brevet);
 
   const handleDownload = (fichier) => {
   if (fichier instanceof File) {

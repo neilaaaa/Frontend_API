@@ -98,9 +98,9 @@ export default function EditBrevet() {
     <input type="file" multiple onChange={handleFile} />
 
     <ul className="edit-docs">
-      {form.documents?.map((doc, i) => (
-        <li key={i}>{doc}</li>
-      ))}
+      {form.documents ?.map(value.map(d => d.fichier). join(", ")
+         
+      )}
     </ul>
 
     <div className="edit-actions">

@@ -61,11 +61,11 @@ export default function Brevets() {
     pdfFormat: (val) => Array.isArray(val)? val.map(i => `${i.nom_inv} ${i.prenom_inv}`).join(", ") : "Aucun"},
   { key: "statut", label: "Statut" },
   {
-    key: "documents",
+    key: "id_document",
     label: "Documents",
     render: (value) =>
-      value && value.length > 0
-        ? value.join(", ")
+      Array.isArray(value) && value.length > 0 
+        ? value.map(d => d.nom_document). join(", ")
         : "Aucun",
     pdfExclude: true
   },
