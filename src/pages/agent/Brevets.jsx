@@ -68,8 +68,8 @@ export default function Brevets() {
         {value?.length > 0 ? `${value.length} document(s)` : "Ajouter document"}
       </button> 
         
-    ),
-    pdfExclude: true   
+    ), pdfExclude: true
+     
   },
 ]}
       onAdd={() => navigate("/agent/brevets/add")}

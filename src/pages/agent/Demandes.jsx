@@ -1,17 +1,16 @@
 import { useState, useEffect } from "react";
 import "./Demandes.css";
-
+import { getDemandeBrevets, addDemandeBrevet, updateDemandeBrevet, deleteDemandeBrevet } from "../../features/demande/apiDemande";
 /* ─── MUI Icons ────────────────────────────────────────────────────────── */
 import SearchIcon   from "@mui/icons-material/Search";
 import EditIcon     from "@mui/icons-material/Edit";
 import PrintIcon    from "@mui/icons-material/Print";
 import DownloadIcon from "@mui/icons-material/Download";
 import DeleteIcon   from "@mui/icons-material/Delete";
+import {api} from "/src/contexts/AuthContext.jsx";
 
 /* ─── Storage ──────────────────────────────────────────────────────────── */
-const KEY      = "agent_demandes";
-const loadData = () => JSON.parse(localStorage.getItem(KEY) || "[]");
-const saveData = (l) => localStorage.setItem(KEY, JSON.stringify(l));
+
 
 /* ─── Empty form ───────────────────────────────────────────────────────── */
 const EMPTY = {
@@ -20,7 +19,7 @@ const EMPTY = {
   deposant_adresse: "", deposant_nationalite: "",
   inventeur_nom: "", inventeur_prenom: "", inventeur_adresse: "",
   titre: "",
-  priorite_num_depot: "", priorite_date: "", priorite_pays: "", priorite_nature: "",
+  num_depot: "", priorite_date: "", priorite_pays: "", priorite_nature: "",
   mandataire_nom: "", mandataire_prenom: "", mandataire_adresse: "", mandataire_date_pouvoir: "",
   brevet_principal_num: "", brevet_principal_date: "",
   autres_informations: "",
@@ -37,29 +36,34 @@ const chk = (v) => (v === true || v === "true" ? "&#9745;" : "&#9744;");
 
 /* ─── Build & open print HTML ──────────────────────────────────────────── */
 function buildAndOpen(demande, mode) {
-  const f = demande.data || {};
-
+  const f = demande;
+  console.log("DEMANDE:", demande);
+  
   const nBrevet     = chk(f.nature_brevet);
   const nPct        = chk(f.nature_pct);
   const nCertificat = chk(f.nature_certificat);
 
-  const depNom   = g(f, "deposant_nom");
-  const depPren  = g(f, "deposant_prenom");
-  const depDenom = g(f, "deposant_denomination");
-  const depAdr   = br(f.deposant_adresse);
-  const depNat   = g(f, "deposant_nationalite");
+  const deposant = f.deposant?.[0] || {};
+  const depNom   = g(deposant, "nom_dep");
+  const depPren  = g(deposant, "prenom_dep");
+  const depDenom = g(deposant, "denomination");
+  const depAdr   = br(deposant.adresse_dep);
+  const depNat   = g(deposant, "nationalite");
 
-  const invNom  = g(f, "inventeur_nom");
-  const invPren = g(f, "inventeur_prenom");
-  const invAdr  = br(f.inventeur_adresse);
+  const invBlock = (f.inventeur || [])
+    .map(inv => {
+      const nom = g(inv, "nom_inv");
+      const prenom = g(inv, "prenom_inv");
+      const adr = br(inv.adress);
+      return [nom, prenom].filter(Boolean).join(" ") + (adr ? "<br/>" + adr : "");
+    })
+    .join("<br/><br/>");
 
   const titre      = g(f, "titre");
-  const mandNom    = g(f, "mandataire_nom");
-  const mandPren   = g(f, "mandataire_prenom");
-  const mandAdr    = br(f.mandataire_adresse);
+  const mandataire = br(f.mandataire);
   const mandDate   = g(f, "mandataire_date_pouvoir");
-  const bretNum    = g(f, "brevet_principal_num");
-  const bretDate   = g(f, "brevet_principal_date");
+  const bretNum    = g(f.brevet||{}, "num_brevet");
+  const bretDate   = g(f.brevet||{}, "brevet_principal_date");
   const autresInfo = br(f.autres_informations);
 
   const pCI  = chk(f.piece_copie_int);
@@ -77,10 +81,8 @@ function buildAndOpen(demande, mode) {
   const dep1  = [depNom, depPren].filter(Boolean).join(" ");
   const dep2  = depDenom ? "<br/>" + depDenom : "";
   const dep3  = depAdr   ? "<br/>" + depAdr   : "";
-  const inv1  = [invNom, invPren].filter(Boolean).join(" ");
-  const inv2  = invAdr ? "<br/>" + invAdr : "";
-  const mand1 = [mandNom, mandPren].filter(Boolean).join(" ");
-  const mand2 = mandAdr ? "<br/>" + mandAdr : "";
+  const mand1 = mandataire ;
+  const mand2 = ""
 
   const html = `<!DOCTYPE html>
 <html lang="fr">
@@ -100,8 +102,8 @@ body{font-family:"Times New Roman",Times,serif;font-size:10pt;color:#000;backgro
 .hl{width:33%;text-align:left}.hm{width:34%;text-align:center;vertical-align:middle}.hr{width:33%;text-align:right}
 .arabic{font-family:Arial,sans-serif;font-size:8.5pt;direction:rtl;line-height:1.5}
 .inst{font-size:7.5pt;font-weight:bold;line-height:1.4}
-.logo{display:inline-block;border:3px solid #000;padding:2px 10px;font-size:18pt;font-weight:900;font-family:Arial,sans-serif;letter-spacing:-1px}
-.logoi{font-style:italic;font-weight:400}
+.logo{display:inline-block; border:3px solid #000;padding:1px 40px;font-size:18pt;font-weight:900;font-family:Arial,sans-serif;letter-spacing:-1px}
+.img{width:50px;height:50px;object-fit:contain}
 .ref{position:absolute;top:1.4cm;right:1.7cm;font-size:7.5pt;text-align:right;line-height:1.5}
 .nat{border:2.5px solid #000;margin:8px 0 7px}
 .nat-t{text-align:center;font-size:13pt;font-weight:bold;padding:5px 8px;border-bottom:1.5px solid #000}
@@ -150,10 +152,9 @@ body{font-family:"Times New Roman",Times,serif;font-size:10pt;color:#000;backgro
   <button onclick="window.print()">🖨&nbsp; Imprimer / Enregistrer PDF</button>
 </div>
 <div class="page">
-  <div class="ref">R2-FO-03<br/>E1</div>
   <table class="hdr"><tr>
     <td class="hl"><div class="arabic">المعهد الوطني الجزائري للملكية الصناعية</div><div class="inst">INSTITUT NATIONAL ALGÉRIEN</div><div class="inst">DE LA PROPRIÉTÉ INDUSTRIELLE</div></td>
-    <td class="hm"><div class="logo"><span class="logoi">in</span>&thinsp;pi</div><div style="font-size:6pt;margin-top:3px;font-family:Arial,sans-serif">Institut National Algérien de la Propriété Industrielle</div></td>
+    <td class="hm"><div class="logo"><img class="img" src="/logoinapii.png" alt="INAPI Logo"/></div></td>
     <td class="hr"><div class="arabic">الجمهورية الجزائرية الديمقراطية الشعبية</div><div class="inst">RÉPUBLIQUE ALGÉRIENNE</div><div class="inst">DÉMOCRATIQUE ET POPULAIRE</div></td>
   </tr></table>
   <div class="nat">
@@ -165,7 +166,7 @@ body{font-family:"Times New Roman",Times,serif;font-size:10pt;color:#000;backgro
     </tr></table>
   </div>
   <div class="fb"><div class="ft">[71] - DÉPOSANT(S) : <em>Nom, Prénom [dénomination], et Adresse complète</em></div><div class="fv" style="min-height:58px">${dep1}${dep2}${dep3}</div><div class="ff">Nationalité du ou des déposants : ${depNat}</div></div>
-  <div class="fb"><div class="ft">[72] - INVENTEUR(S) : <em>Nom, Prénom, Adresse</em></div><div class="fv" style="min-height:58px">${inv1}${inv2}</div></div>
+  <div class="fb"><div class="ft">[72] - INVENTEUR(S) : <em>Nom, Prénom, Adresse</em></div><div class="fv" style="min-height:58px">${invBlock }</div></div>
   <div class="fb"><div class="ft">[54] - TITRE DE L'INVENTION :</div><div class="fv" style="min-height:42px">${titre}</div></div>
   <div class="pb"><div class="ft">[30] – REVENDICATION DE PRIORITÉ (S)</div>
     <table class="pt"><thead><tr><th>[31] - N°(s) de dépôt</th><th>[32] - date(s)</th><th>[33] - pays d'origine</th><th>Nature de la demande</th></tr></thead>
@@ -208,6 +209,13 @@ body{font-family:"Times New Roman",Times,serif;font-size:10pt;color:#000;backgro
 </body>
 </html>`;
 
+  const win = window.open("", "_blank");
+  win.document.write(html);
+  win.document.close();
+  win.print();
+  console.log("Inventeurs:", f.inventeur);
+  console.log( f);
+
   const blob = new Blob([html], { type: "text/html;charset=utf-8" });
   const url  = URL.createObjectURL(blob);
 
@@ -232,7 +240,17 @@ export default function AgentDemandes() {
   const [form, setForm]           = useState({ ...EMPTY });
   const [search, setSearch]       = useState("");
 
-  useEffect(() => setDemandes(loadData()), []);
+  const load = async () =>{
+    try{
+      const res = await getDemandeBrevets();
+      setDemandes(res.results ?? res);
+    } catch{
+      console.log("Erreur de chergement des demandes")
+    }
+  }
+  useEffect(() => {
+    load();
+  }, []);
 
   const setField = (e) => {
     const { name, value, type, checked } = e.target;
@@ -240,50 +258,120 @@ export default function AgentDemandes() {
   };
 
   const openAdd  = () => { setEditId(null); setForm({ ...EMPTY }); setShowModal(true); };
-  const openEdit = (d) => { setEditId(d.id); setForm({ ...EMPTY, ...d.data }); setShowModal(true); };
+  const openEdit = (d) => { setEditId(d.id_demande); setForm({ ...EMPTY, 
+    nature_brevet: d.nature === "Brevet d'invention",
+    nature_pct: d.nature === "Extension PCT",
+    nature_certificat: d.nature === "Certificat d'addition",
+    titre: d.titre || "",
+    num_depot: d.num_depo || "",
+    priorite_date: d.date_depo || "",
+    priorite_pays: d.pays_origine || "",
+    brevet_principal_num: d.numdemande_CA || "",
+    brevet_principal_date: d.date_CA || "",
+    mandataire_nom: d.mandataire || "",
+    mandataire_date_pouvoir: d.date_pouvoir || "",
+    autres_informations: d.autre_info || "",
+    prepose_reception: d.prepose_reception || "",
+    lieu_reception: d.lieu_reception || "",
+    date_reception: d.date_reception || "",
 
-  const handleSave = () => {
+    deposant_nom:           d.deposant?.[0]?.nom_dep || "",
+    deposant_prenom:        d.deposant?.[0]?.prenom_dep || "",
+    deposant_denomination:  d.deposant?.[0]?.denomination || "",
+    deposant_adresse:       d.deposant?.[0]?.adresse_dep || "",
+    deposant_nationalite:   d.deposant?.[0]?.nationalite || "",
+  }); setShowModal(true); };
+
+  const handleSave = async () => {
+    console.log("handle save")
+    console.log("form:", form)
     const natureLbl = form.nature_brevet ? "Brevet d'invention"
       : form.nature_pct ? "Extension PCT"
       : form.nature_certificat ? "Certificat d'addition" : "—";
+     console.log("brevet", natureLbl)
 
+      const payload = {
+     titre:             form.titre || "—",
+     nature:            natureLbl,
+     num_depo:          Number(form.priorite_num_depot) || 0,
+     date_depo:         form.priorite_date || null,
+     pays_origine:      form.priorite_pays || "",
+     numdemande_CA:     Number(form.brevet_principal_num) || 0,
+     date_CA:           form.brevet_principal_date || null,
+     mandataire:        [form.mandataire_nom, form.mandataire_prenom].filter(Boolean).join(" "),
+     date_pouvoir:      form.mandataire_date_pouvoir || null,
+     autre_info:        form.autres_informations || "",
+     statut:            "non_valider",
+  };
+   console.log("payload:", payload)
+
+    try{
+      console.log("6 - dans le try")
     if (editId !== null) {
-      const updated = demandes.map((d) =>
-        d.id !== editId ? d : {
-          ...d,
-          deposant: [form.deposant_nom, form.deposant_prenom].filter(Boolean).join(" ") || form.deposant_denomination || d.deposant,
-          titre:    form.titre || d.titre,
-          nature:   natureLbl,
-          data:     { ...form },
-        }
-      );
-      saveData(updated); setDemandes(updated);
-    } else {
-      const nd = {
-        id:       Date.now(),
-        deposant: [form.deposant_nom, form.deposant_prenom].filter(Boolean).join(" ") || form.deposant_denomination || "—",
-        titre:    form.titre || "—",
-        nature:   natureLbl,
-        statut:   "EN_ATTENTE",
-        date:     new Date().toLocaleDateString("fr-DZ"),
-        data:     { ...form },
-      };
-      const updated = [nd, ...demandes];
-      saveData(updated); setDemandes(updated);
+      console.log("7 - mode édition")
+      await updateDemandeBrevet(editId, payload);
+      console.log("editID: ", editId)
+
+      const demandeActuelle = demandes.find(d=> d.id_demande ==editId)
+      const deposantExistant = demandeActuelle?.deposant?.[0]
+
+      if (deposantExistant){
+       await api.patch(`deposants/${deposantExistant.id_dep}/`, {
+       nom_dep:      form.deposant_nom,
+       prenom_dep:   form.deposant_prenom,
+       denomination: form.deposant_denomination,
+       adresse_dep:  form.deposant_adresse,
+       nationalite:  form.deposant_nationalite,
+    })
+  } else {
+    // ← pas de déposant → on en crée un
+    await api.post("deposants/", {
+      nom_dep:      form.deposant_nom,
+      prenom_dep:   form.deposant_prenom,
+      denomination: form.deposant_denomination,
+      adresse_dep:  form.deposant_adresse,
+      nationalite:  form.deposant_nationalite,
+      id_demande:   editId
+    })
+    }} else {
+       console.log("7 - mode ajout")
+      const nouvelleDemande =await addDemandeBrevet(payload)
+      console.log("demande cree:", nouvelleDemande)
+      
+      await api.post("deposants/",{
+        nom_dep: form.deposant_nom,
+        prenom_dep: form.deposant_prenom,
+        denomination: form.deposant_denomination,
+        adresse_dep: form.deposant_adresse,
+        nationalite: form.deposant_nationalite,
+        id_demande: nouvelleDemande.id_demande, // Associer le déposant à la demande créée 
+      })
+      console.log("deposant cree")
+    } await load()
+     setShowModal(false)
+    } catch (err){
+      console.log("ERREUR: ",err)
+      console.log("ERREUR response: ", err.response?.data)
     }
-    setShowModal(false);
+  }
+
+  const handleDelete = async (id) => {
+   if (!window.confirm ("Etes-vous sûr de vouloir supprimer cette demande ?")) return
+   try{
+    await deleteDemandeBrevet(id)
+    await load()
+   } catch{
+    console.log("Erreur de suppression")
+   }
   };
 
-  const handleDelete = (id) => {
-    if (!window.confirm("Supprimer cette demande ?")) return;
-    const u = demandes.filter((d) => d.id !== id);
-    saveData(u); setDemandes(u);
-  };
-
-  const filtered = demandes.filter((d) =>
-    [d.deposant, d.titre, d.nature]
+  const filtered = demandes.filter((d) =>{
+    const deposantStr = Array.isArray(d.deposant)
+    ? d.deposant.map(dep => `${dep.nom_dep} ${dep.prenom_dep}`).join(" ")
+    : ""
+    return [deposantStr, d.titre, d.nature]
       .some((v) => (v || "").toLowerCase().includes(search.toLowerCase()))
-  );
+});
 
   const badgeCls = (s) =>
     s === "ACCEPTER" ? "badge green" : s === "REFUSER" ? "badge red" : "badge orange";
@@ -295,7 +383,6 @@ export default function AgentDemandes() {
         <div className="dem-header">
           <div>
             <h2 className="dem-title">Demandes de Protection</h2>
-            <p className="dem-sub">Gestion des demandes de brevets — INAPI</p>
           </div>
           <button className="dem-add-btn" onClick={openAdd}>+ Ajouter une demande</button>
         </div>
@@ -347,9 +434,9 @@ export default function AgentDemandes() {
                   </tr>
                 ) : (
                   filtered.map((d) => (
-                    <tr key={d.id}>
-                      <td>{d.date}</td>
-                      <td>{d.deposant}</td>
+                    <tr key={d.id_demande}>
+                      <td>{d.date_CA}</td>
+                      <td>{Array.isArray(d.deposant) ? d.deposant.map(dep => `${dep.nom_dep} ${dep.prenom_dep}`).join(", ") :  "—"}</td>
                       <td className="dem-titre-cell">{d.titre}</td>
                       <td>{d.nature}</td>
                       <td><span className={badgeCls(d.statut)}>{d.statut}</span></td>
@@ -425,6 +512,14 @@ export default function AgentDemandes() {
                 <div className="modal-grid">
                   <F label="Titre complet" name="titre" value={form.titre} onChange={setField} full area />
                 </div>
+              </Sec>
+
+              <Sec num="30" label="[30] — REVENDICATION DE PRIORITÉ">
+               <div className="modal-grid">
+                <F label="Date de dépôt"  name="priorite_date" value={form.priorite_date} onChange={setField} type="date" />
+                <F label="Numero de dépôt" name="Numero de dépôt"  value={form.Numero_de_dépôt}  onChange={setField} />
+                <F label="Pays d'origine" name="priorite_pays"  value={form.priorite_pays}  onChange={setField} />
+               </div>
               </Sec>
 
               <Sec num="+" label="Certificat d'addition — Brevet principal">
@@ -518,3 +613,5 @@ function CL({ name, checked, onChange, label }) {
     </label>
   );
 }
+
+//bon j'ai l'imprimé de demande brevets qui s'affiche que le deposant titre de l'invention et le mandataire, sachant que je veut d'autres champs comme inventeur mais ca ne veut pas s'afficher et la tabe 
