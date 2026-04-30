@@ -14,6 +14,8 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* ─── Card ───────────────────────────────────────────────── */
@@ -27,6 +29,7 @@
     0 4px 6px rgba(234,97,19,.05),
     0 12px 32px rgba(0,0,0,.08);
   border: 1px solid #f0e0cc;
+  min-width: 0;
 }
 
 /* ─── Title ──────────────────────────────────────────────── */
@@ -44,8 +47,9 @@
 /* ─── Grid ───────────────────────────────────────────────── */
 .brevet-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
+  min-width: 0;
 }
 
 /* ─── Form group ─────────────────────────────────────────── */
@@ -68,9 +72,22 @@
   letter-spacing: .5px;
 }
 
+.brevet-grid > label {
+  align-self: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #a0826d;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
 /* ─── Input / Select ─────────────────────────────────────── */
 .form-group input,
-.form-group select {
+.form-group select,
+.brevet-grid > input,
+.brevet-grid > select {
+  width: 100%;
+  min-width: 0;
   padding: 10px 13px;
   border-radius: 10px;
   border: 1.5px solid #f0ddd0 !important;
@@ -83,7 +100,9 @@
 }
 
 .form-group input:focus,
-.form-group select:focus {
+.form-group select:focus,
+.brevet-grid > input:focus,
+.brevet-grid > select:focus {
   border-color: #F88F22 !important;
   background: #fff !important;
   box-shadow: 0 0 0 3px rgba(248,143,34,0.18) !important;
@@ -136,6 +155,8 @@
   color: #EA6113;
   border: 1px solid #ffd7b3;
   font-weight: 500;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .doc-item::before {
@@ -208,3 +229,49 @@
 }
 
 .btn-cancel:hover { background: #fdf5ec !important; }
+
+@media (max-width: 768px) {
+  .brevet-page {
+    min-height: auto;
+    padding: 16px;
+  }
+
+  .brevet-card {
+    padding: 24px 20px;
+    border-radius: 16px;
+  }
+
+  .brevet-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .brevet-grid > label {
+    margin-bottom: -10px;
+  }
+
+  .form-group.full-width,
+  .brevet-section-label {
+    grid-column: span 1;
+  }
+
+  .brevet-actions,
+  .container_btn {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 420px) {
+  .brevet-page {
+    padding: 10px;
+  }
+
+  .brevet-card {
+    padding: 18px 14px;
+    border-radius: 14px;
+  }
+
+  .brevet-title {
+    font-size: 17px;
+  }
+}

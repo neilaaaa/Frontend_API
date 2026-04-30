@@ -16,6 +16,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  min-width: 0;
 }
 
 .fichier-nom {
@@ -67,17 +68,19 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  padding: 20px;
 }
 
 .modal-box {
   background: #fff;
   border-radius: 10px;
-  width: 80%;
+  width: min(100%, 800px);
   max-width: 800px;
-  max-height: 80vh;
+  max-height: calc(100dvh - 40px);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .modal-header {
@@ -86,6 +89,15 @@
   align-items: center;
   padding: 16px 20px;
   border-bottom: 1px solid #eee;
+  gap: 12px;
+  min-width: 0;
+}
+
+.modal-header h3,
+.modal-body,
+.doc-card-title,
+.view-doc-value {
+  overflow-wrap: anywhere;
 }
 
 .modal-header h3 {
@@ -108,6 +120,7 @@
 
 .modal-table {
   width: 100%;
+  min-width: 620px;
   border-collapse: collapse;
   font-size: 13px;
 }
@@ -130,6 +143,8 @@
   border-top: 1px solid #eee;
   display: flex;
   justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 /* BADGES CATEGORIE */
@@ -152,6 +167,23 @@
   font-weight: 500;
   color: #666;
   margin-bottom: 2px;
+}
+
+.user-form textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: 0.2s;
+  resize: vertical;
+}
+
+.user-form textarea:focus {
+  border-color: #6a8042;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15);
 }
 
 .docs-list {
@@ -243,6 +275,7 @@
   font-size: 14px;
   color: #2d2013;
   font-weight: 500;
+  overflow-wrap: anywhere;
 }
 /* ─── File select button ─────────────────────────────────── */
 .file-select-btn {
@@ -333,6 +366,8 @@
   font-size: 13px;
   font-weight: 500;
   color: #EA6113;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .view-dl-btn {
@@ -353,4 +388,125 @@
 .view-dl-btn:hover {
   background: #fff4e6;
   border-color: #F88F22;
+}
+
+@media (max-width: 768px) {
+  .fichier-row,
+  .file-selected-row,
+  .view-file-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .fichier-input,
+  .fichier-nom,
+  .file-selected-name,
+  .view-file-name {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .modal-overlay {
+    padding: 12px;
+  }
+
+  .modal-box {
+    width: 100%;
+    max-height: calc(100dvh - 24px);
+  }
+
+  .modal-header,
+  .modal-footer {
+    padding: 14px 16px;
+  }
+
+  .modal-body {
+    padding: 14px 16px;
+  }
+
+  .modal-table {
+    min-width: 620px;
+  }
+
+  .view-doc-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .view-doc-item.full {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 420px) {
+  .doc-card-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .dl-btn,
+  .file-select-btn,
+  .file-change-btn,
+  .view-dl-btn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 14px;
+  }
+
+  .modal-box {
+    width: 100%;
+    max-height: 90dvh;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .fichier-row,
+  .file-selected-row,
+  .view-file-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .fichier-input,
+  .fichier-nom,
+  .file-change-btn,
+  .view-dl-btn {
+    width: 100%;
+  }
+
+  .view-doc-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .view-doc-item.full {
+    grid-column: span 1;
+  }
+
+  .dl-btn,
+  .file-selected-name {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .doc-card-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .modal-table {
+    min-width: 560px;
+  }
 }

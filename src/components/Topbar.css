@@ -1,6 +1,6 @@
 /* ── TOPBAR ─────────────────────────────────────── */
 .topbar {
-  height: 60px;
+  min-height: 60px;
   background: #ffffff;
   border-radius: 12px;
   position: sticky;
@@ -8,10 +8,11 @@
   margin: 10px 10px 0 10px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.05);
   z-index: 999;
+  max-width: calc(100% - 20px);
 }
 
 .topbarConteneur {
-  height: 100%;
+  min-height: 60px;
   padding: 0 20px;
   display: flex;
   align-items: center;
@@ -23,15 +24,23 @@
   display: flex;
   align-items: center;
   gap: 15px;
+  min-width: 0;
 }
 .menuIcon { color: #ff7a00; cursor: pointer; }
-.logo { font-weight: 600; font-size: 18px; color: #333; }
+.logo {
+  font-weight: 600;
+  font-size: 18px;
+  color: #333;
+  white-space: nowrap;
+}
 
 /* RIGHT */
 .topright {
   display: flex;
   align-items: center;
   gap: 15px;
+  min-width: 0;
+  justify-content: flex-end;
 }
 
 /* SEARCH */
@@ -42,12 +51,16 @@
   padding: 6px 12px;
   border-radius: 10px;
   gap: 6px;
+  min-width: 0;
+  max-width: 240px;
 }
 .searchContainer input {
   border: none;
   outline: none;
   background: transparent;
   font-size: 13px;
+  width: min(180px, 24vw);
+  min-width: 0;
 }
 
 /* ── CLOCHE ─────────────────────────────────────── */
@@ -103,6 +116,7 @@
   top: calc(100% + 12px);
   right: 0;
   width: 360px;
+  max-width: calc(100vw - 96px);
   background: #ffffff;
   border-radius: 16px;
   box-shadow: 0 8px 40px rgba(0,0,0,0.14);
@@ -128,6 +142,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  flex-wrap: wrap;
 }
 .notifPanelTitle > span:first-child {
   font-weight: 700;
@@ -278,8 +294,82 @@
   cursor: pointer;
   padding: 5px 10px;
   border-radius: 10px;
+  min-width: 0;
 }
 .userContainer:hover { background: #f5f5f5; }
 .userInfo { display: flex; flex-direction: column; }
-.username { font-size: 13px; font-weight: 600; color: #333; }
+.username {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .userRole { font-size: 11px; color: #aaa; text-transform: capitalize; }
+
+@media (max-width: 900px) {
+  .topbarConteneur {
+    padding: 0 14px;
+    gap: 12px;
+  }
+
+  .topright {
+    gap: 8px;
+  }
+
+  .searchContainer input {
+    width: min(130px, 18vw);
+  }
+
+  .username {
+    max-width: 90px;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    margin: 8px 8px 0;
+    max-width: calc(100% - 16px);
+  }
+
+  .topbarConteneur {
+    padding: 8px 10px;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .logo {
+    display: none;
+  }
+
+  .searchContainer {
+    padding: 6px 8px;
+    max-width: 120px;
+  }
+
+  .searchContainer input {
+    width: 92px;
+  }
+
+  .userInfo {
+    display: none;
+  }
+
+  .notifPanel {
+    right: -54px;
+    width: min(320px, calc(100vw - 88px));
+  }
+}
+
+@media (max-width: 420px) {
+  .searchContainer {
+    display: none;
+  }
+
+  .notifPanel {
+    right: -48px;
+    width: calc(100vw - 80px);
+  }
+}

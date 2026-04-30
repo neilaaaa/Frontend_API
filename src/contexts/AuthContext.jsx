@@ -52,10 +52,12 @@ export function AuthProvider({ children }) {
       console.log("me.data:", me.data)        
       console.log("groups:", me.data.groups)
 
-      const djangoGroup = me.data.groups[0]
+      const djangoGroup = me.data.groups[0]?.toLowerCase()
       console.log("djangoGroup:", djangoGroup)
 
-      const role = GROUP_TO_ROLE[djangoGroup]       
+      const role = me.data.is_superuser || me.data.is_staff
+        ? "admin"
+        : GROUP_TO_ROLE[djangoGroup]
        console.log("role:", role)
 
       // 3. construit l'objet user

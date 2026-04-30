@@ -6,13 +6,13 @@ const Layout = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div style={{ display: "flex", height: "100vh" }}>
+    <div className="app-shell">
       <Sidebar collapsed={collapsed} />
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <div className="main-shell">
         <Topbar collapsed={collapsed} setCollapsed={setCollapsed} />
-        <div style={{ flex: 1, padding: "20px", overflowY: "auto" }}>
+        <main className="main-content">
           {children}
-        </div>
+        </main>
       </div>
     </div>
   );
