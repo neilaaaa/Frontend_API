@@ -10,6 +10,7 @@ body,
 #root {
   min-height: 100%;
   width: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -70,8 +71,13 @@ a {
   flex: 1;
   min-width: 0;
   padding: clamp(10px, 2vw, 20px);
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   scroll-padding-top: 76px;
+}
+
+.sidebar-backdrop {
+  display: none;
 }
 
 @media (max-width: 768px) {
@@ -113,6 +119,10 @@ th {
 }
 
 @media (max-width: 900px) {
+  .app-shell {
+    display: block;
+  }
+
   .main-shell {
     max-height: none;
     min-height: 100dvh;
@@ -120,6 +130,17 @@ th {
 
   .main-content {
     overscroll-behavior: contain;
+    padding: 10px;
+  }
+
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    border: 0;
+    background: rgba(27, 20, 13, 0.42);
+    z-index: 999;
+    cursor: pointer;
   }
 }
 
@@ -138,6 +159,7 @@ th {
 
   .main-content {
     padding-inline: 6px;
+    padding-bottom: 14px;
   }
 
   input,

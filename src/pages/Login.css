@@ -17,6 +17,11 @@
   border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
+.login-inputs,
+.submit-container {
+  width: 100%;
+}
+
 /* HEADER */
 .login-header h2 {
   text-align: center;
@@ -109,5 +114,9 @@
 
   .login-header h2 {
     font-size: 22px;
+  }
+
+  .login-inputs .input {
+    padding: 9px;
   }
 }

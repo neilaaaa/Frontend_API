@@ -32,8 +32,18 @@ body, html {
   backdrop-filter: blur(0px); /* effet moderne glass */
 }
 
+@media (max-width: 768px) {
+  .background {
+    background-position: 58% center;
+  }
+}
+
 @media (max-width: 480px) {
   .overlay {
     padding: 16px;
+  }
+
+  .background {
+    background-position: 62% center;
   }
 }

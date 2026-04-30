@@ -4,10 +4,18 @@ import UserForm from "./UserForm";
 import { createUser, deleteUser, getUsers, updateUser } from "../../features/admin/userApi";
 import { useAuth } from "../../contexts/AuthContext";
 
+const ROLE_LABELS = {
+  admin: "Admin",
+  agent: "Agent",
+  responsable: "Responsable",
+  directeur: "Directeur",
+};
+
 function mapUserToRow(user) {
+  const primaryGroup = user.groups?.[0]?.toLowerCase();
   const role = user.is_staff || user.is_superuser
     ? "Admin"
-    : user.groups?.[0] || "Sans role";
+    : ROLE_LABELS[primaryGroup] || "Sans role";
 
   return {
     id: user.id,

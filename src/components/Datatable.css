@@ -17,10 +17,10 @@
   align-items: flex-start;
   padding: 28px;
   background: #ffffff;
-  min-height: 100vh;
+  min-height: min(100vh, 100%);
   font-family: "DM Sans", "Segoe UI", Arial, sans-serif;
   width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
   max-width: 100%;
 }
 
@@ -29,12 +29,14 @@
   flex-shrink: 0;
   position: sticky;
   top: 24px;
+  max-width: 100%;
 }
 
 .dt-right {
   flex: 1;
   min-width: 0;
   max-width: 100%;
+  overflow-x: clip;
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -46,7 +48,7 @@
   min-height: 100vh;
   font-family: "DM Sans", "Segoe UI", Arial, sans-serif;
   width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
   max-width: 100%;
 }
 
@@ -318,6 +320,12 @@
 
 .dt-actions-cell { text-align: center !important; white-space: nowrap; }
 
+.dt-actions-cell .btn {
+  width: auto;
+  min-width: 140px;
+  margin-top: 0;
+}
+
 .dt-empty {
   text-align: center !important;
   padding: 40px !important;
@@ -466,6 +474,10 @@
     min-width: 680px;
   }
 
+  .dt-actions-cell .btn {
+    min-width: 120px;
+  }
+
   .dt-pagination {
     justify-content: center;
   }
@@ -499,6 +511,11 @@
   .dt-btn-pdf {
     width: 100%;
     justify-content: center;
+  }
+
+  .dt-actions-cell .btn {
+    width: 100%;
+    min-width: 0;
   }
 
   .dt-empty {

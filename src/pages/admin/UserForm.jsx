@@ -15,7 +15,12 @@ function mapEditData(editData) {
   return {
     username: editData.username || "",
     email: editData.email || "",
-    role: editData.role === "Sans role" ? "" : editData.role || "",
+    role:
+      editData.role === "Sans role"
+        ? ""
+        : editData.role === "Admin"
+          ? "admin"
+          : editData.role?.toLowerCase() || "",
     password: "",
     is_active: editData.is_active ?? true,
   };
@@ -47,7 +52,7 @@ export default function UserForm({ onSubmit, editData, onCancel }) {
       payload.password = form.password;
     }
 
-    if (form.role === "Admin") {
+    if (form.role === "admin") {
       payload.is_staff = true;
       payload.is_superuser = true;
       payload.groups = [];
@@ -101,10 +106,10 @@ export default function UserForm({ onSubmit, editData, onCancel }) {
       <label className="user-form-label" htmlFor="admin-role">Role</label>
       <select id="admin-role" name="role" value={form.role} onChange={handleChange}>
         <option value="">Role</option>
-        <option value="Admin">Admin</option>
-        <option value="Agent">Agent</option>
-        <option value="Responsable">Responsable</option>
-        <option value="Directeur">Directeur</option>
+        <option value="admin">Admin</option>
+        <option value="agent">Agent</option>
+        <option value="responsable">Responsable</option>
+        <option value="directeur">Directeur</option>
       </select>
 
       <label className="user-form-check">
