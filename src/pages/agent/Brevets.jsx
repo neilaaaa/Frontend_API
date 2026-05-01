@@ -22,6 +22,8 @@ export default function Brevets() {
       console.log(data)
       console.log(response)
     } catch{
+      console.error("erreur:", err)
+      console.error("response:", err.response?.data)
       setError("Erreur chargement des brevets");
     } finally{
       setLoading(false);
@@ -54,7 +56,7 @@ export default function Brevets() {
   { key: "date_depo", label: "Date dépôt" },
   { key: "date_sortie", label: "Date sortie" },
   { key: "titulaire", label: "Titulaire" },
-  { key: "id_inv", label: "Inventeurs", 
+  { key: "inventeur", label: "Inventeurs", 
     render:(value)=> Array.isArray(value)
         ? value.map(i => `${i.nom_inv} ${i.prenom_inv}`).join(", ")
         : "Aucun" ,
@@ -68,9 +70,12 @@ export default function Brevets() {
         {value?.length > 0 ? `${value.length} document(s)` : "Ajouter document"}
       </button> 
         
-    ), pdfExclude: true
-     
+    ), pdfExclude: true  
   },
+  {key: "id_demande",
+  render: (id_demande) => (
+    <span>{id_demande?.titre}</span>
+  )}
 ]}
       onAdd={() => navigate("/agent/brevets/add")}
       onEdit={(row) => navigate(`/agent/brevets/edit/${row.id_brevet}`)}

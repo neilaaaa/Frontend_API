@@ -3,15 +3,7 @@ import AttachFileIcon from "@mui/icons-material/AttachFile";
 import ChangeCircleOutlinedIcon from "@mui/icons-material/ChangeCircleOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import "./documents.css";
-
-const TYPES_DOCUMENT = [
-  "Mémoire descriptif", "Reçu paiement", "Demande brevet",
-  "Recours", "Rapport d'examen", "Certificat", "Autre",
-];
-
-const BREVETS = [
-  "Brevet FR-2024-001", "Brevet FR-2024-002", "Brevet FR-2024-003",
-];
+import { getBrevets } from "../../features/brevets/brevetApi";
 
 export default function DocumentForm({ onSubmit, editData, onCancel, brevetPreselect }) {
   const fileRef = useRef();
@@ -24,7 +16,7 @@ export default function DocumentForm({ onSubmit, editData, onCancel, brevetPrese
   useEffect(() => {
     if (editData) {
       setForm({
-        brevet_lie:    editData.brevet_lie    || "",
+        brevet_lie:    editData.    || "",
         nom_document:  editData.nom_document  || "",
         type_document: editData.type_document || "",
         description:   editData.description   || "",

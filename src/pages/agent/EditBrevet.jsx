@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import "./editBrevet.css"
 import { updateBrevet, getBrevetById } from "../../features/brevets/brevetApi";
 import { getDocumentsByBrevet, updateDocument, deleteDocument, addDocument } from "../../features/documents/documentApi";
+import { getDemandeBrevets } from "../../features/demande/apiDemande";
 import Brevets from "./Brevets";
 
 export default function EditBrevet() {
@@ -14,17 +15,27 @@ export default function EditBrevet() {
   const [loading, setLoading] = useState(true)
   const [error, setError]=useState()
   const [docError, setDocError] = useState("")
+  const [demande, setDemande] = useState([])
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     const fetchBrevet = async () => {
       try{
         setLoading(true)
         const data = await getBrevetById(id)
-        setForm(data)
+       setForm({...data, id_demande: data.id_demande?.id || data.id_demande || ""})
+
         const res = await getDocumentsByBrevet(id)
         setDocs(res.results ?? res)
-      } catch{
-        setError("Erreur de chergement")
+
+        const demandesData = await getDemandeBrevets();  
+        setDemande(demandesData);
+      } catch (err) {
+       console.error("Erreur détaillée:", err)
+       console.error("Response:", err.response)        
+       console.error("Status:", err.response?.status)  
+       console.error("Data:", err.response?.data)      
+  setError(`Erreur ${err.response?.status}: ${JSON.stringify(err.response?.data)}`)
       } finally{
         setLoading(false)
       }
@@ -37,14 +48,23 @@ export default function EditBrevet() {
 
   const handleSubmit = async () => {
     try {
+      setSaving(true);
+      setError("")
       await updateBrevet(id, {
         ...form,
         num_brevet: Number(form.num_brevet),
         num_depo: Number(form.num_depo),
+        id_demande: form.id_demande || null,
       })
       navigate("/agent/brevets")
-    } catch {
+    } catch (err){
+      const data = err.response?.data
+      if (data?.id_demande) {
+      window.alert("⚠️ Cette demande est déjà attribuée à un autre brevet. Veuillez en choisir une autre.")
+    }else {
       setError("Erreur lors de la modification.")
+    }}finally{
+      setSaving(false);
     }
   }
 
@@ -124,6 +144,10 @@ const handleFile = async (e) => {
   setDocs(res.results ?? res)
 }
 
+// trouver la demande liée au brevet pour l'afficher dans le select
+  const demandeActuelle = demande.find(
+    (d) => String(d.id_demande) === String(form?.id_demande)
+  );
 
   if (loading) return <p>Chargement...</p>
   if (error)   return <p style={{ color: "red" }}>{error}</p>
@@ -159,7 +183,43 @@ const handleFile = async (e) => {
 
      <label>Déposant</label>
      <input name="nom_deposant" value={form.nom_deposant ?? ""} onChange={handleChange} />
-
+       <div className="form-group">
+       <label >Demande liée</label>
+          <div className="demande-field">
+            <select
+              name="id_demande"
+              value={form.id_demande || ""}
+              onChange={handleChange}
+            >
+              <option value=""></option>
+              {demande.map((d) => (
+                <option key={d.id_demande} value={d.id_demande}>
+                  {d.titre}
+                </option>
+              ))}
+            </select>
+               {demandeActuelle && ( //affiche le bouton que si une demande est liée
+              <button
+                type="button"
+                className="btn-link"
+                onClick={() =>
+                  navigate(`/agent/demandes/${demandeActuelle.id}`)
+                }
+              >
+                Voir la demande 
+              </button>
+            )}
+            <button
+              type="button"
+              className="btn-link btn-new"
+              onClick={() => navigate("/agent/demandes/ajouter")}
+            >
+              + Nouvelle demande
+            </button>
+            
+            
+            </div>
+          </div>
       <div className="form-group">
         <label>Statut</label>
         <select name="statut" value={form.statut} onChange={handleChange}>

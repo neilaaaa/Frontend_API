@@ -6,6 +6,7 @@ import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutl
 import "./documents.css";
 import { getDocuments, deleteDocument, addDocument, updateDocument } from "../../features/documents/documentApi";
 import { useNavigate } from "react-router-dom";
+import { getBrevets } from "../../features/brevets/brevetApi";
 
 export default function AgentDocuments() {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ export default function AgentDocuments() {
   const [loading, setLoading] = useState(false);
   const [editDoc, setEditDoc] = useState(null);
   const [viewDoc, setViewDoc] = useState(null);
+  const [brevet, setBrevet]=useState([])
 
   const load = async () =>{
     try{
@@ -29,6 +31,12 @@ export default function AgentDocuments() {
   }
 
   useEffect(()=>{
+    getBrevets().then(res => {
+    console.log("brevets reçus:", res)
+    const unique = [...new Map(res.map(b => [b.id_brevet, b])).values()]
+    console.log("brevets uniques:", unique)
+    setBrevet(unique)
+  })
     load()
   }, [])
  
@@ -37,7 +45,7 @@ export default function AgentDocuments() {
       setLoading(true)
       try{
        if (editDoc) {
-       await updateDocument(editDoc.id, doc)
+       await updateDocument(editDoc.id_document, doc)
        setEditDoc(null)
        } else {
         if (Array.isArray(doc)){
@@ -138,7 +146,14 @@ function ViewDocumentModal({ doc, allDocuments, onClose }) {
 
             <div className="view-doc-item">
               <span className="view-doc-label">Brevet lié</span>
-              <span className="view-doc-value">{doc.brevet_lie}</span>
+              <span className="view-doc-value">
+                <select name="id_brevet" value={form.id_brevet || ""} onChange={setField}></select>
+                <option value="">Aucun brevet</option>
+                    {brevets.map((b) => (
+                     <option key={b.id_brevet} value={b.id_brevet}>
+                      {b.titre}
+                    </option>
+                    ))}</span>
             </div>
 
             <div className="view-doc-item">

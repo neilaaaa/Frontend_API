@@ -368,7 +368,7 @@
 }
 
 .fg input,
-.fg textarea {
+.fg textarea, .fg select {
   padding: 9px 11px;
   border: 1.5px solid #f0ddd0 !important;
   border-radius: 8px;
