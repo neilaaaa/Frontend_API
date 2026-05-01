@@ -1,83 +1,144 @@
 import { useEffect, useState } from "react";
 import "./UserForm.css";
 
-export default function UserForm({ onSubmit, editData, onCancel }) {
-  const emptyForm = {
-    id: null,
-    username: "",
-    nom: "",
-    prenom: "",
-    role: "",
-    date_ajout: "",
-    email: "",
-    password: "",
-  };
+const emptyForm = {
+  username: "",
+  email: "",
+  role: "",
+  password: "",
+  is_active: true,
+};
 
+function mapEditData(editData) {
+  if (!editData) return emptyForm;
+
+  return {
+    username: editData.username || "",
+    email: editData.email || "",
+    role:
+      editData.role === "Sans role"
+        ? ""
+        : editData.role === "Admin"
+          ? "admin"
+          : editData.role?.toLowerCase() || "",
+    password: "",
+    is_active: editData.is_active ?? true,
+  };
+}
+
+export default function UserForm({ onSubmit, editData, onCancel }) {
   const [form, setForm] = useState(emptyForm);
 
-  // EDIT → remplir form
   useEffect(() => {
-    if (editData) {
-      setForm(editData);
-    } else {
-      setForm(emptyForm);
-    }
+    setForm(mapEditData(editData));
   }, [editData]);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const buildPayload = () => {
+    const payload = {
+      username: form.username.trim(),
+      email: form.email.trim(),
+      is_active: form.is_active,
+    };
+
+    if (form.password.trim()) {
+      payload.password = form.password;
+    }
+
+    if (form.role === "admin") {
+      payload.is_staff = true;
+      payload.is_superuser = true;
+      payload.groups = [];
+    } else {
+      payload.is_staff = false;
+      payload.is_superuser = false;
+      payload.groups = form.role ? [form.role] : [];
+    }
+
+    return payload;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    onSubmit(buildPayload());
 
-    const finalData = {
-      ...form,
-      id: form.id || Date.now(),
-    };
-
-    onSubmit(finalData);
-
-    // reset seulement en mode ADD
     if (!editData) {
       setForm(emptyForm);
     }
   };
 
-  // 🔥 ANNULER = retour mode AJOUT
   const handleCancel = () => {
     setForm(emptyForm);
-
-    if (onCancel) {
-      onCancel(); // 👉 important pour quitter mode edit
-    }
+    onCancel?.();
   };
 
   return (
     <form className="user-form" onSubmit={handleSubmit}>
       <h3>{editData ? "Modifier utilisateur" : "Ajouter utilisateur"}</h3>
 
-      <input name="username" placeholder="NomUtilisateur" value={form.username} onChange={handleChange} />
-      <input name="nom" placeholder="Nom" value={form.nom} onChange={handleChange} />
-      <input name="prenom" placeholder="Prénom" value={form.prenom} onChange={handleChange} />
+      <label className="user-form-label" htmlFor="admin-username">Username</label>
+      <input
+        id="admin-username"
+        name="username"
+        placeholder="Username"
+        value={form.username}
+        onChange={handleChange}
+        required
+      />
 
-      <select name="role" value={form.role} onChange={handleChange}>
-        <option value="">Rôle</option>
+      <label className="user-form-label" htmlFor="admin-email">Email</label>
+      <input
+        id="admin-email"
+        name="email"
+        placeholder="Email"
+        value={form.email}
+        onChange={handleChange}
+        required
+      />
+
+      <label className="user-form-label" htmlFor="admin-role">Role</label>
+      <select id="admin-role" name="role" value={form.role} onChange={handleChange}>
+        <option value="">Role</option>
         <option value="admin">Admin</option>
         <option value="agent">Agent</option>
-        <option value="user">User</option>
+        <option value="responsable">Responsable</option>
+        <option value="directeur">Directeur</option>
       </select>
 
-      <input type="date" name="date_ajout" value={form.date_ajout} onChange={handleChange} />
+      <label className="user-form-check">
+        <input
+          type="checkbox"
+          name="is_active"
+          checked={form.is_active}
+          onChange={handleChange}
+        />
+        <span>Compte actif</span>
+      </label>
 
-      <input name="email" placeholder="Email" value={form.email} onChange={handleChange} />
-      <input type="password" name="password" placeholder="Mot de passe" value={form.password} onChange={handleChange} />
+      <label className="user-form-label" htmlFor="admin-password">
+        {editData ? "Nouveau mot de passe" : "Mot de passe"}
+      </label>
+      <input
+        id="admin-password"
+        type="password"
+        name="password"
+        placeholder={editData ? "Nouveau mot de passe (optionnel)" : "Mot de passe"}
+        value={form.password}
+        onChange={handleChange}
+        required={!editData}
+      />
 
       <button type="submit">
         {editData ? "Modifier" : "Ajouter"}
       </button>
 
-      {/* 🔥 ANNULER */}
       {editData && (
         <button type="button" className="cancel-btn" onClick={handleCancel}>
           Annuler

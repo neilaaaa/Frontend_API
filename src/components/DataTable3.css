@@ -10,6 +10,9 @@
   min-height: 100vh;
   font-family: "DM Sans", "Segoe UI", sans-serif;
   box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 /* ── HEADER ─────────────────────────────────────────────── */
@@ -22,7 +25,12 @@
   gap: 12px;
 }
 
-.dt3-title-block { display: flex; align-items: center; gap: 14px; }
+.dt3-title-block {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
 
 .dt3-icon-box {
   width: 48px; height: 48px;
@@ -38,6 +46,7 @@
   font-weight: 700;
   color: #1a1a2e;
   margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .dt3-title-block p {
@@ -55,6 +64,8 @@
   cursor: pointer; font-size: 13px; font-weight: 600;
   font-family: inherit;
   transition: opacity .18s;
+  justify-content: center;
+  min-width: max-content;
 }
 
 .dt3-btn:hover { opacity: .85; }
@@ -122,6 +133,8 @@
     0 10px 28px rgba(0,0,0,.08);
   overflow: hidden;
   border: 1px solid #f0e0cc;
+  min-width: 0;
+  max-width: 100%;
 }
 
 /* ── TOOLBAR ────────────────────────────────────────────── */
@@ -133,13 +146,20 @@
   flex-wrap: wrap; gap: 10px;
 }
 
-.dt3-toolbar-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.dt3-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
 
 /* Search */
 .dt3-search-wrap {
   position: relative !important;
   display: flex;
   align-items: center;
+  min-width: 0;
 }
 
 .dt3-search-wrap > div {
@@ -182,6 +202,7 @@
   cursor: pointer;
   font-family: inherit;
   transition: border-color .18s;
+  max-width: 100%;
 }
 
 .dt3-select:focus { border-color: #F88F22 !important; }
@@ -197,10 +218,15 @@
 }
 
 /* ── TABLE ──────────────────────────────────────────────── */
-.dt3-table-wrap { overflow-x: auto; }
+.dt3-table-wrap {
+  overflow-x: auto;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
 
 table.dt3-table {
   width: 100%;
+  min-width: 760px;
   border-collapse: separate;
   border-spacing: 0;
   font-size: 13.5px;
@@ -237,6 +263,7 @@ table.dt3-table {
   vertical-align: middle !important;
   background: #fff !important;
   transition: background .13s;
+  overflow-wrap: anywhere;
 }
 
 .dt3-table tbody tr:hover td { background: #fff9f3 !important; }
@@ -293,7 +320,12 @@ table.dt3-table {
   color: #2d2013;
 }
 
-.dt3-pages { display: flex; align-items: center; gap: 4px; }
+.dt3-pages {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
 
 .dt3-pb {
   width: 32px; height: 32px;
@@ -323,3 +355,80 @@ table.dt3-table {
 }
 
 .dt3-pb:disabled { opacity: .35; cursor: default; }
+
+@media (max-width: 768px) {
+  .dt3-page {
+    padding: 16px;
+    min-height: auto;
+  }
+
+  .dt3-header {
+    align-items: flex-start;
+  }
+
+  .dt3-title-block {
+    align-items: flex-start;
+  }
+
+  .dt3-icon-box {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+  }
+
+  .dt3-title-block h1 {
+    font-size: 19px;
+  }
+
+  .dt3-actions,
+  .dt3-toolbar,
+  .dt3-toolbar-left,
+  .dt3-search-wrap,
+  .dt3-search,
+  .dt3-select {
+    width: 100%;
+  }
+
+  .dt3-btn {
+    flex: 1 1 130px;
+    justify-content: center;
+    min-width: 0;
+  }
+
+  .dt3-table {
+    min-width: 680px;
+  }
+
+  .dt3-pagination,
+  .dt3-pages,
+  .dt3-per-page {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .dt3-count {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 520px) {
+  .dt3-page {
+    padding: 10px;
+  }
+
+  .dt3-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .dt3-toolbar,
+  .dt3-pagination {
+    padding: 12px;
+  }
+
+  .dt3-table th,
+  .dt3-table td {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}

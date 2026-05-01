@@ -11,7 +11,7 @@ export default function RespAddBrevet() {
     num_brevet: "", titre: "", num_depo: "",
     date_depo: "", date_sortie: "", titulaire: "",
     nom_inventeur: "", nom_deposant: "",
-    status: "EN_ATTENTE", documents: [],
+    statut: "EN_ATTENTE", documents: [],
   });
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -19,7 +19,10 @@ export default function RespAddBrevet() {
     const files = Array.from(e.target.files).map((f) => f.name);
     setForm({ ...form, documents: [...form.documents, ...files] });
   };
-  const handleSubmit = () => { addBrevet(form); navigate("/responsable/brevets"); };
+  const handleSubmit = () => {
+    addBrevet({ ...form, status: form.statut });
+    navigate("/responsable/brevets");
+  };
 
   return (
     <div className="brevet-page">
@@ -64,7 +67,7 @@ export default function RespAddBrevet() {
 
           <div className="form-group">
             <label>Statut</label>
-            <select name="status" value={form.status} onChange={handleChange}>
+            <select name="statut" value={form.statut} onChange={handleChange}>
               <option value="EN_ATTENTE">En attente</option>
               <option value="ACCEPTER">Accepté</option>
               <option value="REFUSER">Refusé</option>

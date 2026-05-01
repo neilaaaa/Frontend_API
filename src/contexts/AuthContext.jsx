@@ -1,9 +1,12 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000/";
+
 export const api = axios.create({
-  baseURL: "http://127.0.0.1:8000/"
+  baseURL: API_BASE_URL
 });
 
 api.interceptors.request.use((config) => {
@@ -32,31 +35,39 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null)  
+  const [user, setUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem("user");
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      localStorage.removeItem("user");
+      return null;
+    }
+  })  
   const [error, setError] = useState("")
 
   // garde la session après refresh
-  useEffect(() => {
-    const saved = localStorage.getItem("user");
-    if (saved) setUser(JSON.parse(saved));
-  }, []);
-
   const login = async (email, password) => {
     setError("")
     try {
       const res = await api.post("users/login/", { username: email, password })
       localStorage.setItem("token", res.data.token)
-      console.log("token ok: ", res.data.token)
 
       const me = await api.get("users/me/")
-      console.log("me.data:", me.data)        
-      console.log("groups:", me.data.groups)
 
-      const djangoGroup = me.data.groups[0]
-      console.log("djangoGroup:", djangoGroup)
+      const djangoGroup = me.data.groups[0]?.toLowerCase()
 
-      const role = GROUP_TO_ROLE[djangoGroup]       
-       console.log("role:", role)
+      const role = me.data.is_superuser || me.data.is_staff
+        ? "admin"
+        : GROUP_TO_ROLE[djangoGroup]
+
+      if (!role) {
+        localStorage.removeItem("token")
+        localStorage.removeItem("user")
+        setUser(null)
+        setError("Aucun role valide n'est attribue a ce compte.")
+        return
+      }
 
       // 3. construit l'objet user
       const userData = { email, role, id: me.data.id }
@@ -67,8 +78,11 @@ export function AuthProvider({ children }) {
       navigate(ROLE_HOME[role] || "/")
 
     } catch (err) {
-      console.log(err)
-      setError("Identifiants incorrects.")
+      const message =
+        err.response?.data?.error ||
+        err.response?.data?.detail ||
+        "Identifiants incorrects."
+      setError(message)
     }
   }
 

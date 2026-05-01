@@ -12,6 +12,9 @@
   font-family: "DM Sans", "Segoe UI", Arial, sans-serif;
   background: #faf7f2;
   min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 /* ─── Header ────────────────────────────────────────────── */
@@ -20,6 +23,8 @@
   justify-content: space-between;
   align-items: flex-end;
   margin-bottom: 22px;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .dem-title {
@@ -62,6 +67,8 @@
   box-shadow: 0 2px 14px rgba(234,97,19,.07);
   padding: 22px;
   border: 1px solid #f5ece0;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .dem-toolbar {
@@ -69,6 +76,7 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 18px;
+  min-width: 0;
 }
 
 .dem-search-wrap {
@@ -106,10 +114,15 @@
 }
 
 /* ─── Table ─────────────────────────────────────────────── */
-.dem-table-wrap { overflow-x: auto; }
+.dem-table-wrap {
+  overflow-x: auto;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
 
 .dem-table {
   width: 100%;
+  min-width: 720px;
   border-collapse: separate;
   border-spacing: 0;
   font-size: 13.5px;
@@ -241,6 +254,7 @@
   box-shadow: 0 24px 80px rgba(234,97,19,.18);
   overflow: hidden;
   border: 1px solid #f5ece0;
+  min-width: 0;
 }
 
 /* ── En-tête modal — ORANGE ── */
@@ -457,4 +471,94 @@
 .btn-save:hover {
   opacity: .9;
   transform: translateY(-1px);
+}
+
+@media (max-width: 900px) {
+  .dem-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .dem-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .dem-search-wrap {
+    width: 100%;
+  }
+
+  .dem-modal {
+    max-width: calc(100vw - 24px);
+  }
+}
+
+@media (max-width: 640px) {
+  .dem-page {
+    padding: 14px;
+    min-height: auto;
+  }
+
+  .dem-card {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .dem-add-btn,
+  .dem-count {
+    width: 100%;
+    text-align: center;
+  }
+
+  .modal-header,
+  .modal-footer {
+    padding: 14px 16px;
+  }
+
+  .modal-header-left {
+    min-width: 0;
+  }
+
+  .modal-header h3,
+  .modal-header p {
+    overflow-wrap: anywhere;
+  }
+
+  .modal-body {
+    padding: 14px 16px;
+  }
+
+  .modal-grid,
+  .pieces-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fg.full {
+    grid-column: span 1;
+  }
+
+  .modal-footer {
+    flex-direction: column-reverse;
+  }
+
+  .modal-footer button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .dem-page {
+    padding: 10px;
+  }
+
+  .dem-title {
+    font-size: 19px;
+  }
+
+  .dem-table th,
+  .dem-table td {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
 }

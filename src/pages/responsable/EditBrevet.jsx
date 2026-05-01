@@ -16,7 +16,10 @@ export default function RespEditBrevet() {
     const files = Array.from(e.target.files).map((f) => f.name);
     setForm({ ...form, documents: [...(form.documents || []), ...files] });
   };
-  const handleSave = () => { updateBrevet(id, form); navigate("/responsable/brevets"); };
+  const handleSave = () => {
+    updateBrevet(id, { ...form, status: form.statut ?? form.status });
+    navigate("/responsable/brevets");
+  };
 
   if (!form) return <p>Chargement...</p>;
 
@@ -63,7 +66,11 @@ export default function RespEditBrevet() {
 
           <div className="form-group">
             <label>Statut</label>
-            <select name="status" value={form.status} onChange={handleChange}>
+            <select
+              name="statut"
+              value={form.statut ?? form.status ?? "EN_ATTENTE"}
+              onChange={handleChange}
+            >
               <option value="EN_ATTENTE">En attente</option>
               <option value="ACCEPTER">Accepté</option>
               <option value="REFUSER">Refusé</option>

@@ -19,7 +19,7 @@ const TYPE_CONFIG = {
   demande:  { emoji: "📋", color: "#7c3aed", bg: "#f3e8ff" },
 };
 
-export default function Topbar({ collapsed, setCollapsed }) {
+export default function Topbar({ collapsed, onMenuToggle }) {
   const { user } = useAuth();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const navigate = useNavigate();
@@ -49,7 +49,14 @@ export default function Topbar({ collapsed, setCollapsed }) {
       <div className="topbarConteneur">
 
         <div className="topleft">
-          <MenuIcon className="menuIcon" onClick={() => setCollapsed(!collapsed)} />
+          <button
+            type="button"
+            className="menuButton"
+            aria-label={collapsed ? "Ouvrir le menu" : "Basculer le menu"}
+            onClick={onMenuToggle}
+          >
+            <MenuIcon className="menuIcon" />
+          </button>
           <span className="logo">Mon espace</span>
         </div>
 

@@ -4,68 +4,71 @@ import DocumentForm from "./DocumentForm";
 import DownloadIcon from "@mui/icons-material/Download";
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 import "./documents.css";
-import { getDocuments, deleteDocument, addDocument, updateDocument } from "../../features/documents/documentApi";
-import { useNavigate } from "react-router-dom";
+import {
+  getDocuments,
+  deleteDocument,
+  addDocument,
+  updateDocument,
+} from "../../features/documents/documentApi";
 
 export default function AgentDocuments() {
-  const navigate = useNavigate();
   const [data, setData] = useState([]);
-  const [error, setError]=useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [editDoc, setEditDoc] = useState(null);
   const [viewDoc, setViewDoc] = useState(null);
 
-  const load = async () =>{
-    try{
+  const load = async () => {
+    try {
       setLoading(true);
       setError("");
       const res = await getDocuments();
-      setData (res.results || res);  
-    } catch{
+      setData(res.results || res);
+    } catch {
       setError("Erreur de chargement des documents");
-    } finally{
+    } finally {
       setLoading(false);
     }
-  }
+  };
 
-  useEffect(()=>{
-    load()
-  }, [])
- 
+  useEffect(() => {
+    load();
+  }, []);
+
   const handleSubmit = async (doc) => {
-      setError("")
-      setLoading(true)
-      try{
-       if (editDoc) {
-       await updateDocument(editDoc.id, doc)
-       setEditDoc(null)
-       } else {
-        if (Array.isArray(doc)){
-         for (const t of doc){ await addDocument(t)}; 
-        } else {
-        await addDocument(doc);
+    setError("");
+    setLoading(true);
+    try {
+      if (editDoc) {
+        await updateDocument(editDoc.id_document, doc);
+        setEditDoc(null);
+      } else if (Array.isArray(doc)) {
+        for (const item of doc) {
+          await addDocument(item);
         }
+      } else {
+        await addDocument(doc);
       }
-        await load()
-     }catch{
-      setError("Erreur d'enregitrement");
-    } finally{
+
+      await load();
+    } catch {
+      setError("Erreur d'enregistrement");
+    } finally {
       setLoading(false);
     }
+  };
 
-     }
-
-    const handleDelete = async (row) =>{
-      try{
-        await deleteDocument(row.id_document)
-        await load()
-      }catch{
+  const handleDelete = async (row) => {
+    try {
+      await deleteDocument(row.id_document);
+      await load();
+    } catch {
       setError("Erreur de suppression");
     }
-    }
+  };
 
-    if (loading) return <p>Loading...</p>
-    if (error) return <p style={{ color: "red" }}>{error}</p>
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
     <>
@@ -75,10 +78,7 @@ export default function AgentDocuments() {
         data={data}
         columns={[
           { key: "nom_document", label: "Nom document" },
-          { key: "id_type", label: "Type",
-             render:(value)=> Array.isArray(value)
-             ? value.map(i => `${i.nom_type}`).join(", "): "Aucun" , },
-          { key: "categorie", label: "Catégorie" },
+          { key: "type_document", label: "Type" },
           { key: "date_ajout", label: "Date ajout" },
         ]}
         form={
@@ -90,7 +90,7 @@ export default function AgentDocuments() {
           />
         }
         onEdit={(row) => setEditDoc(row)}
-        onDelete= {handleDelete}
+        onDelete={handleDelete}
         onView={(row) => setViewDoc(row)}
       />
 
@@ -104,41 +104,44 @@ export default function AgentDocuments() {
   );
 }
 
-function ViewDocumentModal({ doc, allDocuments, onClose }) {
-  const docsLies = allDocuments.filter((d) => d.id_brevet === doc.brevet_brevet);
+function ViewDocumentModal({ doc, onClose }) {
+  const fileName =
+    doc.fichier instanceof File
+      ? doc.fichier.name
+      : typeof doc.fichier === "string" && doc.fichier !== ""
+      ? doc.fichier
+      : null;
 
-  const handleDownload = (fichier) => {
-  if (fichier instanceof File) {
-    // Vrai fichier uploadé → téléchargement réel
-    const url = URL.createObjectURL(fichier);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = fichier.name;
-    a.click();
-    URL.revokeObjectURL(url);
-  } else if (typeof fichier === "string" && fichier !== "") {
-    // Juste un nom string → affiche un message
-    alert(`Le fichier "${fichier}" n'est pas disponible en local.\nDans la version finale, il sera chargé depuis le serveur.`);
-  } else {
-    alert("Aucun fichier disponible.");
-  }
-};
+  const handleDownload = () => {
+    if (doc.fichier instanceof File) {
+      const url = URL.createObjectURL(doc.fichier);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = doc.fichier.name;
+      a.click();
+      URL.revokeObjectURL(url);
+    } else if (typeof doc.fichier === "string" && doc.fichier !== "") {
+      alert(
+        `Le fichier "${doc.fichier}" n'est pas disponible en local.\nDans la version finale, il sera charge depuis le serveur.`
+      );
+    } else {
+      alert("Aucun fichier disponible.");
+    }
+  };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-
         <div className="modal-header">
-          <h3>Détails du document</h3>
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <h3>Details du document</h3>
+          <button className="modal-close" onClick={onClose}>X</button>
         </div>
 
         <div className="modal-body">
           <div className="view-doc-grid">
-
             <div className="view-doc-item">
-              <span className="view-doc-label">Brevet lié</span>
-              <span className="view-doc-value">{doc.brevet_lie}</span>
+              <span className="view-doc-label">Brevet lie</span>
+              <span className="view-doc-value">{doc.brevet_lie ?? "-"}</span>
             </div>
 
             <div className="view-doc-item">
@@ -158,32 +161,32 @@ function ViewDocumentModal({ doc, allDocuments, onClose }) {
 
             <div className="view-doc-item full">
               <span className="view-doc-label">Description</span>
-              <span className="view-doc-value">{doc.description || "—"}</span>
+              <span className="view-doc-value">{doc.description || "-"}</span>
             </div>
 
             <div className="view-doc-item full">
               <span className="view-doc-label">Fichier</span>
               {fileName ? (
                 <div className="view-file-row">
-                  <InsertDriveFileOutlinedIcon style={{ fontSize: 16, color: "#EA6113" }} />
+                  <InsertDriveFileOutlinedIcon
+                    style={{ fontSize: 16, color: "#EA6113" }}
+                  />
                   <span className="view-file-name">{fileName}</span>
                   <button className="view-dl-btn" onClick={handleDownload}>
                     <DownloadIcon style={{ fontSize: 16 }} />
-                    Télécharger
+                    Telecharger
                   </button>
                 </div>
               ) : (
                 <span className="no-file">Aucun fichier joint</span>
               )}
             </div>
-
           </div>
         </div>
 
         <div className="modal-footer">
           <button className="dt-btn" onClick={onClose}>Fermer</button>
         </div>
-
       </div>
     </div>
   );

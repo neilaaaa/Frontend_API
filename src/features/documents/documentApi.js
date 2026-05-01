@@ -17,7 +17,6 @@ export const addDocument = async (data) => {
     : {"Content-Type": "application/json"}
   });
   return res.data;
-  alert ("document ajouter !")
 };
 
 
