@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getBrevetById} from "../../features/brevets/brevetApi";
-import { addDocument } from "../../features/documents/documentApi";
 import "./viewBrevet.css"
 
 export default function ViewBrevet() {
@@ -17,7 +16,6 @@ export default function ViewBrevet() {
     try{
       const brevet = await getBrevetById(id)
       setData(brevet)
-      console.log(brevet)
     } catch{
       setError("brevet Introuvable !")
     } finally{
@@ -31,6 +29,8 @@ export default function ViewBrevet() {
   if(loading) return <p> Loading </p>
   if (error)   return <p style={{ color: "red" }}>{error}</p>
   if (!data) return <p>Brevet Introuvable</p>;
+
+  const brevetStatut = data.statut ?? data.status;
 
   return (
     <div className="view-page">
@@ -47,7 +47,7 @@ export default function ViewBrevet() {
     <p><b>Titulaire:</b> {data.titulaire}</p>
     <p><b>Déposant:</b> {data.id_dep?.nom_dep}</p>
     <p><b>Inventeurs:</b> {data.id_inv?.map(inv=>inv.nom_inv).join(", ")}</p>
-    <p><b>Status:</b> {data.statut}</p>
+    <p><b>Statut:</b> {brevetStatut}</p>
   </div>
 
         {/* Documents */}

@@ -20,7 +20,7 @@ export default function RespBrevets() {
         { key: "titulaire",     label: "Titulaire" },
         { key: "nom_inventeur", label: "Inventeur" },
         { key: "nom_deposant",  label: "Déposant" },
-        { key: "status",        label: "Statut" },
+        { key: "statut",        label: "Statut" },
         {
           key: "documents", label: "Documents",
           render: (v) => v?.length > 0 ? v.join(", ") : "Aucun",

@@ -46,14 +46,14 @@ const MENUS = {
   ],
 };
 
-export default function Sidebar({ collapsed }) {
+export default function Sidebar({ collapsed, mobileOpen, onNavigate }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const items = user ? MENUS[user.role] || [] : [];
 
   return (
-    <div className={`sidebar ${collapsed ? "collapsed" : ""}`}>
+    <div className={`sidebar ${collapsed ? "collapsed" : ""} ${mobileOpen ? "mobile-open" : ""}`}>
       {/* LOGO */}
       <div className="sidebarLogo">
         <img src="/src/assets/sonatrach.png" alt="Logo" />
@@ -66,6 +66,7 @@ export default function Sidebar({ collapsed }) {
             key={item.to}
             to={item.to}
             end
+            onClick={onNavigate}
             className={({ isActive }) =>
               `sidebarItem ${isActive ? "active" : ""}`
             }
@@ -81,6 +82,7 @@ export default function Sidebar({ collapsed }) {
         <div
           className="sidebarItem logout"
           onClick={() => {
+            onNavigate?.();
             logout();
             navigate("/login");
           }}

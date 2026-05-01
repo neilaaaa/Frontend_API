@@ -12,7 +12,6 @@ export const getBrevets = async (id) => {
 export const addBrevet =async (brevet) => {
   const res = await api.post("brevets/", brevet);
   return res.data;
-  alert ("brevet ajouter !")
 };
 
 

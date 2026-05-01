@@ -18,6 +18,15 @@ export default function Datatable2({
   title = "Table",
   exportName = "export",
 }) {
+  const getRowKey = (row, index) =>
+    row.id ??
+    row.id_brevet ??
+    row.id_document ??
+    row.id_paiement ??
+    row.id_recours ??
+    row.id_demande ??
+    index;
+
   const [search, setSearch]   = useState("");
   const [sortKey, setSortKey] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
@@ -147,8 +156,8 @@ export default function Datatable2({
                 </td>
               </tr>
             ) : (
-              pageData.map((row) => (
-                <tr key={row.id}>
+              pageData.map((row, index) => (
+                <tr key={getRowKey(row, index)}>
                   {columns.map((c) => (
                   <td key={c.key}>
                     {c.render ? c.render(row[c.key]): row[c.key]}

@@ -13,11 +13,13 @@ export default function RespViewBrevet() {
 
   if (!data) return <p>Chargement...</p>;
 
+  const brevetStatut = data.statut ?? data.status;
+
   const statusClass = {
     EN_ATTENTE: "en-attente",
     ACCEPTER:   "accepter",
     REFUSER:    "refuser",
-  }[data.status] ?? "en-attente";
+  }[brevetStatut] ?? "en-attente";
 
   return (
     <div className="view-page">
@@ -59,7 +61,7 @@ export default function RespViewBrevet() {
           </div>
           <div className="view-info-item">
             <div className="view-info-label">Statut</div>
-            <span className={`view-status ${statusClass}`}>{data.status}</span>
+            <span className={`view-status ${statusClass}`}>{brevetStatut}</span>
           </div>
         </div>
 
