@@ -17,8 +17,11 @@
   align-items: flex-start;
   padding: 28px;
   background: #ffffff;
-  min-height: 100vh;
+  min-height: min(100vh, 100%);
   font-family: "DM Sans", "Segoe UI", Arial, sans-serif;
+  width: 100%;
+  overflow-x: clip;
+  max-width: 100%;
 }
 
 .dt-left {
@@ -26,11 +29,14 @@
   flex-shrink: 0;
   position: sticky;
   top: 24px;
+  max-width: 100%;
 }
 
 .dt-right {
   flex: 1;
   min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -41,6 +47,9 @@
   background: #faf7f2;
   min-height: 100vh;
   font-family: "DM Sans", "Segoe UI", Arial, sans-serif;
+  width: 100%;
+  overflow-x: clip;
+  max-width: 100%;
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -55,6 +64,8 @@
   display: flex;
   flex-direction: column;
   gap: 13px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .user-form h3 {
@@ -81,7 +92,7 @@
 .user-form input,
 .user-form select {
   width: 100%;
-  height: 100%;
+  min-height: 40px;
   padding: 10px 12px;
   border: 1.5px solid #f0ddd0 !important;
   border-radius: 9px;
@@ -147,6 +158,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 18px;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .dt-title {
@@ -157,7 +170,12 @@
   letter-spacing: -0.3px;
 }
 
-.dt-actions { display: flex; gap: 8px; }
+.dt-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
 
 .dt-btn {
   padding: 8px 18px;
@@ -171,6 +189,7 @@
   transition: opacity .18s;
   font-family: inherit;
   box-shadow: 0 2px 8px rgba(248,143,34,0.28);
+  min-width: max-content;
 }
 
 .dt-btn:hover { opacity: .88; }
@@ -186,6 +205,7 @@
   cursor: pointer;
   transition: opacity .18s;
   font-family: inherit;
+  min-width: max-content;
 }
 
 .dt-btn-excel:hover { opacity: .85; }
@@ -201,6 +221,7 @@
   cursor: pointer;
   transition: opacity .18s;
   font-family: inherit;
+  min-width: max-content;
 }
 
 .dt-btn-pdf:hover { opacity: .85; }
@@ -243,11 +264,15 @@
   box-shadow:
     0 4px 6px rgba(234,97,19,.05),
     0 10px 28px rgba(0,0,0,.08);
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 .dt-table {
   width: 100%;
+  min-width: 760px;
   border-collapse: separate;
   border-spacing: 0;
   font-size: 13.5px;
@@ -285,6 +310,7 @@
   vertical-align: middle !important;
   background: #fff !important;
   transition: background .13s;
+  overflow-wrap: anywhere;
 }
 
 .dt-table tbody tr:last-child td { border-bottom: none !important; }
@@ -293,6 +319,12 @@
 .dt-table tbody tr:nth-child(even):hover td { background: #fff6ee !important; }
 
 .dt-actions-cell { text-align: center !important; white-space: nowrap; }
+
+.dt-actions-cell .btn {
+  width: auto;
+  min-width: 140px;
+  margin-top: 0;
+}
 
 .dt-empty {
   text-align: center !important;
@@ -400,3 +432,97 @@
 }
 
 .btn:hover { opacity: .9; transform: translateY(-1px); }
+
+@media (max-width: 1100px) {
+  .dt-layout {
+    flex-direction: column;
+    padding: 22px;
+  }
+
+  .dt-left {
+    width: 100%;
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .dt-layout,
+  .dt-container {
+    padding: 16px;
+    min-height: auto;
+  }
+
+  .dt-title {
+    font-size: 18px;
+  }
+
+  .dt-header {
+    align-items: flex-start;
+  }
+
+  .dt-actions {
+    width: 100%;
+  }
+
+  .dt-actions > button {
+    flex: 1 1 120px;
+    min-width: 0;
+    text-align: center;
+  }
+
+  .dt-table {
+    min-width: 680px;
+  }
+
+  .dt-actions-cell .btn {
+    min-width: 120px;
+  }
+
+  .dt-pagination {
+    justify-content: center;
+  }
+
+  .dt-pg-info {
+    width: 100%;
+    margin-right: 0;
+    text-align: center;
+  }
+}
+
+@media (max-width: 520px) {
+  .dt-layout,
+  .dt-container {
+    padding: 10px;
+  }
+
+  .user-form {
+    padding: 18px;
+    border-radius: 12px;
+  }
+
+  .dt-table th,
+  .dt-table td {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .dt-btn,
+  .dt-btn-excel,
+  .dt-btn-pdf {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .dt-actions-cell .btn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .dt-empty {
+    padding: 28px 16px !important;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}

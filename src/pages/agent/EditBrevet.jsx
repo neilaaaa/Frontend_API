@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import "./editBrevet.css"
+import "./editBrevet.css";
 import { updateBrevet, getBrevetById } from "../../features/brevets/brevetApi";
 import { getDocumentsByBrevet, updateDocument, deleteDocument, addDocument } from "../../features/documents/documentApi";
 import { getDemandeBrevets } from "../../features/demande/apiDemande";
@@ -39,8 +39,9 @@ export default function EditBrevet() {
       } finally{
         setLoading(false)
       }
-    }
-    fetchBrevet()
+    };
+
+    fetchBrevet();
   }, [id]);
 
   const handleChange = (e) =>
@@ -155,31 +156,30 @@ const handleFile = async (e) => {
 
   return (
     <div className="brevet-page">
-    <div className="brevet-card">
-      <h2 className="brevet-title">Modifier le brevet</h2>
+      <div className="brevet-card">
+        <h2 className="brevet-title">Modifier le brevet</h2>
 
-    <div className="brevet-grid">
+        <div className="brevet-grid">
+          <label> Num brevet </label>
+          <input name="num_brevet" value={form.num_brevet ?? ""} onChange={handleChange} />
 
-     <label> Num brevet </label>
-     <input name="num_brevet" value={form.num_brevet ?? ""} onChange={handleChange} />
+          <label>Titre</label>
+          <input name="titre" value={form.titre ?? ""} onChange={handleChange} />
 
-     <label>Titre</label>
-     <input name="titre" value={form.titre ?? ""} onChange={handleChange} />
+          <label>Num dÃ©pÃ´t</label>
+          <input name="num_depo" value={form.num_depo ?? ""} onChange={handleChange} />
 
-     <label>Num dépôt</label>
-     <input name="num_depo" value={form.num_depo ?? ""} onChange={handleChange} />
+          <label>Date dÃ©pÃ´t</label>
+          <input type="date" name="date_depo" value={form.date_depo ?? ""} onChange={handleChange} />
 
-     <label>Date dépôt</label>
-     <input type="date" name="date_depo" value={form.date_depo ?? ""} onChange={handleChange} />
+          <label>Date sortie</label>
+          <input type="date" name="date_sortie" value={form.date_sortie ?? ""} onChange={handleChange} />
 
-     <label>Date sortie</label>
-     <input type="date" name="date_sortie" value={form.date_sortie ?? ""} onChange={handleChange} />
+          <label>Titulaire</label>
+          <input name="titulaire" value={form.titulaire ?? ""} onChange={handleChange} />
 
-     <label>Titulaire</label>
-     <input name="titulaire" value={form.titulaire ?? ""} onChange={handleChange} />
-
-     <label>Inventeur</label>
-     <input name="nom_inventeur" value={form.nom_inventeur ?? ""} onChange={handleChange} />
+          <label>Inventeur</label>
+          <input name="nom_inventeur" value={form.nom_inventeur ?? ""} onChange={handleChange} />
 
      <label>Déposant</label>
      <input name="nom_deposant" value={form.nom_deposant ?? ""} onChange={handleChange} />

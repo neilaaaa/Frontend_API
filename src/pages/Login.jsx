@@ -4,15 +4,12 @@ import user_icon from "../assets/person.png";
 import password_icon from "../assets/password.png";
 import Background from "../components/Background";
 import { useAuth } from "../contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-  const { login } = useAuth();
-  const navigate = useNavigate();
+  const { login, error } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
 
   const handleLogin =async (e) => {
     e.preventDefault()
@@ -26,7 +23,7 @@ export default function Login() {
           <div className="underline"></div>
         </div>
 
-        {error && <p className="error">{error}</p>}
+        {error && <p className="error" role="alert">{error}</p>}
 
         <div className="login-inputs">
           <div className="input">

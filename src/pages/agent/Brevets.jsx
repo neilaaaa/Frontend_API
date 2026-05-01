@@ -19,8 +19,6 @@ export default function Brevets() {
       setError("");
       const response = await getBrevets();
       setData(response.results || response);
-      console.log(data)
-      console.log(response)
     } catch{
       console.error("erreur:", err)
       console.error("response:", err.response?.data)
