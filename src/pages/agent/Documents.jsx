@@ -4,8 +4,12 @@ import DocumentForm from "./DocumentForm";
 import DownloadIcon from "@mui/icons-material/Download";
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 import "./documents.css";
-import { getDocuments, deleteDocument, addDocument, updateDocument } from "../../features/documents/documentApi";
-import { useNavigate } from "react-router-dom";
+import {
+  getDocuments,
+  deleteDocument,
+  addDocument,
+  updateDocument,
+} from "../../features/documents/documentApi";
 import { getBrevets } from "../../features/brevets/brevetApi";
 
 export default function AgentDocuments() {
@@ -14,47 +18,64 @@ export default function AgentDocuments() {
   const [loading, setLoading] = useState(false);
   const [editDoc, setEditDoc] = useState(null);
   const [viewDoc, setViewDoc] = useState(null);
-  const [brevet, setBrevet]=useState([])
+  const [brevets, setBrevets] = useState([]);
 
   const load = async () => {
     try {
       setLoading(true);
       setError("");
+
       const res = await getDocuments();
       setData(res.results || res);
-    } catch {
+    } catch (error) {
+      console.error(error);
       setError("Erreur de chargement des documents");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(()=>{
-    getBrevets().then(res => {
-    console.log("brevets reçus:", res)
-    const unique = [...new Map(res.map(b => [b.id_brevet, b])).values()]
-    console.log("brevets uniques:", unique)
-    setBrevet(unique)
-  })
-    load()
-  }, [])
- 
+  const loadBrevets = async () => {
+    try {
+      const res = await getBrevets();
+
+      const unique = [
+        ...new Map((res.results || res).map((b) => [b.id_brevet, b])).values(),
+      ];
+
+      setBrevets(unique);
+    } catch (error) {
+      console.error(error);
+      setError("Erreur de chargement des brevets");
+    }
+  };
+
+  useEffect(() => {
+    loadBrevets();
+    load();
+  }, []);
+
   const handleSubmit = async (doc) => {
-      setError("")
-      setLoading(true)
-      try{
-       if (editDoc) {
-       await updateDocument(editDoc.id_document, doc)
-       setEditDoc(null)
-       } else {
-        if (Array.isArray(doc)){
-         for (const t of doc){ await addDocument(t)}; 
+    setError("");
+    setLoading(true);
+
+    try {
+      if (editDoc) {
+        await updateDocument(editDoc.id_document, doc);
+        setEditDoc(null);
+      } else {
+        if (Array.isArray(doc)) {
+          for (const item of doc) {
+            await addDocument(item);
+          }
         } else {
-        await addDocument(doc);
+          await addDocument(doc);
+        }
       }
 
       await load();
-    } catch {
+    } catch (error) {
+      console.error(error);
       setError("Erreur d'enregistrement");
     } finally {
       setLoading(false);
@@ -65,13 +86,17 @@ export default function AgentDocuments() {
     try {
       await deleteDocument(row.id_document);
       await load();
-    } catch {
+    } catch (error) {
+      console.error(error);
       setError("Erreur de suppression");
     }
   };
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+
+  if (error) {
+    return <p style={{ color: "red" }}>{error}</p>;
+  }
 
   return (
     <>
@@ -90,6 +115,7 @@ export default function AgentDocuments() {
             editData={editDoc}
             onSubmit={handleSubmit}
             onCancel={() => setEditDoc(null)}
+            brevets={brevets}
           />
         }
         onEdit={(row) => setEditDoc(row)}
@@ -100,6 +126,7 @@ export default function AgentDocuments() {
       {viewDoc && (
         <ViewDocumentModal
           doc={viewDoc}
+          brevets={brevets}
           onClose={() => setViewDoc(null)}
         />
       )}
@@ -107,7 +134,7 @@ export default function AgentDocuments() {
   );
 }
 
-function ViewDocumentModal({ doc, onClose }) {
+function ViewDocumentModal({ doc, brevets, onClose }) {
   const fileName =
     doc.fichier instanceof File
       ? doc.fichier.name
@@ -115,17 +142,23 @@ function ViewDocumentModal({ doc, onClose }) {
       ? doc.fichier
       : null;
 
+  const brevetLie = brevets.find(
+    (b) => Number(b.id_brevet) === Number(doc.id_brevet)
+  );
+
   const handleDownload = () => {
     if (doc.fichier instanceof File) {
       const url = URL.createObjectURL(doc.fichier);
       const a = document.createElement("a");
+
       a.href = url;
       a.download = doc.fichier.name;
       a.click();
+
       URL.revokeObjectURL(url);
     } else if (typeof doc.fichier === "string" && doc.fichier !== "") {
       alert(
-        `Le fichier "${doc.fichier}" n'est pas disponible en local.\nDans la version finale, il sera charge depuis le serveur.`
+        `Le fichier "${doc.fichier}" n'est pas disponible en local.\nDans la version finale, il sera chargé depuis le serveur.`
       );
     } else {
       alert("Aucun fichier disponible.");
@@ -136,8 +169,11 @@ function ViewDocumentModal({ doc, onClose }) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-box" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h3>Details du document</h3>
-          <button className="modal-close" onClick={onClose}>X</button>
+          <h3>Détails du document</h3>
+
+          <button className="modal-close" onClick={onClose}>
+            X
+          </button>
         </div>
 
         <div className="modal-body">
@@ -145,46 +181,56 @@ function ViewDocumentModal({ doc, onClose }) {
             <div className="view-doc-item">
               <span className="view-doc-label">Brevet lié</span>
               <span className="view-doc-value">
-                <select name="id_brevet" value={form.id_brevet || ""} onChange={setField}></select>
-                <option value="">Aucun brevet</option>
-                    {brevets.map((b) => (
-                     <option key={b.id_brevet} value={b.id_brevet}>
-                      {b.titre}
-                    </option>
-                    ))}</span>
+                {brevetLie?.titre ||
+                  brevetLie?.nom_brevet ||
+                  doc.brevet?.titre ||
+                  doc.id_brevet ||
+                  "Aucun brevet"}
+              </span>
             </div>
 
             <div className="view-doc-item">
               <span className="view-doc-label">Nom document</span>
-              <span className="view-doc-value">{doc.nom_document}</span>
+              <span className="view-doc-value">
+                {doc.nom_document || "-"}
+              </span>
             </div>
 
             <div className="view-doc-item">
               <span className="view-doc-label">Type</span>
-              <span className="view-doc-value">{doc.type_document}</span>
+              <span className="view-doc-value">
+                {doc.type_document || "-"}
+              </span>
             </div>
 
             <div className="view-doc-item">
               <span className="view-doc-label">Date ajout</span>
-              <span className="view-doc-value">{doc.date_ajout}</span>
+              <span className="view-doc-value">
+                {doc.date_ajout || "-"}
+              </span>
             </div>
 
             <div className="view-doc-item full">
               <span className="view-doc-label">Description</span>
-              <span className="view-doc-value">{doc.description || "-"}</span>
+              <span className="view-doc-value">
+                {doc.description || "-"}
+              </span>
             </div>
 
             <div className="view-doc-item full">
               <span className="view-doc-label">Fichier</span>
+
               {fileName ? (
                 <div className="view-file-row">
                   <InsertDriveFileOutlinedIcon
                     style={{ fontSize: 16, color: "#EA6113" }}
                   />
+
                   <span className="view-file-name">{fileName}</span>
+
                   <button className="view-dl-btn" onClick={handleDownload}>
                     <DownloadIcon style={{ fontSize: 16 }} />
-                    Telecharger
+                    Télécharger
                   </button>
                 </div>
               ) : (
@@ -195,7 +241,9 @@ function ViewDocumentModal({ doc, onClose }) {
         </div>
 
         <div className="modal-footer">
-          <button className="dt-btn" onClick={onClose}>Fermer</button>
+          <button className="dt-btn" onClick={onClose}>
+            Fermer
+          </button>
         </div>
       </div>
     </div>
