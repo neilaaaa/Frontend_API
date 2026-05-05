@@ -60,7 +60,7 @@ export default function AgentDocuments() {
       }
 
       await load();
-    } }catch(err) {
+    } catch(err) {
       console.log("l'erreur", err)
       setError("Erreur d'enregistrement");
     } finally {
