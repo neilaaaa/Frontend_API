@@ -31,7 +31,7 @@ export default function Datatable2({
   const [sortKey, setSortKey] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
   const [page, setPage]       = useState(1);
-  const perPage = 10;
+  const perPage = 5;
 
   /* ── Search ── */
   const filtered = useMemo(() => {
@@ -62,14 +62,6 @@ export default function Datatable2({
   };
 
   const handleSearch = (e) => { setSearch(e.target.value); setPage(1); };
-
-  /* ── Export Excel ── */
-  const exportExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(sorted);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "data");
-    XLSX.writeFile(wb, `${exportName}.xlsx`);
-  };
 
   /* ── Export PDF ── */
   const exportPDF = () => {
@@ -107,7 +99,6 @@ export default function Datatable2({
         <div className="dt-header">
           <h2 className="dt-title">{title}</h2>
           <div className="dt-actions">
-            <button className="dt-btn-excel" onClick={exportExcel}>⬇ Excel</button>
             <button className="dt-btn-pdf"   onClick={exportPDF}>⬇ PDF</button>
           </div>
         </div>
@@ -157,7 +148,7 @@ export default function Datatable2({
               </tr>
             ) : (
               pageData.map((row, index) => (
-                <tr key={getRowKey(row, index)}>
+                <tr key={index}>
                   {columns.map((c) => (
                   <td key={c.key}>
                     {c.render ? c.render(row[c.key]): row[c.key]}

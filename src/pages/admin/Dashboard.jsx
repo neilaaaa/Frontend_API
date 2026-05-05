@@ -5,10 +5,6 @@ import "../../components/dashboard/dashboard.css";
 
 const roles = [
   {
-    name: "Admin",
-    text: "Gere les utilisateurs, les roles et les acces.",
-  },
-  {
     name: "Agent",
     text: "Cree et suit les demandes, brevets, documents et paiements.",
   },

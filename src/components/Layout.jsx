@@ -42,7 +42,7 @@ const Layout = ({ children }) => {
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
-      <div className="main-shell">
+      <div className={`main-shell ${collapsed ? "collapsed" : ""}`}>
         <Topbar collapsed={collapsed} onMenuToggle={handleMenuToggle} />
         <main className="main-content">
           {children}

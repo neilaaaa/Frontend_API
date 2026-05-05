@@ -14,11 +14,12 @@
   flex-direction: column;
   flex-shrink: 0;
   transition: width 0.3s ease;
-  overflow: hidden;
   border-radius: 0 22px 22px 0;
   box-shadow: 4px 0 24px rgba(234,97,19,0.30);
-  position: relative;
-  z-index: 1000;
+  position: fixed !important;
+  z-index: 2000;
+  top: 0;
+  left: 0;
 }
 
 /* Reflet lumineux en haut */
@@ -36,7 +37,7 @@
   border-radius: 0 22px 0 0;
 }
 
-.sidebar.collapsed { width: 72px; }
+.sidebar.collapsed {width: 72px; }
 
 /* ── Logo ──────────────────────────────────────────────── */
 .sidebarLogo {

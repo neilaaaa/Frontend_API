@@ -4,9 +4,9 @@ import DocumentForm from "./DocumentForm";
 import DownloadIcon from "@mui/icons-material/Download";
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 import "./documents.css";
-import { getDocuments, deleteDocument, addDocument, updateDocument } from "../../features/documents/documentApi";
+import { getTousDocuments, deleteDocument, addDocument, updateDocument } from "../../features/documents/documentApi";
 import { useNavigate } from "react-router-dom";
-import { getBrevets } from "../../features/brevets/brevetApi";
+import { getTousBrevets } from "../../features/brevets/brevetApi";
 
 export default function AgentDocuments() {
   const [data, setData] = useState([]);
@@ -20,7 +20,7 @@ export default function AgentDocuments() {
     try {
       setLoading(true);
       setError("");
-      const res = await getDocuments();
+      const res = await getTousDocuments();
       setData(res.results || res);
     } catch {
       setError("Erreur de chargement des documents");
@@ -30,11 +30,12 @@ export default function AgentDocuments() {
   };
 
   useEffect(()=>{
-    getBrevets().then(res => {
+    getTousBrevets().then(res => {
     console.log("brevets reçus:", res)
     const unique = [...new Map(res.map(b => [b.id_brevet, b])).values()]
     console.log("brevets uniques:", unique)
     setBrevet(unique)
+    console.log("data documents:", data[0])
   })
     load()
   }, [])
@@ -54,7 +55,8 @@ export default function AgentDocuments() {
       }
 
       await load();
-    } catch {
+    } }catch(err) {
+      console.log("l'erreur", err)
       setError("Erreur d'enregistrement");
     } finally {
       setLoading(false);
@@ -82,6 +84,12 @@ export default function AgentDocuments() {
         columns={[
           { key: "nom_document", label: "Nom document" },
           { key: "type_document", label: "Type" },
+          {
+            key: "brevet",
+            label: "Brevet",
+            render: (val) =>
+              val ? `${val.titre} — N°${val.num_brevet}` : "—",
+          },
           { key: "date_ajout", label: "Date ajout" },
         ]}
         form={
@@ -108,29 +116,31 @@ export default function AgentDocuments() {
 }
 
 function ViewDocumentModal({ doc, onClose }) {
-  const fileName =
-    doc.fichier instanceof File
-      ? doc.fichier.name
-      : typeof doc.fichier === "string" && doc.fichier !== ""
-      ? doc.fichier
-      : null;
+  const [downloading, setDownloading] = useState(false)
 
-  const handleDownload = () => {
-    if (doc.fichier instanceof File) {
-      const url = URL.createObjectURL(doc.fichier);
+  const handleDownload = async () => {
+    if (! doc.fichier) {
+      alert("Aucun fichier dispo")
+      return;
+    } 
+    try{
+      setDownloading(true);
+      const res = await downloadDocument(doc.id_document);
+      const url = URL.createObjectURL(new Blob([res.data]));
       const a = document.createElement("a");
       a.href = url;
-      a.download = doc.fichier.name;
+      a.download = doc.fichier.split("/").pop();
       a.click();
       URL.revokeObjectURL(url);
-    } else if (typeof doc.fichier === "string" && doc.fichier !== "") {
-      alert(
-        `Le fichier "${doc.fichier}" n'est pas disponible en local.\nDans la version finale, il sera charge depuis le serveur.`
-      );
-    } else {
-      alert("Aucun fichier disponible.");
+    } catch(err){
+      console.log("l'erreur est: ", err)
+      alert("Erreur lors du téléchargement.");
+    } finally {
+      setDownloading(false);
     }
-  };
+    } 
+
+  const fileName = doc.fichier ? doc.fichier.split("/").pop() : null;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -145,13 +155,8 @@ function ViewDocumentModal({ doc, onClose }) {
             <div className="view-doc-item">
               <span className="view-doc-label">Brevet lié</span>
               <span className="view-doc-value">
-                <select name="id_brevet" value={form.id_brevet || ""} onChange={setField}></select>
-                <option value="">Aucun brevet</option>
-                    {brevets.map((b) => (
-                     <option key={b.id_brevet} value={b.id_brevet}>
-                      {b.titre}
-                    </option>
-                    ))}</span>
+                    {doc.brevet ? `${doc.brevet?.titre}- N° ${doc.brevet.num_brevet}`: "Aucun Brevet"}
+              </span>
             </div>
 
             <div className="view-doc-item">
@@ -162,6 +167,9 @@ function ViewDocumentModal({ doc, onClose }) {
             <div className="view-doc-item">
               <span className="view-doc-label">Type</span>
               <span className="view-doc-value">{doc.type_document}</span>
+              {doc.type_document === "autre" &&(
+                `${doc.type_document}-(${doc.autre_type})`
+              )}
             </div>
 
             <div className="view-doc-item">
@@ -198,6 +206,7 @@ function ViewDocumentModal({ doc, onClose }) {
           <button className="dt-btn" onClick={onClose}>Fermer</button>
         </div>
       </div>
+
     </div>
   );
 }

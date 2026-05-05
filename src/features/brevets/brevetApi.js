@@ -8,6 +8,18 @@ export const getBrevets = async (id) => {
 // "si res.data.results est null ou undefined → utilise res.data"
 };
 
+export const getTousBrevets = async (id) => {
+  let results = []
+  let url = "brevets/"
+
+   while (url) {
+    const res = await api.get(url)
+    results = [...results, ...(res.data.results ?? [])]
+    // extraire juste le chemin de next
+    url = res.data.next ? res.data.next.replace("http://127.0.0.1:8000/", "") : null
+  }
+  return results
+};
 
 export const addBrevet =async (brevet) => {
   const res = await api.post("brevets/", brevet);

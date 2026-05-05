@@ -8,6 +8,19 @@ export const getDocuments = async (id) => {
 // "si res.data.results est null ou undefined → utilise res.data"
 };
 
+export const getTousDocuments = async (id) => {
+  let results = []
+  let url = "documents/"
+
+   while (url) {
+    const res = await api.get(url)
+    results = [...results, ...(res.data.results ?? [])]
+    // extraire juste le chemin de next
+    url = res.data.next ? res.data.next.replace("http://127.0.0.1:8000/", "") : null
+  }
+  return results
+};
+
 
 export const addDocument = async (data) => {
   const isFormData = data instanceof FormData;

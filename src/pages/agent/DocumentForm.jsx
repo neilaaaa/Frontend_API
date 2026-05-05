@@ -3,30 +3,46 @@ import AttachFileIcon from "@mui/icons-material/AttachFile";
 import ChangeCircleOutlinedIcon from "@mui/icons-material/ChangeCircleOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import "./documents.css";
-import { getBrevets } from "../../features/brevets/brevetApi";
+import { getTousBrevets } from "../../features/brevets/brevetApi";
 
 export default function DocumentForm({ onSubmit, editData, onCancel, brevetPreselect }) {
   const fileRef = useRef();
 
   const [form, setForm] = useState({
-    brevet_lie: "", nom_document: "", type_document: "",
-    description: "", date_ajout: "", fichier: null,
+    id_brevet: "", nom_document: "", type_document: "", autre_type:"",
+    description: "", date_ajout: "",  date_sortie_officielle:"", fichier: null,
   });
+  const [brevets, setBrevets] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (editData) {
-      setForm({
-        brevet_lie:    editData.    || "",
+    const fetchBrevets = async ()=>{
+      try{
+        const res =await getTousBrevets()
+        console.log("total brevets:", res.length)
+        setBrevets(res)
+
+        if (editData) {
+        setForm({
+        id_brevet:    editData.id_brevet,
         nom_document:  editData.nom_document  || "",
         type_document: editData.type_document || "",
+        autre_type: editData.autre_type || "",
         description:   editData.description   || "",
         date_ajout:    editData.date_ajout    || "",
+        date_ajout:    editData.date_ajout    || "",
+        date_sortie_officielle: editData.date_sortie_officielle    || "",
         fichier:       editData.fichier       || null,
       });
     } else {
-      setForm({ brevet_lie: brevetPreselect || "", nom_document: "", type_document: "", description: "", date_ajout: "", fichier: null });
-    }
-  }, [editData, brevetPreselect]);
+      setForm({ id_brevet: brevetPreselect || "", nom_document: "", type_document: "", description: "", date_ajout: "", fichier: null });
+    }}catch {
+        console.error("Erreur chargement brevets");
+      }
+    };
+    fetchBrevets();
+     }, [editData])
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -40,34 +56,62 @@ export default function DocumentForm({ onSubmit, editData, onCancel, brevetPrese
     if (fileRef.current) fileRef.current.value = "";
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit({ id: editData ? editData.id : Date.now(), ...form });
-    if (!editData) {
-      setForm({ brevet_lie: "", nom_document: "", type_document: "", description: "", date_ajout: "", fichier: null });
-      if (fileRef.current) fileRef.current.value = "";
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
+  setLoading(true);
+  try {
+    const formData = new FormData()
+    formData.append("nom_document",  form.nom_document)
+    formData.append("type_document", form.type_document)
+    formData.append("autre_type", form.type_document === "autre" ? form.autre_type || "": "")
+    formData.append("description",   form.description)
+    formData.append("id_brevet",     form.id_brevet)
+    formData.append("date_sortie_officielle", form.date_sortie_officielle)
+    formData.append("date_ajout", form.date_ajout)
+    if (form.fichier instanceof File) {
+      formData.append("fichier", form.fichier) 
     }
-  };
+    console.log("formData autre_type:", form.autre_type)
+     console.log("formData type_document:", form.type_document)
+    await onSubmit(formData)  
+
+    if (!editData) {
+      setForm(emptyForm)
+      if (fileRef.current) fileRef.current.value = ""
+    }
+  } catch {
+    setError("Erreur lors de l'enregistrement.")
+  } finally {
+    setLoading(false)
+  }
+}
 
   const handleCancel = () => {
-    setForm({ brevet_lie: "", nom_document: "", type_document: "", description: "", date_ajout: "", fichier: null });
+    setForm(emptyForm);
+    if (fileRef.current) fileRef.current.value = "";
     if (onCancel) onCancel();
   };
 
   const fileName = form.fichier instanceof File
     ? form.fichier.name
-    : typeof form.fichier === "string" && form.fichier !== ""
-    ? form.fichier
     : null;
+
+  const existingFile =
+    editData?.fichier && typeof editData.fichier === "string"
+      ? editData.fichier.split("/").pop()
+      : null;
 
   return (
     <form className="user-form" onSubmit={handleSubmit}>
       <h3>{editData ? "Modifier document" : "Ajouter document"}</h3>
 
+      {error && <p style={{ color: "red", fontSize: "13px" }}>{error}</p>}
+
       <label className="field-label">Brevet lié</label>
-      <select name="brevet_lie" value={form.brevet_lie} onChange={handleChange} required disabled={!!editData}>
+      <select name="id_brevet" value={form.id_brevet} onChange={handleChange} >
         <option value="">Sélectionner un brevet</option>
-        {BREVETS.map((b) => <option key={b} value={b}>{b}</option>)}
+        {brevets.map((b) => <option key={b.id_brevet} value={b.id_brevet}>{b.titre}-N°{b.num_brevet}</option>)}
       </select>
 
       <label className="field-label">Nom document</label>
@@ -75,24 +119,51 @@ export default function DocumentForm({ onSubmit, editData, onCancel, brevetPrese
 
       <label className="field-label">Type de document</label>
       <select name="type_document" value={form.type_document} onChange={handleChange} required>
-        <option value="">Sélectionner un type</option>
-        {TYPES_DOCUMENT.map((t) => <option key={t} value={t}>{t}</option>)}
+       <option value="">Choisir un type</option>
+       <option value="brevet">Brevet</option>
+       <option value="paiement">Bon de paiement</option>
+       <option value="Memoire Descriptif">Memoire Descriptif</option>
+       <option value="autre">Autre</option>
       </select>
+      {form.type_document === "autre" && (
+        <input name="autre_type" value={form.autre_type|| ""} onChange={handleChange} placeholder="Preciser le type..." type="text"/>
+      )}
 
       <label className="field-label">Description</label>
       <textarea name="description" value={form.description} onChange={handleChange} placeholder="Description du document" rows="3" />
+
+      {form.type_document === "brevet" && (
+        <>
+        <label className="field-label">Date Officiel sortie brevet</label>
+        <input type="date" name=" date_sortie_officielle" value={form.date_sortie_officielle} onChange={handleChange} required />
+      </>
+      )}
 
       <label className="field-label">Date ajout</label>
       <input type="date" name="date_ajout" value={form.date_ajout} onChange={handleChange} required />
 
       <label className="field-label">Fichier</label>
-      <input ref={fileRef} type="file" id="file-upload" style={{ display: "none" }} onChange={handleFile} />
+      <input
+        ref={fileRef}
+        type="file"
+        id="file-upload"
+        accept="*/*"
+        style={{ display: "none" }}
+        onChange={handleFile}
+      />
 
       {!fileName ? (
+        <>
+        {existingFile && (
+          <p style={{ fontSize: "12px", color: "#666", margin: "4px 0" }}>
+              Fichier actuel : <strong>{existingFile}</strong>
+            </p>
+        )}
         <label htmlFor="file-upload" className="file-select-btn">
           <AttachFileIcon style={{ fontSize: 16 }} />
-          Sélectionner un fichier
+           {existingFile ? "Remplacer le fichier" : "Sélectionner un fichier"}
         </label>
+        </>
       ) : (
         <div className="file-selected-row">
           <AttachFileIcon style={{ fontSize: 15, color: "#EA6113" }} />
@@ -107,7 +178,7 @@ export default function DocumentForm({ onSubmit, editData, onCancel, brevetPrese
         </div>
       )}
 
-      <button type="submit">{editData ? "Enregistrer" : "Ajouter"}</button>
+      <button type="submit" disabled={loading}>{loading ? "Enregistrement..." : editData ? "Enregistrer": "Ajouter"}</button>
 
       {editData && (
         <button type="button" className="cancel-btn" onClick={handleCancel}>Annuler</button>

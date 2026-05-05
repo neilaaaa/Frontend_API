@@ -75,7 +75,7 @@ export default function DocumentForm({ onSubmit, editData, onCancel, brevetPrese
       <label className="field-label">Brevet lié</label>
       <select name="brevet_lie" value={form.brevet_lie} onChange={handleChange} required disabled={!!editData}>
         <option value="">Sélectionner un brevet</option>
-        {BREVETS.map((b) => <option key={b} value={b}>{b}</option>)}
+        {brevet.map((b) => <option key={b.id_brevet} value={b.id_brevet}>{b.titre}</option>)}
       </select>
 
       <label className="field-label">Nom document</label>

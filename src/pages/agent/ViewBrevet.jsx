@@ -57,25 +57,17 @@ export default function ViewBrevet() {
     <p><b>Status:</b> {data.statut}</p>
    </div>
    <div className="view-card">
-     <p><b>Demande associée: {data?.titre_demande_liee ?? "Aucune demande liée"} </b></p>
+     <p><b>Demande associée:</b> {data?.titre_demande_liee ?? "Aucune demande liée"} </p>
    </div>
     
         {/* Documents */}
-        <div className="view-docs">
-          <p className="view-docs-title">📎 Documents joints</p>
+        <div className="view-card">
+          <p> <b> Documents joints: </b>
           
-          {data.document_set?.length > 0 ? (
-            <ul className="view-docs-list">
-              {data.document_set.map((doc) => (
-                <li key={doc.id_document} className="view-doc-item">
-                   <span> {doc.nom_document} </span> 
-                   <span>{doc.date_ajout}</span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="view-no-doc">Aucun document joint</p>
-          )}
+          <button className="btn" onClick={() => navigate(`/agent/documents?brevet=${data.id_brevet}`)}>
+           {data.document_set?.length > 0 ? `${data.document_set.length} document(s)` : "Voir document"}
+          </button>
+          </p>
         </div>
 
         <button className="view-btn-back" onClick={() => navigate(-1)}>

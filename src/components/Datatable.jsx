@@ -26,7 +26,7 @@ export default function DataTable({
   const [sortKey, setSortKey] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
   const [page, setPage]       = useState(1);
-  const perPage = 10;
+  const perPage = 5;
 
   /* ── Search ── */
   const filtered = useMemo(() => {
@@ -57,14 +57,6 @@ export default function DataTable({
   };
 
   const handleSearch = (e) => { setSearch(e.target.value); setPage(1); };
-
-  /* ── Export Excel ── */
-  const exportExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(sorted);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "data");
-    XLSX.writeFile(wb, `${exportName}.xlsx`);
-  };
 
   /* ── Export PDF ── */
   const exportPDF = () => {
@@ -103,7 +95,6 @@ export default function DataTable({
           {onAdd && (
             <button className="dt-btn" onClick={onAdd}>+ Ajouter</button>
           )}
-          <button className="dt-btn-excel" onClick={exportExcel}>⬇ Excel</button>
           <button className="dt-btn-pdf"   onClick={exportPDF}>⬇ PDF</button>
         </div>
       </div>

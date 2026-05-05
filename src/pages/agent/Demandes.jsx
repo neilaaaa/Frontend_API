@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./Demandes.css";
 import { getDemandeBrevets, addDemandeBrevet, updateDemandeBrevet, deleteDemandeBrevet } from "../../features/demande/apiDemande";
-import {getBrevets} from "../../features/brevets/brevetApi"
+import {getTousBrevets} from "../../features/brevets/brevetApi"
 /* ─── MUI Icons ────────────────────────────────────────────────────────── */
 import SearchIcon   from "@mui/icons-material/Search";
 import EditIcon     from "@mui/icons-material/Edit";
@@ -273,7 +273,7 @@ export default function AgentDemandes() {
     }
   }
   useEffect(() => {
-    getBrevets().then(res => {
+    getTousBrevets().then(res => {
     console.log("brevets reçus:", res)
     const unique = [...new Map(res.map(b => [b.id_brevet, b])).values()]
     console.log("brevets uniques:", unique)

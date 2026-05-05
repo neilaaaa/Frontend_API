@@ -35,7 +35,7 @@ export default function EditBrevet() {
        console.error("Response:", err.response)        
        console.error("Status:", err.response?.status)  
        console.error("Data:", err.response?.data)      
-  setError(`Erreur ${err.response?.status}: ${JSON.stringify(err.response?.data)}`)
+       setError(`Erreur ${err.response?.status}: ${JSON.stringify(err.response?.data)}`)
       } finally{
         setLoading(false)
       }
@@ -55,7 +55,7 @@ export default function EditBrevet() {
         ...form,
         num_brevet: Number(form.num_brevet),
         num_depo: Number(form.num_depo),
-        id_demande: form.id_demande || null,
+        
       })
       navigate("/agent/brevets")
     } catch (err){

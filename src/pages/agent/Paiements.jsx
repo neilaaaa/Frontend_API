@@ -1,51 +1,65 @@
 import { useEffect, useState } from "react";
 import Datatable2 from "../../components/Datatable2";
 import PaiementForm from "./PaiementForm";
+import {
+  getPaiement,
+  addPaiement,
+  updatePaiement,
+  deletePaiement
+} from "../../features/paiement/apiPaiement"
 
 export default function AgentPaiements() {
   const [data, setData] = useState([]);
   const [editPaiement, setEditPaiement] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    const exempleData = [
-      {
-        id: 1,
-        titre_brevet: "Brevet FR-2024-001",
-        date_paiement: "2024-01-15",
-        montant_total: 1500.00,
-        statut: "payer",
-      },
-      {
-        id: 2,
-        titre_brevet: "Brevet FR-2024-002",
-        date_paiement: "2024-02-20",
-        montant_total: 2300.50,
-        statut: "non_payer",
-      },
-      {
-        id: 3,
-        titre_brevet: "Brevet FR-2024-003",
-        date_paiement: "2024-03-05",
-        montant_total: 800.00,
-        statut: "non_payer",
-      },
-    ];
-    setData(exempleData);
-  }, []);
-
-  const handleSubmit = (paiement) => {
-    if (editPaiement) {
-      setData((prev) =>
-        prev.map((p) => (p.id === editPaiement.id ? paiement : p))
-      );
-      setEditPaiement(null);
-    } else {
-      setData((prev) => [...prev, paiement]);
+ const load = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const res = await getPaiement();
+      setData(res);
+      console.log(data[0])
+    } catch {
+      setError("Erreur chargement des paiements.");
+    } finally {
+      setLoading(false);
     }
   };
 
+  useEffect(() => {
+    load();
+  }, []);
+
+  const handleSubmit = async (paiement) => {
+    try{
+      setError("");
+      if(editPaiement){
+        await updatePaiement(editPaiement.id_paiement, paiement);
+        setEditPaiement(null);
+      } else{
+        await addPaiement(paiement);
+      }
+      await load()
+    } catch (err){
+      console.log("ERREUR:", err.respose?.data)
+      setError(JSON.stringify(err.response?.data) || "Erreur enregistrement.");
+    }
+  }
+
   const handleEdit = (row) => setEditPaiement(row);
-  const handleDelete = (row) => setData((prev) => prev.filter((p) => p.id !== row.id));
+
+ const handleDelete = async (row) => {
+    try {
+      await deletePaiement(row.id_paiement);
+      await load();
+    } catch {
+      setError("Erreur suppression.");
+    }
+  };
+
+   if (loading) return <p>Chargement...</p>;
 
   return (
     <Datatable2
@@ -53,14 +67,33 @@ export default function AgentPaiements() {
       exportName="paiements"
       data={data}
       columns={[
-        { key: "titre_brevet", label: "Titre brevet" },
+        {
+            key: "brevet",
+            label: "Brevet",
+            render: (val) =>
+              val ? `${val.titre} — N°${val.num_brevet}` : "—",
+
+            pdfFormat: (val) =>
+              typeof val === "object"
+                ? `${val?.titre ?? ""} — N°${val?.num_brevet ?? ""}`.trim()
+                : val,
+          },
         { key: "date_paiement", label: "Date paiement" },
-        { key: "montant_total", label: "Montant total DA" },
-        { key: "statut", label: "Statut" },
+        { key: "montant_total", label: "Montant (DA)",
+            render: (val) =>
+              val != null
+                ? Number(val).toLocaleString("fr-DZ") + " DA"
+                : "—",
+            pdfFormat: (val) =>
+              val != null ? Number(val).toLocaleString("fr-DZ") + " DA" : "—",
+        },
+        { key: "statut", label: "Statut", 
+          pdfFormat: (val) => (val === "payer" ? "Payé" : "Non payé"),
+         },
       ]}
       form={
         <PaiementForm
-          key={editPaiement ? editPaiement.id : "new"}
+          key={editPaiement ? editPaiement.id_paiement : "new"}
           editData={editPaiement}
           onSubmit={handleSubmit}
           onCancel={() => setEditPaiement(null)}

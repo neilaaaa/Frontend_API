@@ -33,6 +33,7 @@ export default function AddBrevet() {
     setError("");
     setLoading(true);
     try {
+      console.log("test try", form)
       await addBrevet({
         num_brevet: Number(form.num_brevet),
         titre: form.titre,
@@ -43,7 +44,9 @@ export default function AddBrevet() {
         statut: form.statut,
       });
       navigate("/agent/brevets");
-    } catch {
+    } catch (err) {
+      console.error("erreur 400:", err.response?.data)
+      console.log(err)
       setError("Erreur lors de l'ajout du brevet.");
     } finally {
       setLoading(false);
@@ -59,7 +62,7 @@ export default function AddBrevet() {
         <div className="brevet-section-label">Identification</div>
 
         <div className="form-group">
-          <label>NumÃ©ro brevet</label>
+          <label>Numero brevet</label>
           <input name="num_brevet" placeholder="Ex : BR-2024-001" onChange={handleChange} />
         </div>
 
@@ -69,7 +72,7 @@ export default function AddBrevet() {
         </div>
 
         <div className="form-group">
-          <label>NumÃ©ro de dÃ©pÃ´t</label>
+          <label>Numero de depot</label>
           <input name="num_depo" placeholder="Ex : DEP-2024-001" onChange={handleChange} />
         </div>
 
@@ -81,7 +84,7 @@ export default function AddBrevet() {
         <div className="brevet-section-label">Dates</div>
 
         <div className="form-group">
-          <label>Date de dÃ©pÃ´t</label>
+          <label>Date de depot</label>
           <input type="date" name="date_depo" onChange={handleChange} />
         </div>
 
@@ -96,7 +99,7 @@ export default function AddBrevet() {
         </div>
 
         <div className="form-group">
-          <label>DÃ©posant</label>
+          <label>Deposant</label>
           <input name="deposant" onChange={handleChange} />
         </div>
 

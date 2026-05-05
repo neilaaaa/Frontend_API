@@ -234,7 +234,7 @@
   position: fixed;
   inset: 0;
   background: rgba(30,15,5,.50);
-  z-index: 999;
+  z-index: 9999 !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -252,9 +252,9 @@
   display: flex;
   flex-direction: column;
   box-shadow: 0 24px 80px rgba(234,97,19,.18);
-  overflow: hidden;
   border: 1px solid #f5ece0;
-  min-width: 0;
+  position: relative;
+  z-index: 10000;
 }
 
 /* ── En-tête modal — ORANGE ── */

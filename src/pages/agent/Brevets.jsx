@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import DataTable from "../../components/Datatable";
 
 import {
-  getBrevets,
+  getTousBrevets,
   deleteBrevet,
 } from "../../features/brevets/brevetApi";
 
@@ -17,7 +17,7 @@ export default function Brevets() {
     try{
       setLoading(true);
       setError("");
-      const response = await getBrevets();
+      const response = await getTousBrevets();
       setData(response.results || response);
     } catch{
       console.error("erreur:", err)
@@ -53,27 +53,12 @@ export default function Brevets() {
   { key: "titre", label: "Titre" },
   { key: "date_depo", label: "Date dépôt" },
   { key: "date_sortie", label: "Date sortie" },
-  { key: "titulaire", label: "Titulaire" },
   { key: "inventeur", label: "Inventeurs", 
     render:(value)=> Array.isArray(value)
         ? value.map(i => `${i.nom_inv} ${i.prenom_inv}`).join(", ")
         : "Aucun" ,
     pdfFormat: (val) => Array.isArray(val)? val.map(i => `${i.nom_inv} ${i.prenom_inv}`).join(", ") : "Aucun"},
   { key: "statut", label: "Statut" },
-  {
-    key: "document_set",
-    label: "Documents",
-    render: (value, row) =>(
-      <button className="btn" onClick={()=> navigate(`/agent/documents?brevet=${row.id_brevet}`)}>
-        {value?.length > 0 ? `${value.length} document(s)` : "Ajouter document"}
-      </button> 
-        
-    ), pdfExclude: true  
-  },
-  {key: "id_demande",
-  render: (id_demande) => (
-    <span>{id_demande?.titre}</span>
-  )}
 ]}
       onAdd={() => navigate("/agent/brevets/add")}
       onEdit={(row) => navigate(`/agent/brevets/edit/${row.id_brevet}`)}

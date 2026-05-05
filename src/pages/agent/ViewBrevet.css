@@ -165,7 +165,6 @@
   overflow-wrap: anywhere;
 }
 
-.view-doc-item::before { content: "📎"; font-size: 13px; }
 
 .view-no-docs {
   font-size: 13px;
@@ -221,7 +220,7 @@
 
 @media (max-width: 768px) {
   .view-page {
-    min-height: auto;
+    min-height: auto ;
     padding: 16px;
   }
 

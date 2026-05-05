@@ -22,6 +22,7 @@ const GROUP_TO_ROLE = {
   "agent":        "agent",
   "responsable":  "responsable",
   "directeur":    "directeur",
+  "admin":        "admin"
 }
 
 const ROLE_HOME = {
