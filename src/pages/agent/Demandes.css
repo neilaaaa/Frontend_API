@@ -562,3 +562,260 @@
     padding-right: 12px !important;
   }
 }
+/* ═══════════════════════════════════════════════════════════
+   FIX DEMANDES — style proche Brevet + modal فوق sidebar
+   ═══════════════════════════════════════════════════════════ */
+
+.dem-page {
+  min-height: 100vh;
+  background: #f4f0ea !important;
+  padding: 32px 24px !important;
+  font-family: "DM Sans", "Segoe UI", sans-serif !important;
+}
+
+/* card ta3 liste demandes */
+.dem-card {
+  background: #fff !important;
+  border-radius: 20px !important;
+  padding: 28px 32px !important;
+  box-shadow:
+    0 4px 6px rgba(234,97,19,.05),
+    0 12px 32px rgba(0,0,0,.08) !important;
+  border: 1px solid #f0e0cc !important;
+}
+
+/* title proche brevet */
+.dem-title {
+  font-size: 19px !important;
+  font-weight: 700 !important;
+  color: #1a1a2e !important;
+  margin: 0 0 4px !important;
+  padding-left: 14px !important;
+  border-left: 4px solid !important;
+  border-image: linear-gradient(180deg, #EA6113, #FBB931) 1 !important;
+}
+
+/* IMPORTANT: modal فوق sidebar */
+.dem-overlay {
+  z-index: 3000 !important;
+  padding: 24px !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* modal كيما card brevet */
+.dem-modal {
+  position: relative !important;
+  z-index: 3001 !important;
+  width: min(1000px, calc(100vw - 48px)) !important;
+  max-width: 1000px !important;
+  max-height: calc(100dvh - 48px) !important;
+  border-radius: 20px !important;
+  border: 1px solid #f0e0cc !important;
+  box-shadow:
+    0 4px 6px rgba(234,97,19,.05),
+    0 20px 60px rgba(0,0,0,.18) !important;
+  overflow: hidden !important;
+}
+
+/* header modal */
+.modal-header {
+  padding: 20px 28px !important;
+  background: linear-gradient(135deg, #EA6113, #F88F22) !important;
+}
+
+/* body formulaire */
+.modal-body {
+  padding: 28px 32px !important;
+  background: #fff !important;
+}
+
+/* sections داخل demande */
+.modal-section {
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin-bottom: 24px !important;
+  background: transparent !important;
+}
+
+/* section title كيما brevet-section-label */
+.section-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .8px !important;
+  color: #EA6113 !important;
+  margin-bottom: 14px !important;
+}
+
+.section-title::after {
+  content: "" !important;
+  flex: 1 !important;
+  height: 1px !important;
+  background: linear-gradient(90deg, #f0ddd0, transparent) !important;
+}
+
+/* grid كيما brevet */
+.modal-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 18px !important;
+  min-width: 0 !important;
+}
+
+/* full width */
+.fg.full {
+  grid-column: span 2 !important;
+}
+
+/* labels */
+.fg label {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #a0826d !important;
+  text-transform: uppercase !important;
+  letter-spacing: .5px !important;
+  margin-bottom: 6px !important;
+}
+
+/* inputs كيما brevet */
+.fg input,
+.fg textarea,
+.fg select {
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 10px 13px !important;
+  border-radius: 10px !important;
+  border: 1.5px solid #f0ddd0 !important;
+  font-size: 13.5px !important;
+  background: #fdf8f3 !important;
+  color: #2d2013 !important;
+  font-family: inherit !important;
+  transition: border .15s, box-shadow .15s, background .15s !important;
+  outline: none !important;
+}
+
+.fg input:focus,
+.fg textarea:focus,
+.fg select:focus {
+  border-color: #F88F22 !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 3px rgba(248,143,34,0.18) !important;
+}
+
+/* checkboxes */
+.chk-label,
+.piece-item {
+  border-radius: 10px !important;
+  border: 1.5px solid #f0ddd0 !important;
+  background: #fdf8f3 !important;
+  padding: 10px 13px !important;
+}
+
+.chk-label:has(input:checked),
+.piece-item:has(input:checked) {
+  border-color: #F88F22 !important;
+  background: #fff4e6 !important;
+  color: #EA6113 !important;
+}
+
+/* pieces grid */
+.pieces-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+/* footer buttons كيما brevet */
+.modal-footer {
+  padding: 18px 32px !important;
+  background: #fff !important;
+  border-top: 1.5px solid #f0e0cc !important;
+  gap: 12px !important;
+}
+
+.btn-save,
+.btn-cancel {
+  flex: 1 !important;
+  padding: 12px !important;
+  border-radius: 11px !important;
+  font-size: 14px !important;
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #EA6113, #F88F22) !important;
+  box-shadow: 0 3px 12px rgba(248,143,34,0.35) !important;
+}
+
+.btn-cancel {
+  background: #fff !important;
+  color: #6b7280 !important;
+  border: 1.5px solid #f0ddd0 !important;
+}
+
+/* responsive */
+@media (max-width: 768px) {
+  .dem-page {
+    padding: 16px !important;
+  }
+
+  .dem-card {
+    padding: 24px 20px !important;
+    border-radius: 16px !important;
+  }
+
+  .dem-overlay {
+    padding: 12px !important;
+  }
+
+  .dem-modal {
+    width: calc(100vw - 24px) !important;
+    max-height: calc(100dvh - 24px) !important;
+    border-radius: 16px !important;
+  }
+
+  .modal-body {
+    padding: 24px 20px !important;
+  }
+
+  .modal-grid,
+  .pieces-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .fg.full,
+  .section-title {
+    grid-column: span 1 !important;
+  }
+
+  .modal-footer {
+    flex-direction: column-reverse !important;
+    padding: 16px 20px !important;
+  }
+
+  .modal-footer button {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .dem-page {
+    padding: 10px !important;
+  }
+
+  .dem-card {
+    padding: 18px 14px !important;
+    border-radius: 14px !important;
+  }
+
+  .dem-title {
+    font-size: 17px !important;
+  }
+
+  .modal-body {
+    padding: 18px 14px !important;
+  }
+}

@@ -5,7 +5,13 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import "./documents.css";
 import { getTousBrevets } from "../../features/brevets/brevetApi";
 
-export default function DocumentForm({ onSubmit, editData, onCancel, brevetPreselect }) {
+export default function DocumentForm({
+  onSubmit,
+  editData,
+  onCancel,
+  brevetPreselect,
+  brevets = [],
+}) {
   const fileRef = useRef();
 
   const [form, setForm] = useState({
@@ -44,16 +50,41 @@ export default function DocumentForm({ onSubmit, editData, onCancel, brevetPrese
     fetchBrevets();
      }, [editData])
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleFile = (e) => {
     const file = e.target.files[0];
-    if (file) setForm({ ...form, fichier: file });
+
+    if (file) {
+      setForm({
+        ...form,
+        fichier: file,
+      });
+    }
   };
 
   const handleRemoveFile = () => {
-    setForm({ ...form, fichier: null });
-    if (fileRef.current) fileRef.current.value = "";
+    setForm({
+      ...form,
+      fichier: null,
+    });
+
+    if (fileRef.current) {
+      fileRef.current.value = "";
+    }
+  };
+
+  const resetForm = () => {
+    setForm(emptyForm);
+
+    if (fileRef.current) {
+      fileRef.current.value = "";
+    }
   };
 
  const handleSubmit = async (e) => {
@@ -115,7 +146,13 @@ export default function DocumentForm({ onSubmit, editData, onCancel, brevetPrese
       </select>
 
       <label className="field-label">Nom document</label>
-      <input name="nom_document" value={form.nom_document} onChange={handleChange} placeholder="Nom du document" required />
+      <input
+        name="nom_document"
+        value={form.nom_document}
+        onChange={handleChange}
+        placeholder="Nom du document"
+        required
+      />
 
       <label className="field-label">Type de document</label>
       <select name="type_document" value={form.type_document} onChange={handleChange} required>
@@ -140,7 +177,13 @@ export default function DocumentForm({ onSubmit, editData, onCancel, brevetPrese
       )}
 
       <label className="field-label">Date ajout</label>
-      <input type="date" name="date_ajout" value={form.date_ajout} onChange={handleChange} required />
+      <input
+        type="date"
+        name="date_ajout"
+        value={form.date_ajout}
+        onChange={handleChange}
+        required
+      />
 
       <label className="field-label">Fichier</label>
       <input
@@ -167,12 +210,24 @@ export default function DocumentForm({ onSubmit, editData, onCancel, brevetPrese
       ) : (
         <div className="file-selected-row">
           <AttachFileIcon style={{ fontSize: 15, color: "#EA6113" }} />
+
           <span className="file-selected-name">{fileName}</span>
-          <label htmlFor="file-upload" className="file-change-btn" title="Changer le fichier">
+
+          <label
+            htmlFor="file-upload"
+            className="file-change-btn"
+            title="Changer le fichier"
+          >
             <ChangeCircleOutlinedIcon style={{ fontSize: 16 }} />
             Changer
           </label>
-          <button type="button" className="file-remove-btn" onClick={handleRemoveFile} title="Supprimer le fichier">
+
+          <button
+            type="button"
+            className="file-remove-btn"
+            onClick={handleRemoveFile}
+            title="Supprimer le fichier"
+          >
             <DeleteOutlineIcon style={{ fontSize: 16 }} />
           </button>
         </div>
@@ -181,7 +236,9 @@ export default function DocumentForm({ onSubmit, editData, onCancel, brevetPrese
       <button type="submit" disabled={loading}>{loading ? "Enregistrement..." : editData ? "Enregistrer": "Ajouter"}</button>
 
       {editData && (
-        <button type="button" className="cancel-btn" onClick={handleCancel}>Annuler</button>
+        <button type="button" className="cancel-btn" onClick={handleCancel}>
+          Annuler
+        </button>
       )}
     </form>
   );

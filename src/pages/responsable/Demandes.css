@@ -730,3 +730,11 @@
     width: 100%;
   }
 }
+.dem-overlay {
+  z-index: 3000 !important;
+}
+
+.dem-modal {
+  position: relative !important;
+  z-index: 3001 !important;
+}

@@ -14,7 +14,7 @@ export default function AgentDocuments() {
   const [loading, setLoading] = useState(false);
   const [editDoc, setEditDoc] = useState(null);
   const [viewDoc, setViewDoc] = useState(null);
-  const [brevet, setBrevet]=useState([])
+  const [brevets, setBrevets] = useState([]);
 
   const load = async () => {
     try {
@@ -22,7 +22,8 @@ export default function AgentDocuments() {
       setError("");
       const res = await getTousDocuments();
       setData(res.results || res);
-    } catch {
+    } catch (error) {
+      console.error(error);
       setError("Erreur de chargement des documents");
     } finally {
       setLoading(false);
@@ -41,17 +42,21 @@ export default function AgentDocuments() {
   }, [])
  
   const handleSubmit = async (doc) => {
-      setError("")
-      setLoading(true)
-      try{
-       if (editDoc) {
-       await updateDocument(editDoc.id_document, doc)
-       setEditDoc(null)
-       } else {
-        if (Array.isArray(doc)){
-         for (const t of doc){ await addDocument(t)}; 
+    setError("");
+    setLoading(true);
+
+    try {
+      if (editDoc) {
+        await updateDocument(editDoc.id_document, doc);
+        setEditDoc(null);
+      } else {
+        if (Array.isArray(doc)) {
+          for (const item of doc) {
+            await addDocument(item);
+          }
         } else {
-        await addDocument(doc);
+          await addDocument(doc);
+        }
       }
 
       await load();
@@ -67,13 +72,17 @@ export default function AgentDocuments() {
     try {
       await deleteDocument(row.id_document);
       await load();
-    } catch {
+    } catch (error) {
+      console.error(error);
       setError("Erreur de suppression");
     }
   };
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+
+  if (error) {
+    return <p style={{ color: "red" }}>{error}</p>;
+  }
 
   return (
     <>
@@ -98,6 +107,7 @@ export default function AgentDocuments() {
             editData={editDoc}
             onSubmit={handleSubmit}
             onCancel={() => setEditDoc(null)}
+            brevets={brevets}
           />
         }
         onEdit={(row) => setEditDoc(row)}
@@ -108,6 +118,7 @@ export default function AgentDocuments() {
       {viewDoc && (
         <ViewDocumentModal
           doc={viewDoc}
+          brevets={brevets}
           onClose={() => setViewDoc(null)}
         />
       )}
@@ -128,9 +139,11 @@ function ViewDocumentModal({ doc, onClose }) {
       const res = await downloadDocument(doc.id_document);
       const url = URL.createObjectURL(new Blob([res.data]));
       const a = document.createElement("a");
+
       a.href = url;
       a.download = doc.fichier.split("/").pop();
       a.click();
+
       URL.revokeObjectURL(url);
     } catch(err){
       console.log("l'erreur est: ", err)
@@ -146,8 +159,11 @@ function ViewDocumentModal({ doc, onClose }) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-box" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h3>Details du document</h3>
-          <button className="modal-close" onClick={onClose}>X</button>
+          <h3>Détails du document</h3>
+
+          <button className="modal-close" onClick={onClose}>
+            X
+          </button>
         </div>
 
         <div className="modal-body">
@@ -161,7 +177,9 @@ function ViewDocumentModal({ doc, onClose }) {
 
             <div className="view-doc-item">
               <span className="view-doc-label">Nom document</span>
-              <span className="view-doc-value">{doc.nom_document}</span>
+              <span className="view-doc-value">
+                {doc.nom_document || "-"}
+              </span>
             </div>
 
             <div className="view-doc-item">
@@ -174,25 +192,32 @@ function ViewDocumentModal({ doc, onClose }) {
 
             <div className="view-doc-item">
               <span className="view-doc-label">Date ajout</span>
-              <span className="view-doc-value">{doc.date_ajout}</span>
+              <span className="view-doc-value">
+                {doc.date_ajout || "-"}
+              </span>
             </div>
 
             <div className="view-doc-item full">
               <span className="view-doc-label">Description</span>
-              <span className="view-doc-value">{doc.description || "-"}</span>
+              <span className="view-doc-value">
+                {doc.description || "-"}
+              </span>
             </div>
 
             <div className="view-doc-item full">
               <span className="view-doc-label">Fichier</span>
+
               {fileName ? (
                 <div className="view-file-row">
                   <InsertDriveFileOutlinedIcon
                     style={{ fontSize: 16, color: "#EA6113" }}
                   />
+
                   <span className="view-file-name">{fileName}</span>
+
                   <button className="view-dl-btn" onClick={handleDownload}>
                     <DownloadIcon style={{ fontSize: 16 }} />
-                    Telecharger
+                    Télécharger
                   </button>
                 </div>
               ) : (
@@ -203,7 +228,9 @@ function ViewDocumentModal({ doc, onClose }) {
         </div>
 
         <div className="modal-footer">
-          <button className="dt-btn" onClick={onClose}>Fermer</button>
+          <button className="dt-btn" onClick={onClose}>
+            Fermer
+          </button>
         </div>
       </div>
 
