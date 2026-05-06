@@ -9,8 +9,14 @@ const STATUT_COLOR = { ACCEPTER: "green", REFUSER: "red", EN_ATTENTE: "yellow" }
 const STATUT_LABEL = { ACCEPTER: "Accepté", REFUSER: "Refusé", EN_ATTENTE: "En attente" };
 
 const COLUMNS = [
-  { key: "num_brevet",  label: "N° Brevet",    sortable: true,  render: (r) => <span className="dt3-ref">BR-{String(r.num_brevet).padStart(3, "0")}</span> },
-  { key: "titre",       label: "Titre",         sortable: true,  render: (r) =><span title={r.titre}>{r.titre.length > 45 ? r.titre.slice(0, 45) + "…" : r.titre}</span>},
+  { key: "num_brevet", 
+     label: "N° Brevet", 
+      sortable: true,  
+      render: (r) => <span className="dt3-ref">BR-{String(r.num_brevet).padStart(3, "0")}</span> },
+  { key: "titre",   
+    label: "Titre", 
+    sortable: true,
+    render: (r) =><span title={r.titre}>{r.titre.length > 45 ? r.titre.slice(0, 45) + "…" : r.titre}</span>},
   { key: "date_depo",   label: "Date dépôt",    sortable: true  },
   { key: "date_sortie", 
     label: "Date sortie",  
@@ -27,14 +33,24 @@ export default function DirBrevets() {
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState(null);
 
-   useEffect(() => {
-    getTousBrevets()            
-      .then((rows) => setData(rows))
-      .catch((err) => {
-        console.error("Erreur chargement brevets :", err);
-        setError("Impossible de charger les brevets.");
-      })
-      .finally(() => setLoading(false));
+  
+  const load = async () => {
+    try{
+      setLoading(true);
+      setError("");
+      const response = await getTousBrevets();
+      setData(response.results || response);
+    } catch{
+      console.error("erreur:", err)
+      console.error("response:", err.response?.data)
+      setError("Erreur chargement des brevets");
+    } finally{
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
   }, []);
 
   const stats = useMemo(() => [

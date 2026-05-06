@@ -58,3 +58,20 @@ export const getDocumentsByBrevet = async (brevetId) => {
   const res = await api.get(`documents/?brevet=${brevetId}`);
   return res.data.results ?? res.data;
 };
+
+export const downloadDocument = async (id) => {
+  const res = await api.get(`documents/${id}/download/`, {
+    responseType: "blob",
+  });
+  return res;
+};
+
+function buildFormData(doc) {
+  const formData = new FormData();
+  Object.entries(doc).forEach(([key, value]) => {
+    if (value !== null && value !== undefined && value !== "") {
+      formData.append(key, value);
+    }
+  });
+  return formData;
+}

@@ -10,7 +10,6 @@ export default function DocumentForm({
   editData,
   onCancel,
   brevetPreselect,
-  brevets = [],
 }) {
   const fileRef = useRef();
 
@@ -36,7 +35,6 @@ export default function DocumentForm({
         type_document: editData.type_document || "",
         autre_type: editData.autre_type || "",
         description:   editData.description   || "",
-        date_ajout:    editData.date_ajout    || "",
         date_ajout:    editData.date_ajout    || "",
         date_sortie_officielle: editData.date_sortie_officielle    || "",
         fichier:       editData.fichier       || null,

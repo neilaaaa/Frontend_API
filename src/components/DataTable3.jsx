@@ -6,6 +6,8 @@ import DownloadIcon from "@mui/icons-material/Download";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
+import jsPDF from "jspdf"
+import autoTable from "jspdf-autotable"  
 import "./DataTable3.css";
 
 /* ════════════════════════════════════════════════
@@ -167,37 +169,27 @@ export default function DataTable3({
   };
 
   /* ── export PDF ── */
-  const handlePDF = () => {
-    import("jspdf").then(({ default: jsPDF }) => {
-      import("jspdf-autotable").then(() => {
-        const doc = new jsPDF({ orientation: "landscape" });
-        doc.setFontSize(15);
-        doc.text(pdfTitle || title, 14, 16);
-        doc.setFontSize(9);
-        doc.setTextColor(150);
-        doc.text(`Exporté le ${new Date().toLocaleDateString("fr-FR")} — ${filtered.length} enregistrement(s)`, 14, 23);
-        doc.autoTable({
-          startY: 28,
-          head: [pdfColumns],
-          body: filtered.map(pdfRow),
-          styles: { fontSize: 8.5 },
-          headStyles: { fillColor: [255, 122, 0], textColor: 255 },
-          alternateRowStyles: { fillColor: [255, 250, 243] },
-        });
-        doc.save(`${fileName}.pdf`);
+ const handlePDF = () => {
+  import("jspdf").then(({ default: jsPDF }) => {
+    import("jspdf-autotable").then(({ default: autoTable }) => {  // ✅ récupérez autoTable
+      const doc = new jsPDF({ orientation: "landscape" });
+      doc.setFontSize(15);
+      doc.text(pdfTitle || title, 14, 16);
+      doc.setFontSize(9);
+      doc.setTextColor(150);
+      doc.text(`Exporté le ${new Date().toLocaleDateString("fr-FR")} — ${filtered.length} enregistrement(s)`, 14, 23);
+      autoTable(doc, {
+        startY: 28,
+        head: [pdfColumns],
+        body: filtered.map(pdfRow),
+        styles: { fontSize: 8.5 },
+        headStyles: { fillColor: [255, 122, 0], textColor: 255 },
+        alternateRowStyles: { fillColor: [255, 250, 243] },
       });
+      doc.save(`${exportName || title}.pdf`);  // ✅ n'oubliez pas de sauvegarder
     });
-  };
-
-  /* ── export Excel ── */
-  const handleExcel = () => {
-    import("xlsx").then((XLSX) => {
-      const ws = XLSX.utils.json_to_sheet(filtered.map(excelRow));
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, title.substring(0, 31));
-      XLSX.writeFile(wb, `${fileName}.xlsx`);
-    });
-  };
+  });
+};
 
   return (
     <div className="dt3-page">
@@ -213,9 +205,6 @@ export default function DataTable3({
         <div className="dt3-actions">
           <button className="dt3-btn dt3-btn-pdf" onClick={handlePDF}>
             <PictureAsPdfIcon style={{ fontSize: 16 }} /> Exporter PDF
-          </button>
-          <button className="dt3-btn dt3-btn-excel" onClick={handleExcel}>
-            <TableChartIcon style={{ fontSize: 16 }} /> Exporter Excel
           </button>
         </div>
       </div>
@@ -291,7 +280,7 @@ export default function DataTable3({
                 </tr>
               ) : (
                 paged.map((row, idx) => (
-                  <tr key={row.id ?? idx}>
+                  <tr key={idx}>
                     {columns.map((col) => (
                       <td key={col.key}>
                         {col.render ? col.render(row) : (row[col.key] ?? "—")}

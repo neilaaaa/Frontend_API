@@ -6,7 +6,7 @@ import {
   addPaiement,
   updatePaiement,
   deletePaiement
-} from "../../features/paiement/apiPaiement"
+} from "../../features/paiement/apiPaiement.js"
 
 export default function AgentPaiements() {
   const [data, setData] = useState([]);
@@ -18,8 +18,8 @@ export default function AgentPaiements() {
     try {
       setLoading(true);
       setError("");
-      const res = await getPaiement();
-      setData(res);
+      const data = await getPaiement();
+      setData(data);
       console.log(data[0])
     } catch {
       setError("Erreur chargement des paiements.");
