@@ -516,3 +516,110 @@
     width: 100%;
   }
 }
+
+@media (max-width: 640px) {
+  .dt-right table,
+  .dt-table {
+    min-width: 0;
+  }
+
+  .dt-table-card {
+    overflow: visible;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .dt-table,
+  .dt-table thead,
+  .dt-table tbody,
+  .dt-table tr,
+  .dt-table th,
+  .dt-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .dt-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .dt-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .dt-table tr {
+    background: #fff;
+    border: 1px solid #f0e0cc;
+    border-radius: 14px;
+    box-shadow:
+      0 4px 6px rgba(234,97,19,.05),
+      0 10px 28px rgba(0,0,0,.08);
+    padding: 8px 12px;
+    overflow: hidden;
+  }
+
+  .dt-table tbody tr:nth-child(even) td,
+  .dt-table tbody tr:hover td,
+  .dt-table tbody tr:nth-child(even):hover td {
+    background: transparent !important;
+  }
+
+  .dt-table td {
+    border: 0 !important;
+    padding: 8px 0 !important;
+    display: grid;
+    grid-template-columns: minmax(96px, 120px) minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+  }
+
+  .dt-table td::before {
+    content: attr(data-label);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    color: #a0826d;
+  }
+
+  .dt-actions-cell {
+    white-space: normal;
+    text-align: left !important;
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 10px !important;
+    border-top: 1px solid #f5ece0 !important;
+    margin-top: 4px;
+  }
+
+  .dt-actions-cell::before {
+    width: 100%;
+    margin-bottom: 4px;
+  }
+
+  .dt-btn-icon {
+    margin: 0;
+  }
+
+  .dt-empty {
+    display: block !important;
+    text-align: center !important;
+    padding: 20px 10px !important;
+  }
+
+  .dt-empty::before {
+    content: none;
+  }
+}

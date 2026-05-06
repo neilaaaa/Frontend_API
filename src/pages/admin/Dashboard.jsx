@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getUsers } from "../../features/admin/userApi";
 import "../../components/dashboard/dashboard.css";
 
@@ -29,18 +29,9 @@ function getRole(user) {
   return user?.groups?.[0] || "Sans role";
 }
 
-function matchesQuery(values, query) {
-  if (!query) return true;
-  return values.some((value) =>
-    String(value ?? "").toLowerCase().includes(query)
-  );
-}
-
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const [users, setUsers] = useState([]);
-  const query = (searchParams.get("q") ?? "").trim().toLowerCase();
 
   useEffect(() => {
     let active = true;
@@ -105,11 +96,6 @@ export default function Dashboard() {
     },
   ];
 
-  const filteredFocusCards = useMemo(
-    () => focusCards.filter((card) => matchesQuery([card.label, card.text, card.value], query)),
-    [focusCards, query]
-  );
-
   const latestUsers = useMemo(
     () =>
       [...users]
@@ -120,21 +106,6 @@ export default function Dashboard() {
           role: getRole(user),
         })),
     [users]
-  );
-
-  const filteredRoles = useMemo(
-    () => roles.filter((role) => matchesQuery([role.name, role.text], query)),
-    [query]
-  );
-
-  const filteredQuickActions = useMemo(
-    () => quickActions.filter((action) => matchesQuery([action.label], query)),
-    [query]
-  );
-
-  const filteredLatestUsers = useMemo(
-    () => latestUsers.filter((user) => matchesQuery([user.username, user.role], query)),
-    [latestUsers, query]
   );
 
   const goToUsers = (section) => {
@@ -151,7 +122,7 @@ export default function Dashboard() {
       </div>
 
       <div className="stats-grid">
-        {filteredFocusCards.map((card) => (
+        {focusCards.map((card) => (
           <div className="stat-card" key={card.label}>
             <span className="stat-accent-bar" />
             <div className="stat-info">
@@ -178,11 +149,7 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {filteredRoles.length === 0 ? (
-                <tr>
-                  <td colSpan={2}>Aucun resultat</td>
-                </tr>
-              ) : filteredRoles.map((role) => (
+              {roles.map((role) => (
                 <tr key={role.name}>
                   <td>{role.name}</td>
                   <td>{role.text}</td>
@@ -198,7 +165,7 @@ export default function Dashboard() {
           </div>
 
           <div className="table-filters admin-quick-actions">
-            {filteredQuickActions.map((action) => (
+            {quickActions.map((action) => (
               <button
                 className={`filter-btn${action.active ? " active" : ""}`}
                 key={action.label}
@@ -221,10 +188,10 @@ export default function Dashboard() {
               <strong>{summary.disabled}</strong>
             </div>
             <div className="admin-summary-list">
-              {filteredLatestUsers.length === 0 ? (
+              {latestUsers.length === 0 ? (
                 <span className="admin-summary-empty">Aucun utilisateur recent.</span>
               ) : (
-                filteredLatestUsers.map((user) => (
+                latestUsers.map((user) => (
                   <div className="admin-summary-user" key={user.username}>
                     <span>{user.username}</span>
                     <small>{user.role}</small>

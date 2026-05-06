@@ -176,11 +176,11 @@ export default function RespDemandes() {
                   ?<tr><td colSpan={6} className="dem-empty">Aucune demande enregistrée</td></tr>
                   :filteredMes.map(d=>(
                     <tr key={d.id}>
-                      <td>{d.date}</td><td>{d.deposant}</td>
-                      <td className="dem-titre-cell">{d.titre}</td>
-                      <td>{d.nature}</td>
-                      <td><span className={badgeCls(d.statut)}>{d.statut}</span></td>
-                      <td className="dem-actions">
+                      <td data-label="Date">{d.date}</td><td data-label="DÃ©posant">{d.deposant}</td>
+                      <td className="dem-titre-cell" data-label="Titre">{d.titre}</td>
+                      <td data-label="Nature">{d.nature}</td>
+                      <td data-label="Statut"><span className={badgeCls(d.statut)}>{d.statut}</span></td>
+                      <td className="dem-actions" data-label="Actions">
                         <button className="act-btn edit"  title="Modifier"    onClick={()=>openEdit(d)}><EditIcon sx={{fontSize:17}}/></button>
                         <button className="act-btn print" title="Imprimer"    onClick={()=>buildAndOpen(d,"print")}><PrintIcon sx={{fontSize:17}}/></button>
                         <button className="act-btn dl"    title="Télécharger" onClick={()=>buildAndOpen(d,"download")}><DownloadIcon sx={{fontSize:17}}/></button>
@@ -221,13 +221,13 @@ export default function RespDemandes() {
                   ?<tr><td colSpan={7} className="dem-empty">Aucune demande d'agent</td></tr>
                   :filteredAgent.map(d=>(
                     <tr key={d.id}>
-                      <td>{d.date}</td>
-                      <td><span className="agent-tag">{d.agentNom||"Agent"}</span></td>
-                      <td>{d.deposant}</td>
-                      <td className="dem-titre-cell">{d.titre}</td>
-                      <td>{d.nature}</td>
-                      <td><span className={badgeCls(d.statut)}>{d.statut}</span></td>
-                      <td className="dem-actions">
+                      <td data-label="Date">{d.date}</td>
+                      <td data-label="Agent"><span className="agent-tag">{d.agentNom||"Agent"}</span></td>
+                      <td data-label="DÃ©posant">{d.deposant}</td>
+                      <td className="dem-titre-cell" data-label="Titre">{d.titre}</td>
+                      <td data-label="Nature">{d.nature}</td>
+                      <td data-label="Statut"><span className={badgeCls(d.statut)}>{d.statut}</span></td>
+                      <td className="dem-actions" data-label="Actions">
                         <button className="act-btn view"    title="Voir"        onClick={()=>setViewDemande(d)}><VisibilityIcon sx={{fontSize:17}}/></button>
                         <button className="act-btn print"   title="Imprimer"    onClick={()=>buildAndOpen(d,"print")}><PrintIcon sx={{fontSize:17}}/></button>
                         <button className="act-btn dl"      title="Télécharger" onClick={()=>buildAndOpen(d,"download")}><DownloadIcon sx={{fontSize:17}}/></button>

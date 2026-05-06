@@ -146,11 +146,11 @@ export default function DataTable({
             pageData.map((row) => (
               <tr key={row.id_brevet}>
                 {columns.map((c) => (
-                  <td key={c.key}>
+                  <td key={c.key} data-label={c.label}>
                     {c.render ? c.render(row[c.key], row): row[c.key]}
                   </td>
                 ))}
-                <td className="dt-actions-cell">
+                <td className="dt-actions-cell" data-label="Actions">
                   {onView && (
                     <button
                       className="dt-btn-icon dt-btn-view"

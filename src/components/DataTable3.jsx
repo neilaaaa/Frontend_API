@@ -287,7 +287,7 @@ export default function DataTable3({
                 paged.map((row, idx) => (
                   <tr key={idx}>
                     {columns.map((col) => (
-                      <td key={col.key}>
+                      <td key={col.key} data-label={col.label}>
                         {col.render ? col.render(row) : (row[col.key] ?? "—")}
                       </td>
                     ))}
