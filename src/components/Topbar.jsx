@@ -3,7 +3,6 @@ import "./Topbar.css";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MenuIcon from "@mui/icons-material/Menu";
-import SearchIcon from "@mui/icons-material/Search";
 import { useAuth } from "../contexts/AuthContext";
 import { useNotifications } from "../contexts/NotificationContext";
 import { useNavigate } from "react-router-dom";
@@ -61,13 +60,6 @@ export default function Topbar({ collapsed, onMenuToggle }) {
         </div>
 
         <div className="topright">
-
-          {/* SEARCH */}
-          <div className="searchContainer">
-            <SearchIcon />
-            <input type="text" placeholder="Rechercher..." />
-          </div>
-
           {/* CLOCHE NOTIFICATIONS */}
           <div className="notifWrapper" ref={panelRef}>
             <div
