@@ -3,7 +3,6 @@ export default function RecentTable({ title, columns, rows, badgeKey, badgeMap }
     <div className="dash-card">
       <div className="dash-card-header">
         <span className="dash-card-title">{title}</span>
-        <a href="#" className="view-all">Voir tout</a>
       </div>
       <table className="mini-table">
         <thead>
