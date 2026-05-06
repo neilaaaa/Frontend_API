@@ -1,15 +1,21 @@
 /* ── TOPBAR ─────────────────────────────────────── */
 .topbar {
   height: 60px;
-  width: 100%;
   background: #ffffff;
   border-radius: 12px;
-  position: sticky;
-  top: 0;
-  margin: 10px 10px 0 10px;
+  position: fixed;
+  top: var(--shell-gap);
+  left: calc(var(--sidebar-width) + var(--shell-gap));
+  right: var(--shell-gap);
+  width: auto;
+  margin: 0;
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   z-index: 1000;
-  max-width: calc(100% - 20px);
+  max-width: none;
+}
+
+.topbar.collapsed {
+  left: calc(var(--sidebar-collapsed-width) + var(--shell-gap));
 }
 
 .topbarConteneur {
@@ -332,6 +338,12 @@
 .userRole { font-size: 11px; color: #aaa; text-transform: capitalize; }
 
 @media (max-width: 900px) {
+  .topbar,
+  .topbar.collapsed {
+    left: 10px;
+    right: 10px;
+  }
+
   .topbarConteneur {
     padding: 0 14px;
     gap: 12px;
@@ -351,9 +363,10 @@
 }
 
 @media (max-width: 640px) {
-  .topbar {
-    margin: 8px 8px 0;
-    max-width: calc(100% - 16px);
+  .topbar,
+  .topbar.collapsed {
+    left: 8px;
+    right: 8px;
     top: 8px;
   }
 
