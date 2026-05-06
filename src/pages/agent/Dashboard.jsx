@@ -106,10 +106,10 @@ export default function Dashboard() {
       {error && <p style={{ padding: "16px", color: "red" }}>{error}</p>}
 
       <div className="stats-grid">
-        <StatCard icon={IconBrevet} value={stats.total_brevets ?? 0} label="Total Brevets" trend="8%" trendUp color="orange" />
-        <StatCard icon={IconAccepte} value={stats.brevets_acceptes ?? 0} label="Brevets acceptés" trend="12%" trendUp color="green" />
-        <StatCard icon={IconDoc} value={stats.total_demandes ?? 0} label="Total Demandes" trend="13%" trendUp color="blue" />
-        <StatCard icon={IconRecours} value={stats.total_recours ?? 0} label="Total Recours" trend="4%" trendUp={false} color="purple" />
+        <StatCard icon={IconBrevet} value={stats.total_brevets ?? 0} label="Total Brevets" />
+        <StatCard icon={IconAccepte} value={stats.brevets_acceptes ?? 0} label="Brevets acceptés" />
+        <StatCard icon={IconDoc} value={stats.total_demandes ?? 0} label="Total Demandes" />
+        <StatCard icon={IconRecours} value={stats.total_recours ?? 0} label="Total Recours" />
       </div>
 
       <div className="charts-row">

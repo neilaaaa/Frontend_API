@@ -103,10 +103,10 @@ export default function RespDashboard() {
 
       {/* STATS */}
       <div className="stats-grid">
-        <StatCard icon={IconBrevet}  value="321" label="Total Brevets"    trend="8%"  trendUp         color="orange" />
-        <StatCard icon={IconAccepte} value="187" label="Brevets acceptés" trend="12%" trendUp         color="green"  />
-        <StatCard icon={IconDoc}     value="564" label="Total Demandes"   trend="13%" trendUp         color="blue"   />
-        <StatCard icon={IconRecours} value="254" label="Total Recours"    trend="4%"  trendUp={false} color="purple" />
+        <StatCard icon={IconBrevet}  value="321" label="Total Brevets" />
+        <StatCard icon={IconAccepte} value="187" label="Brevets acceptés" />
+        <StatCard icon={IconDoc}     value="564" label="Total Demandes" />
+        <StatCard icon={IconRecours} value="254" label="Total Recours" />
       </div>
 
       {/* CHARTS */}
