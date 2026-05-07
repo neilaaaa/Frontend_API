@@ -128,7 +128,6 @@ export default function Dashboard() {
             <div className="stat-info">
               <div className="stat-val">{card.value}</div>
               <div className="stat-label">{card.label}</div>
-              <span className="stat-trend up">{card.text}</span>
             </div>
             <span className="stat-deco" />
           </div>
