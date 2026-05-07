@@ -1,15 +1,21 @@
 /* ── TOPBAR ─────────────────────────────────────── */
 .topbar {
   height: 60px;
-  width: 100%;
   background: #ffffff;
   border-radius: 12px;
-  position: sticky;
-  top: 0;
-  margin: 10px 10px 0 10px;
+  position: fixed;
+  top: var(--shell-gap);
+  left: calc(var(--sidebar-width) + var(--shell-gap));
+  right: var(--shell-gap);
+  width: auto;
+  margin: 0;
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   z-index: 1000;
-  max-width: calc(100% - 20px);
+  max-width: none;
+}
+
+.topbar.collapsed {
+  left: calc(var(--sidebar-collapsed-width) + var(--shell-gap));
 }
 
 .topbarConteneur {
@@ -57,31 +63,10 @@
 .topright {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
   min-width: 0;
   justify-content: flex-end;
-  flex: 1 1 auto;
-}
-
-/* SEARCH */
-.searchContainer {
-  display: flex;
-  align-items: center;
-  background: #f3f3f3;
-  padding: 6px 12px;
-  border-radius: 10px;
-  gap: 6px;
-  min-width: 0;
-  max-width: 240px;
-  width: 100%;
-}
-.searchContainer input {
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 13px;
-  width: min(180px, 24vw);
-  min-width: 0;
+  flex: 0 0 auto;
 }
 
 /* ── CLOCHE ─────────────────────────────────────── */
@@ -332,6 +317,12 @@
 .userRole { font-size: 11px; color: #aaa; text-transform: capitalize; }
 
 @media (max-width: 900px) {
+  .topbar,
+  .topbar.collapsed {
+    left: 10px;
+    right: 10px;
+  }
+
   .topbarConteneur {
     padding: 0 14px;
     gap: 12px;
@@ -341,19 +332,16 @@
     gap: 8px;
   }
 
-  .searchContainer input {
-    width: 100%;
-  }
-
   .username {
     max-width: 90px;
   }
 }
 
 @media (max-width: 640px) {
-  .topbar {
-    margin: 8px 8px 0;
-    max-width: calc(100% - 16px);
+  .topbar,
+  .topbar.collapsed {
+    left: 8px;
+    right: 8px;
     top: 8px;
   }
 
@@ -367,17 +355,6 @@
   .logo {
     max-width: 110px;
     font-size: 15px;
-  }
-
-  .searchContainer {
-    padding: 6px 8px;
-    flex: 1 1 100%;
-    max-width: none;
-    order: 3;
-  }
-
-  .searchContainer input {
-    width: 100%;
   }
 
   .userInfo {

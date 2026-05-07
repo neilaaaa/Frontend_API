@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import TableChartIcon from "@mui/icons-material/TableChart";
@@ -168,6 +168,11 @@ export default function DataTable3({
     setPage(1);
   };
 
+  const handleSearchChange = (event) => {
+    setSearch(event.target.value);
+    setPage(1);
+  };
+
   /* ── export PDF ── */
  const handlePDF = () => {
   import("jspdf").then(({ default: jsPDF }) => {
@@ -232,7 +237,7 @@ export default function DataTable3({
                 className="dt3-search"
                 placeholder="Rechercher..."
                 value={search}
-                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                onChange={handleSearchChange}
               />
             </div>
             {statusList.length > 1 && (
@@ -282,7 +287,7 @@ export default function DataTable3({
                 paged.map((row, idx) => (
                   <tr key={idx}>
                     {columns.map((col) => (
-                      <td key={col.key}>
+                      <td key={col.key} data-label={col.label}>
                         {col.render ? col.render(row) : (row[col.key] ?? "—")}
                       </td>
                     ))}

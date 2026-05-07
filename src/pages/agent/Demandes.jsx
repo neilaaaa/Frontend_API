@@ -514,12 +514,12 @@ export default function AgentDemandes() {
                 ) : (
                   filtered.map((d) => (
                     <tr key={d.id_demande}>
-                      <td>{d.date_CA}</td>               
-                      <td>{Array.isArray(d.deposant) ? d.deposant.map(dep => `${dep.nom_dep} ${dep.prenom_dep}`).join(", ") :  "—"}</td>
-                      <td className="dem-titre-cell">{d.titre}</td>
-                      <td>{d.nature}</td>
-                      <td><span className={badgeCls(d.statut)}>{d.statut}</span></td>
-                      <td className="dem-actions">
+                      <td data-label="Date">{d.date_CA}</td>               
+                      <td data-label="DÃ©posant">{Array.isArray(d.deposant) ? d.deposant.map(dep => `${dep.nom_dep} ${dep.prenom_dep}`).join(", ") :  "—"}</td>
+                      <td className="dem-titre-cell" data-label="Titre">{d.titre}</td>
+                      <td data-label="Nature">{d.nature}</td>
+                      <td data-label="Statut"><span className={badgeCls(d.statut)}>{d.statut}</span></td>
+                      <td className="dem-actions" data-label="Actions">
                         <button className="act-btn edit"  title="Modifier"    onClick={() => openEdit(d)}>
                           <EditIcon sx={{ fontSize: 17 }} />
                         </button>

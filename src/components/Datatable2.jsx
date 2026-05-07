@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -156,11 +156,11 @@ export default function Datatable2({
               pageData.map((row, index) => (
                 <tr key={index}>
                   {columns.map((c) => (
-                  <td key={c.key}>
+                  <td key={c.key} data-label={c.label}>
                     {c.render ? c.render(row[c.key]): row[c.key]}
                   </td>
                   ))}
-                  <td className="dt-actions-cell">
+                  <td className="dt-actions-cell" data-label="Actions">
                     {onView && (
                       <button
                         className="dt-btn-icon dt-btn-view"
