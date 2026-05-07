@@ -1,96 +1,244 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useRespBrevets } from "./RespBrevetsContext";
-import "../agent/editBrevet.css";
+import "../agent/addBrevet.css";
+import { updateBrevet, getBrevetById, getDemandesDisponibles } from "../../features/brevets/brevetApi";
 
 export default function RespEditBrevet() {
   const { id }     = useParams();
   const navigate   = useNavigate();
-  const { getBrevetById, updateBrevet } = useRespBrevets();
-  const [form, setForm] = useState(null);
+  const [form, setForm]         = useState(null);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState("");
+  const [inventeurs, setInventeurs] = useState([]);
+  const [deposant, setDeposant]     = useState({ nom_dep: "", prenom_dep: "" });
+  const [demandes, setDemandes]     = useState([]);
+  const [demandeSelectionnee, setDemandeSelectionnee] = useState("");
 
-  useEffect(() => { setForm(getBrevetById(id) || null); }, [id]);
+ 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [data, demandesData] = await Promise.all([
+          getBrevetById(id),
+          getDemandesDisponibles(),
+        ]);
+       setForm(data);
+         console.log("data complète:", data)
+         console.log("id_inv:", data.id_inv)
+         console.log("id_inventeur:", data.id_inventeur)
+       if (data.id_demande) {
+          setDemandeSelectionnee(String(data.id_demande.id_demande));
+          // Ajouter la demande courante à la liste si elle n'y est pas
+          const dejaDedans = demandesData.some(
+            (d) => d.id_demande === data.id_demande.id_demande
+          );
+          if (!dejaDedans) {
+            setDemandes([data.id_demande, ...demandesData]);
+          } else {
+            setDemandes(demandesData);
+          }
+        } else {
+          setDemandes(demandesData);
+        }
+
+        if (Array.isArray(data.inventeur) && data.inventeur.length > 0) {
+          setInventeurs(data.inventeur.map((i) => ({
+            id_inv:     i.id_inv,
+            nom_inv:    i.nom_inv,
+            prenom_inv: i.prenom_inv,
+          })));
+        } else {
+          setInventeurs([{ nom_inv: "", prenom_inv: "" }]);
+        }
+
+        if (data.deposant?.[0]) {
+          setDeposant({
+            nom_dep:    data.deposant[0].nom_dep    ?? "",
+            prenom_dep: data.deposant[0].prenom_dep ?? "",
+          });
+        }
+      } catch(err) {
+        console.error("erreur complète:", err)
+  console.error("response:", err.response?.data)
+        setError("Erreur de chargement");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [id]);
+
+
+
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-  const handleFile   = (e) => {
-    const files = Array.from(e.target.files).map((f) => f.name);
-    setForm({ ...form, documents: [...(form.documents || []), ...files] });
-  };
-  const handleSave = () => {
-    updateBrevet(id, { ...form, status: form.statut ?? form.status });
-    navigate("/responsable/brevets");
+  const handleInventeurChange = (index, field, value) => {
+    const updated = [...inventeurs];
+    updated[index] = { ...updated[index], [field]: value };
+    setInventeurs(updated);
   };
 
-  if (!form) return <p>Chargement...</p>;
+  const ajouterInventeur = () =>
+    setInventeurs([...inventeurs, { nom_inv: "", prenom_inv: "" }]);
+
+  const supprimerInventeur = (index) =>
+    setInventeurs(inventeurs.filter((_, i) => i !== index));
+
+  const handleSubmit = async () => {
+    try {
+      await updateBrevet(id, {
+        ...form,
+        num_brevet:       Number(form.num_brevet),
+        num_depo:         Number(form.num_depo),
+        id_demande_input: demandeSelectionnee ? Number(demandeSelectionnee) : null,
+        deposant_data:    { nom_dep: deposant.nom_dep, prenom_dep: deposant.prenom_dep },
+        inventeurs_data:  inventeurs.map((i) => ({
+          nom_inv: i.nom_inv, prenom_inv: i.prenom_inv,
+        })),
+      });
+      navigate("/responsable/brevets");
+    } catch (err) {
+      setError(JSON.stringify(err.response?.data));
+    }
+  };
+
+  if (loading) return <p>Chargement...</p>;
+  if (error)   return <p style={{ color: "red" }}>{error}</p>;
+  if (!form)   return <p>Brevet introuvable</p>;
 
   return (
-    <div className="brevet-page">
-      <div className="brevet-card">
-        <h2 className="brevet-title">Modifier le brevet</h2>
+    <div className="add-page">
+      <div className="add-card">
+        <h2 className="add-title">Modifier le brevet</h2>
 
-        <div className="brevet-grid">
+        {error && <p className="add-error">{error}</p>}
+
+        <div className="add-section-label">Demande liée</div>
+        <div className="add-grid">
           <div className="form-group">
-            <label>Num brevet</label>
-            <input name="num_brevet" value={form.num_brevet} onChange={handleChange} />
+            <label>Demande associée</label>
+            <select
+              value={demandeSelectionnee}
+              onChange={(e) => setDemandeSelectionnee(e.target.value)}
+            >
+              <option value=""> Aucune demande </option>
+              {demandes.map((d) => (
+                <option key={d.id_demande} value={d.id_demande}>
+                  {d.id_demande} — {d.titre}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="add-section-label">Identification</div>
+        <div className="add-grid">
+          <div className="form-group">
+            <label>Numéro brevet</label>
+            <input name="num_brevet" value={form.num_brevet ?? ""} onChange={handleChange} />
           </div>
           <div className="form-group">
             <label>Titre</label>
-            <input name="titre" value={form.titre} onChange={handleChange} />
+            <input name="titre" value={form.titre ?? ""} onChange={handleChange} />
           </div>
           <div className="form-group">
-            <label>Num dépôt</label>
-            <input name="num_depo" value={form.num_depo} onChange={handleChange} />
+            <label>Numéro de dépôt</label>
+            <input name="num_depo" value={form.num_depo ?? ""} onChange={handleChange} />
           </div>
           <div className="form-group">
             <label>Titulaire</label>
-            <input name="titulaire" value={form.titulaire} onChange={handleChange} />
+            <input name="titulaire" value={form.titulaire ?? ""} onChange={handleChange} />
           </div>
+        </div>
+
+        <div className="add-section-label">Dates</div>
+        <div className="add-grid">
           <div className="form-group">
-            <label>Date dépôt</label>
-            <input type="date" name="date_depo" value={form.date_depo} onChange={handleChange} />
+            <label>Date de dépôt</label>
+            <input type="date" name="date_depo" value={form.date_depo ?? ""} onChange={handleChange} />
           </div>
           <div className="form-group">
             <label>Date sortie</label>
-            <input type="date" name="date_sortie" value={form.date_sortie} onChange={handleChange} />
+            <input type="date" name="date_sortie" value={form.date_sortie ?? ""} onChange={handleChange} />
           </div>
-          <div className="form-group">
-            <label>Inventeur</label>
-            <input name="nom_inventeur" value={form.nom_inventeur} onChange={handleChange} />
-          </div>
-          <div className="form-group">
-            <label>Déposant</label>
-            <input name="nom_deposant" value={form.nom_deposant} onChange={handleChange} />
-          </div>
+        </div>
 
-          <div className="brevet-section-label">Statut &amp; Documents</div>
-
+        <div className="add-section-label">Statut</div>
+        <div className="add-grid">
           <div className="form-group">
             <label>Statut</label>
-            <select
-              name="statut"
-              value={form.statut ?? form.status ?? "EN_ATTENTE"}
-              onChange={handleChange}
-            >
-              <option value="EN_ATTENTE">En attente</option>
-              <option value="ACCEPTER">Accepté</option>
-              <option value="REFUSER">Refusé</option>
+            <select name="statut" value={form.statut ?? "EN_ATTENTE"} onChange={handleChange}>
+              <option value="EN_ATTENTE">EN ATTENTE</option>
+              <option value="ACCEPTER">ACCEPTER</option>
+              <option value="REFUSER">REFUSER</option>
             </select>
           </div>
+        </div>
 
-          <div className="form-group full-width">
-            <label>Ajouter documents</label>
-            <div className="docs-box">
-              <input type="file" multiple onChange={handleFile} />
-              {form.documents?.map((doc, i) => (
-                <div key={i} className="doc-item">{doc}</div>
-              ))}
+        <div className="add-section-label">Déposant</div>
+        <div className="personne-card">
+          <div className="personne-row">
+            <div>
+              <label>Nom</label>
+              <input
+                value={deposant.nom_dep}
+                onChange={(e) => setDeposant({ ...deposant, nom_dep: e.target.value })}
+              />
+            </div>
+            <div>
+              <label>Prénom</label>
+              <input
+                value={deposant.prenom_dep}
+                onChange={(e) => setDeposant({ ...deposant, prenom_dep: e.target.value })}
+              />
             </div>
           </div>
         </div>
 
-        <div className="brevet-actions">
-          <button className="btn-save"   onClick={handleSave}>Enregistrer</button>
-          <button className="btn-cancel" onClick={() => navigate("/responsable/brevets")}>Annuler</button>
+        <div className="add-section-label">Inventeurs</div>
+        {inventeurs.length === 0 && <p>Aucun inventeur</p>}
+        {inventeurs.map((inv, index) => (
+          <div key={index} className="personne-card">
+            <div className="personne-card-header">
+              <span className="personne-card-num">Inventeur {index + 1}</span>
+              <button
+                type="button"
+                className="btn-remove-inv"
+                onClick={() => supprimerInventeur(index)}
+              >
+                ✕ Supprimer
+              </button>
+            </div>
+            <div className="personne-row">
+              <div>
+                <label>Nom</label>
+                <input
+                  value={inv.nom_inv ?? ""}
+                  onChange={(e) => handleInventeurChange(index, "nom_inv", e.target.value)}
+                />
+              </div>
+              <div>
+                <label>Prénom</label>
+                <input
+                  value={inv.prenom_inv ?? ""}
+                  onChange={(e) => handleInventeurChange(index, "prenom_inv", e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+
+        <button type="button" className="btn-add-inv" onClick={ajouterInventeur}>
+          + Ajouter un inventeur
+        </button>
+
+        <div className="add-actions">
+          <button className="btn-save" onClick={handleSubmit}>Enregistrer</button>
+          <button className="btn-cancel" onClick={() => navigate("/responsable/brevets")}>
+            Annuler
+          </button>
         </div>
       </div>
     </div>

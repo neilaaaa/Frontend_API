@@ -69,7 +69,13 @@ export default function Datatable2({
     doc.text(title, 10, 10);
     autoTable(doc, {
       head: [columns.map((c) => c.label)],
-      body: sorted.map((row) => columns.map((c) => row[c.key])),
+      body: sorted.map((row) => columns.map((c) => {
+        const val = row[c.key]
+        if (c.pdfFormat) return c.pdfFormat(val) 
+        if (typeof val === "object" && val !== null) return JSON.stringify(val)
+        return val ?? "—"
+      })
+    ),
     });
     doc.save(`${exportName}.pdf`);
   };

@@ -13,7 +13,6 @@ const DEMO = [
     titulaire: "Entreprise Alpha",
     nom_inventeur: "Ahmed Benali",
     nom_deposant: "Ahmed Benali",
-    statut: "EN_ATTENTE",
     status: "EN_ATTENTE",
     documents: [],
   },
@@ -22,13 +21,8 @@ const DEMO = [
 export function RespBrevetsProvider({ children }) {
   const [brevets, setBrevets] = useState(DEMO);
 
-  const normalizeBrevet = (brevet) => {
-    const statut = brevet.statut ?? brevet.status ?? "EN_ATTENTE";
-    return { ...brevet, statut, status: statut };
-  };
-
-  const addBrevet    = (b)    => setBrevets(p => [...p, { ...normalizeBrevet(b), id: Date.now() }]);
-  const updateBrevet = (id, b)=> setBrevets(p => p.map(x => x.id === Number(id) ? { ...x, ...normalizeBrevet(b) } : x));
+  const addBrevet    = (b)    => setBrevets(p => [...p, { ...b, id: Date.now() }]);
+  const updateBrevet = (id, b)=> setBrevets(p => p.map(x => x.id === Number(id) ? { ...x, ...b } : x));
   const deleteBrevet = (id)   => setBrevets(p => p.filter(x => x.id !== id));
   const getBrevetById= (id)   => brevets.find(x => x.id === Number(id));
 

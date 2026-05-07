@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import { getTousBrevets } from "../../features/brevets/brevetApi";
 
 export default function RecoursForm({ onSubmit, editData, onCancel }) {
   const emptyForm = {
-    id: null,
+    id_brevet: "",
     titre_brevet: "",
     date_depot: "",
     motif: "",
@@ -12,17 +13,57 @@ export default function RecoursForm({ onSubmit, editData, onCancel }) {
   };
 
   const [form, setForm] = useState(emptyForm);
+  const [brevets, setBrevets] = useState([]);  
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    setForm(editData || emptyForm);
+ useEffect(() => {
+  const fetchBrevets = async () => {
+      try {
+        const res = await getTousBrevets()
+        const unique = [...new Map(res.map(b => [b.id_brevet, b])).values()]
+        setBrevets(unique)
+      } catch {
+        console.error("Erreur chargement brevets")
+      }
+    }
+    fetchBrevets()
+    if (editData) {
+      setForm({
+        id_brevet:       editData.id_brevet?.id_brevet ?? editData.id_brevet ?? "",
+        motif:           editData.motif ?? "",
+        description:     editData.description ?? "",
+        statut:          editData.statut ?? "EN_COURS",
+        date_traitement: editData.date_traitement ?? "",
+      });
+    } else {
+      setForm(emptyForm);
+    }
   }, [editData]);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit({ ...form, id: form.id || Date.now() });
-    if (!editData) setForm(emptyForm);
+    setError("");
+    setLoading(true);
+    try {
+      // ✅ Envoyer seulement les champs nécessaires
+      const payload = {
+        id_brevet:   Number(form.id_brevet),
+        motif:       form.motif,
+        description: form.description,
+        statut:      form.statut,
+        // date_traitement seulement si remplie
+        ...(form.date_traitement && { date_traitement: form.date_traitement }),
+      };
+      await onSubmit(payload);
+      if (!editData) setForm(emptyForm);
+    } catch (err) {
+      setError("Erreur lors de l'enregistrement.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -31,55 +72,63 @@ export default function RecoursForm({ onSubmit, editData, onCancel }) {
   };
 
   return (
-    <form className="user-form" onSubmit={handleSubmit}>
+   <form className="user-form" onSubmit={handleSubmit}>
       <h3>{editData ? "Modifier recours" : "Ajouter recours"}</h3>
 
+      {error && <p style={{ color: "red", fontSize: "13px" }}>{error}</p>}
+
+      {/* ✅ Select brevet depuis l'API */}
+      <label>Brevet</label>
+      <select
+        name="id_brevet"
+        value={form.id_brevet}
+        onChange={handleChange}
+        required
+      >
+        <option value="">-- Sélectionner un brevet --</option>
+        {brevets.map((b) => (
+          <option key={b.id_brevet} value={b.id_brevet}>
+            {b.titre} — N°{b.num_brevet}
+          </option>
+        ))}
+      </select>
+
+      <label>Motif</label>
       <input
-        name="titre_brevet"
-        placeholder="Titre du brevet"
-        value={form.titre_brevet}
+        name="motif"
+        placeholder="Motif du recours"
+        value={form.motif}
         onChange={handleChange}
         required
       />
 
-      <input
-        type="date"
-        name="date_depot"
-        placeholder="Date de dépôt"
-        value={form.date_depot}
-        onChange={handleChange}
-      />
-
-      <input
-        name="motif"
-        placeholder="Motif"
-        value={form.motif}
-        onChange={handleChange}
-      />
-
+      <label>Description</label>
       <textarea
         name="description"
-        placeholder="Description"
+        placeholder="Description détaillée"
         value={form.description}
         onChange={handleChange}
         rows="3"
       />
 
+      <label>Statut</label>
       <select name="statut" value={form.statut} onChange={handleChange}>
-        <option value="EN_COURS">EN_COURS</option>
-        <option value="TRAITE">TRAITE</option>
-        <option value="REFUSE">REFUSE</option>
+        <option value="EN_COURS">EN COURS</option>
+        <option value="TRAITE">TRAITÉ</option>
+        <option value="REFUSE">REFUSÉ</option>
       </select>
 
+      <label>Date de traitement</label>
       <input
         type="date"
         name="date_traitement"
-        placeholder="Date de traitement"
         value={form.date_traitement}
         onChange={handleChange}
       />
 
-      <button type="submit">{editData ? "Modifier" : "Ajouter"}</button>
+      <button type="submit" disabled={loading}>
+        {loading ? "Enregistrement..." : editData ? "Modifier" : "Ajouter"}
+      </button>
 
       {editData && (
         <button type="button" className="cancel-btn" onClick={handleCancel}>

@@ -42,3 +42,8 @@ export const getBrevetById = async (id) => {
   const res = await api.get (`brevets/${id}/`);
   return res.data;
 };
+
+export const getDemandesDisponibles = async () => {
+  const response = await api.get("brevets/demandes-disponibles/");
+  return response.data;
+};

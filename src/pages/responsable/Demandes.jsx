@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import DataTable from "../../components/Datatable";
+import { getDemandeBrevets, deleteDemandeBrevet, validerDemandeBrevet, refuserDemandeBrevet } from "../../features/demande/apiDemande.js";
 import "./Demandes.css";
 
 import SearchIcon      from "@mui/icons-material/Search";
 import EditIcon        from "@mui/icons-material/Edit";
-import PrintIcon       from "@mui/icons-material/Print";
-import DownloadIcon    from "@mui/icons-material/Download";
-import DeleteIcon      from "@mui/icons-material/Delete";
+import PrintIcon    from "@mui/icons-material/Print";
+import DownloadIcon from "@mui/icons-material/Download";
+import DeleteIcon   from "@mui/icons-material/Delete";
 import VisibilityIcon  from "@mui/icons-material/Visibility";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon      from "@mui/icons-material/Cancel";
@@ -92,16 +96,29 @@ function buildAndOpen(demande, mode) {
 
 /* ══════════════════════════════════════════════════════════ */
 export default function RespDemandes() {
-  const [mesDemandes,   setMesDemandes]   = useState([]);
-  const [agentDemandes, setAgentDemandes] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [editId,    setEditId]    = useState(null);
-  const [form,      setForm]      = useState({...EMPTY});
-  const [searchMes,   setSearchMes]   = useState("");
-  const [searchAgent, setSearchAgent] = useState("");
-  const [viewDemande, setViewDemande] = useState(null);
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
-  useEffect(() => { setMesDemandes(loadResp()); setAgentDemandes(loadAgent()); }, []);
+  const [mesData,    setMesData]    = useState([]);
+  const [agentsData, setAgentsData] = useState([]);
+  const [loading,    setLoading]    = useState(false);
+  const [error,      setError]      = useState("");
+
+const load = async () => {
+    try {
+      setLoading(true); setError("");
+      const res = await getDemandeBrevets();
+      const all = res.results || res;
+      setMesData(all.filter(d => d.createur_id === user.id));
+      setAgentsData(all.filter(d => d.createur_id !== user.id));
+    } catch {
+      setError("Erreur chargement des demandes.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
 
   const setField = (e) => {
     const {name,value,type,checked}=e.target;
@@ -111,256 +128,138 @@ export default function RespDemandes() {
   const openAdd  = () => { setEditId(null); setForm({...EMPTY}); setShowModal(true); };
   const openEdit = (d) => { setEditId(d.id); setForm({...EMPTY,...d.data}); setShowModal(true); };
 
-  const handleSave = () => {
-    const natureLbl=form.nature_brevet?"Brevet d'invention":form.nature_pct?"Extension PCT":form.nature_certificat?"Certificat d'addition":"—";
-    if(editId!==null){
-      const u=mesDemandes.map(d=>d.id!==editId?d:{...d,
-        deposant:[form.deposant_nom,form.deposant_prenom].filter(Boolean).join(" ")||form.deposant_denomination||d.deposant,
-        titre:form.titre||d.titre, nature:natureLbl, data:{...form}});
-      saveResp(u); setMesDemandes(u);
-    } else {
-      const nd={id:Date.now(),
-        deposant:[form.deposant_nom,form.deposant_prenom].filter(Boolean).join(" ")||form.deposant_denomination||"—",
-        titre:form.titre||"—", nature:natureLbl, statut:"EN_ATTENTE",
-        date:new Date().toLocaleDateString("fr-DZ"), data:{...form}};
-      const u=[nd,...mesDemandes]; saveResp(u); setMesDemandes(u);
-    }
-    setShowModal(false);
+ const handleDelete = async (row) => {
+    try { await deleteDemandeBrevet(row.id_demande); load(); }
+    catch { setError("Erreur suppression."); }
   };
 
-  const handleDelete = (id) => {
-    if(!window.confirm("Supprimer ?"))return;
-    const u=mesDemandes.filter(d=>d.id!==id); saveResp(u); setMesDemandes(u);
+   const handleValider = async (row) => {
+    try { await validerDemandeBrevet(row.id_demande); load(); }
+    catch { setError("Erreur validation."); }
   };
 
-  const changeStatut = (id, statut) => {
-    const u=agentDemandes.map(d=>d.id===id?{...d,statut}:d);
-    saveAgent(u); setAgentDemandes(u);
+   const handleRefuser = async (row) => {
+    try { await refuserDemandeBrevet(row.id_demande); load(); }
+    catch { setError("Erreur refus."); }
   };
 
-  const filteredMes   = mesDemandes.filter(d=>[d.deposant,d.titre,d.nature].some(v=>(v||"").toLowerCase().includes(searchMes.toLowerCase())));
-  const filteredAgent = agentDemandes.filter(d=>[d.deposant,d.titre,d.nature].some(v=>(v||"").toLowerCase().includes(searchAgent.toLowerCase())));
+  const colonnesBase = [
+    { key: "date_depo", label: "Date dépôt" },
+    { key: "nature",    label: "Nature" },
+    { key: "titre",     label: "Titre" },
+    {
+      key: "deposant",
+      label: "Déposant",
+      render: (value) =>
+        Array.isArray(value) && value.length > 0
+          ? value.map(d => `${d.nom_dep} ${d.prenom_dep}`).join(", ") : "—",
+      pdfFormat: (val) =>
+        Array.isArray(val) && val.length > 0
+          ? val.map(d => `${d.nom_dep} ${d.prenom_dep}`).join(", ") : "—",
+    },
+    {
+      key: "inventeur",
+      label: "Inventeur(s)",
+      render: (value) =>
+        Array.isArray(value) && value.length > 0
+          ? value.map(i => `${i.nom_inv} ${i.prenom_inv}`).join(", ") : "—",
+      pdfFormat: (val) =>
+        Array.isArray(val) && val.length > 0
+          ? val.map(i => `${i.nom_inv} ${i.prenom_inv}`).join(", ") : "—",
+    },
+    { key: "statut", label: "Statut" },
+  ];
 
-  const badgeCls=(s)=>s==="VALIDER"||s==="ACCEPTER"?"badge green":s==="REFUSER"?"badge red":"badge orange";
+  const colonneFormulaire = {
+    key: "_actions_formulaire",
+    label: "Formulaire",
+    pdfExclude: true,
+    render: (_, row) => (
+      <div style={{ display: "flex", gap: "5px", alignItems:"center", white_space: "nowrap" }}>
+        <button
+          title="Imprimer"
+          style={{ background: "rgb(255, 240, 230)", color: "rgb(234, 97, 19)", border: "none", borderRadius: "8px", padding: "6px", cursor: "pointer", }}
+          onClick={() => buildAndOpen(row, "print")}
+        >
+          <PrintIcon sx={{ fontSize: 17 }} />
+        </button>
+        <button
+          title="Télécharger"
+          style={{ background: "#dcfce7", color: "#15803d", border: "none", borderRadius: "8px", padding: "6px", cursor: "pointer" }}
+          onClick={() => buildAndOpen(row, "download")}
+        >
+          <DownloadIcon sx={{ fontSize: 17 }} />
+        </button>
+      </div>
+    ),
+  };
+
+  const colonneDecision = {
+    key: "_actions_decision",
+    label: "Décision",
+    pdfExclude: true,
+    render: (_, row) => (
+      <div style={{ display: "flex", gap: 6 }}>
+        <button
+          title="Valider"
+          disabled={row.statut === "valider"}
+          style={{
+            background: row.statut === "valider" ? "#19d389" : "#219e4f",
+            color: "#fff", border: "none", borderRadius: "10px",
+            padding: "5px 9px",
+            cursor: row.statut === "valider" ? "default" : "pointer",
+          }}
+          onClick={() => handleValider(row)}
+        >
+          <CheckCircleIcon sx={{ fontSize: 17 }} />
+        </button>
+        <button
+          title="Refuser"
+          disabled={row.statut === "refuser"}
+          style={{
+            background: row.statut === "refuser" ? "#fca5a5" : "#dc2626",
+            color: "#fff", border: "none", borderRadius: "10px",
+            padding: "5px 9px",
+            cursor: row.statut === "refuser" ? "default" : "pointer",
+          }}
+          onClick={() => handleRefuser(row)}
+        >
+          <CancelIcon sx={{ fontSize: 17 }} />
+        </button>
+      </div>
+    ),
+  };
+
+  if (loading) return <p style={{ padding: 20 }}>Chargement…</p>;
+  if (error)   return <p style={{ padding: 20, color: "red" }}>{error}</p>;
 
   return (
-    <>
-      <div className="dem-page">
-        <div className="dem-page-header">
-          <h2 className="dem-title">Demandes de Protection</h2>
-          <p className="dem-sub">Espace Responsable — INAPI</p>
-        </div>
+   <div style={{ background: "#faf7f2", minHeight: "100vh" }}>
 
-        {/* ── MES DEMANDES ── */}
-        <div className="dem-section-header">
-          <div className="dem-section-label"><span className="section-dot blue"/>Mes demandes</div>
-          <button className="dem-add-btn" onClick={openAdd}>+ Ajouter une demande</button>
-        </div>
+      {/* ── TABLE 1 : Mes demandes ── */}
+      <DataTable
+        title="Mes Demandes de Protection"
+        data={mesData}
+        columns={[...colonnesBase, colonneFormulaire]}
+        onAdd={()     => navigate("/responsable/demandes/add")}
+        onEdit={(row) => navigate(`/responsable/demandes/edit/${row.id_demande}`)}
+        onView={(row) => navigate(`/responsable/demandes/view/${row.id_demande}`)}
+        onDelete={handleDelete}
+      />
 
-        <div className="dem-card">
-          <div className="dem-toolbar">
-            <div className="dem-search-wrap">
-              <div style={{position:"absolute",left:11,top:0,bottom:0,display:"flex",alignItems:"center",pointerEvents:"none",color:"#F88F22",zIndex:1}}>
-                <SearchIcon sx={{fontSize:18}}/>
-              </div>
-              <input className="dem-search" placeholder="Rechercher…" value={searchMes} onChange={e=>setSearchMes(e.target.value)}/>
-            </div>
-            <span className="dem-count">{filteredMes.length} demande(s)</span>
-          </div>
+      {/* ── TABLE 2 : Demandes des agents ── */}
+      <DataTable
+        title="Demandes des Agents"
+        data={agentsData}
+        columns={[
+          { key: "createur_username", label: "Agent", render: (val) => val || "—" },
+          ...colonnesBase,
+          colonneFormulaire,
+          colonneDecision,
+        ]}
+        onView={(row) => navigate(`/responsable/demandes/view/${row.id_demande}`)}
+      />
 
-          <div className="dem-table-wrap">
-            <table className="dem-table">
-              <thead><tr><th>Date</th><th>Déposant</th><th>Titre</th><th>Nature</th><th>Statut</th><th>Actions</th></tr></thead>
-              <tbody>
-                {filteredMes.length===0
-                  ?<tr><td colSpan={6} className="dem-empty">Aucune demande enregistrée</td></tr>
-                  :filteredMes.map(d=>(
-                    <tr key={d.id}>
-                      <td>{d.date}</td><td>{d.deposant}</td>
-                      <td className="dem-titre-cell">{d.titre}</td>
-                      <td>{d.nature}</td>
-                      <td><span className={badgeCls(d.statut)}>{d.statut}</span></td>
-                      <td className="dem-actions">
-                        <button className="act-btn edit"  title="Modifier"    onClick={()=>openEdit(d)}><EditIcon sx={{fontSize:17}}/></button>
-                        <button className="act-btn print" title="Imprimer"    onClick={()=>buildAndOpen(d,"print")}><PrintIcon sx={{fontSize:17}}/></button>
-                        <button className="act-btn dl"    title="Télécharger" onClick={()=>buildAndOpen(d,"download")}><DownloadIcon sx={{fontSize:17}}/></button>
-                        <button className="act-btn del"   title="Supprimer"   onClick={()=>handleDelete(d.id)}><DeleteIcon sx={{fontSize:17}}/></button>
-                      </td>
-                    </tr>
-                  ))
-                }
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* ── DEMANDES DES AGENTS ── */}
-        <div className="dem-section-header" style={{marginTop:32}}>
-          <div className="dem-section-label"><span className="section-dot orange"/>Demandes des agents</div>
-          <button className="dem-refresh-btn" onClick={()=>setAgentDemandes(loadAgent())}>
-            <RefreshIcon sx={{fontSize:16,verticalAlign:"middle",mr:.5}}/> Actualiser
-          </button>
-        </div>
-
-        <div className="dem-card">
-          <div className="dem-toolbar">
-            <div className="dem-search-wrap">
-              <div style={{position:"absolute",left:11,top:0,bottom:0,display:"flex",alignItems:"center",pointerEvents:"none",color:"#F88F22",zIndex:1}}>
-                <SearchIcon sx={{fontSize:18}}/>
-              </div>
-              <input className="dem-search" placeholder="Rechercher…" value={searchAgent} onChange={e=>setSearchAgent(e.target.value)}/>
-            </div>
-            <span className="dem-count">{filteredAgent.length} demande(s)</span>
-          </div>
-
-          <div className="dem-table-wrap">
-            <table className="dem-table">
-              <thead><tr><th>Date</th><th>Agent</th><th>Déposant</th><th>Titre</th><th>Nature</th><th>Statut</th><th>Actions</th></tr></thead>
-              <tbody>
-                {filteredAgent.length===0
-                  ?<tr><td colSpan={7} className="dem-empty">Aucune demande d'agent</td></tr>
-                  :filteredAgent.map(d=>(
-                    <tr key={d.id}>
-                      <td>{d.date}</td>
-                      <td><span className="agent-tag">{d.agentNom||"Agent"}</span></td>
-                      <td>{d.deposant}</td>
-                      <td className="dem-titre-cell">{d.titre}</td>
-                      <td>{d.nature}</td>
-                      <td><span className={badgeCls(d.statut)}>{d.statut}</span></td>
-                      <td className="dem-actions">
-                        <button className="act-btn view"    title="Voir"        onClick={()=>setViewDemande(d)}><VisibilityIcon sx={{fontSize:17}}/></button>
-                        <button className="act-btn print"   title="Imprimer"    onClick={()=>buildAndOpen(d,"print")}><PrintIcon sx={{fontSize:17}}/></button>
-                        <button className="act-btn dl"      title="Télécharger" onClick={()=>buildAndOpen(d,"download")}><DownloadIcon sx={{fontSize:17}}/></button>
-                        {d.statut!=="VALIDER"&&<button className="act-btn valider" title="Valider"  onClick={()=>changeStatut(d.id,"VALIDER")}><CheckCircleIcon sx={{fontSize:17}}/></button>}
-                        {d.statut!=="REFUSER"&&<button className="act-btn refuser" title="Refuser"  onClick={()=>changeStatut(d.id,"REFUSER")}><CancelIcon sx={{fontSize:17}}/></button>}
-                      </td>
-                    </tr>
-                  ))
-                }
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      {/* ── MODAL AJOUT / MODIFICATION ── */}
-      {showModal&&(
-        <div className="dem-overlay" onClick={e=>e.target.classList.contains("dem-overlay")&&setShowModal(false)}>
-          <div className="dem-modal">
-            <div className="modal-header">
-              <div className="modal-header-left">
-                <div className="modal-header-icon">📋</div>
-                <div><h3>{editId?"Modifier la demande":"Nouvelle demande de protection"}</h3><p>Formulaire officiel INAPI — R2-FO-03</p></div>
-              </div>
-              <button className="modal-close" onClick={()=>setShowModal(false)}>✕</button>
-            </div>
-            <div className="modal-body">
-              <Sec num="01" label="Nature de la demande *">
-                <div className="check-row">
-                  <CL name="nature_brevet"     checked={!!form.nature_brevet}     onChange={setField} label="Brevet d'invention"/>
-                  <CL name="nature_pct"        checked={!!form.nature_pct}        onChange={setField} label="Extension PCT"/>
-                  <CL name="nature_certificat" checked={!!form.nature_certificat} onChange={setField} label="Certificat d'addition"/>
-                </div>
-              </Sec>
-              <Sec num="71" label="[71] — DÉPOSANT(S)">
-                <div className="modal-grid">
-                  <F label="Nom"              name="deposant_nom"          value={form.deposant_nom}          onChange={setField}/>
-                  <F label="Prénom"           name="deposant_prenom"       value={form.deposant_prenom}       onChange={setField}/>
-                  <F label="Dénomination"     name="deposant_denomination" value={form.deposant_denomination} onChange={setField} full/>
-                  <F label="Adresse complète" name="deposant_adresse"      value={form.deposant_adresse}      onChange={setField} full area/>
-                  <F label="Nationalité"      name="deposant_nationalite"  value={form.deposant_nationalite}  onChange={setField}/>
-                </div>
-              </Sec>
-              <Sec num="72" label="[72] — INVENTEUR(S)">
-                <div className="modal-grid">
-                  <F label="Nom"     name="inventeur_nom"     value={form.inventeur_nom}     onChange={setField}/>
-                  <F label="Prénom"  name="inventeur_prenom"  value={form.inventeur_prenom}  onChange={setField}/>
-                  <F label="Adresse" name="inventeur_adresse" value={form.inventeur_adresse} onChange={setField} full area/>
-                </div>
-              </Sec>
-              <Sec num="54" label="[54] — TITRE DE L'INVENTION">
-                <div className="modal-grid">
-                  <F label="Titre complet" name="titre" value={form.titre} onChange={setField} full area/>
-                </div>
-              </Sec>
-              <Sec num="+" label="Certificat d'addition — Brevet principal">
-                <div className="modal-grid">
-                  <F label="N° du brevet principal" name="brevet_principal_num"  value={form.brevet_principal_num}  onChange={setField}/>
-                  <F label="Date"                   name="brevet_principal_date" value={form.brevet_principal_date} onChange={setField} type="date"/>
-                </div>
-              </Sec>
-              <Sec num="74" label="[74] — MANDATAIRE">
-                <div className="modal-grid">
-                  <F label="Nom"             name="mandataire_nom"          value={form.mandataire_nom}          onChange={setField}/>
-                  <F label="Prénom"          name="mandataire_prenom"       value={form.mandataire_prenom}       onChange={setField}/>
-                  <F label="Adresse"         name="mandataire_adresse"      value={form.mandataire_adresse}      onChange={setField} full area/>
-                  <F label="Date du pouvoir" name="mandataire_date_pouvoir" value={form.mandataire_date_pouvoir} onChange={setField} type="date"/>
-                </div>
-              </Sec>
-              <Sec num="ℹ" label="Autres informations">
-                <div className="modal-grid">
-                  <F label="Informations complémentaires" name="autres_informations" value={form.autres_informations} onChange={setField} full area rows={3}/>
-                </div>
-              </Sec>
-              <Sec num="📎" label="Bordereau des pièces déposées *">
-                <div className="pieces-grid">
-                  {[["piece_copie_int","Copie de la demande internationale"],["piece_memoire_nat","Mémoire descriptif en langue nationale"],["piece_memoire_fr","Mémoire descriptif original (français)"],["piece_memoire_fr_dup","Mémoire descriptif duplicata (français)"],["piece_dessins_orig","Dessin(s) original(aux)"],["piece_dessins_dup","Dessin(s) duplicata(aux)"],["piece_abrege","Abrégé descriptif"],["piece_pouvoir","Pouvoir"],["piece_priorite","Document de priorité"],["piece_cession","Cession de priorité"],["piece_titre","Titre / justification paiement taxes"]].map(([n,lbl])=>(
-                    <label key={n} className="piece-item"><input type="checkbox" name={n} checked={!!form[n]} onChange={setField}/><span>{lbl}</span></label>
-                  ))}
-                </div>
-              </Sec>
-            </div>
-            <div className="modal-footer">
-              <button className="btn-cancel" onClick={()=>setShowModal(false)}>Annuler</button>
-              <button className="btn-save"   onClick={handleSave}>{editId?"💾 Enregistrer les modifications":"✅ Enregistrer la demande"}</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── MODAL VUE ── */}
-      {viewDemande&&(
-        <div className="dem-overlay" onClick={e=>e.target.classList.contains("dem-overlay")&&setViewDemande(null)}>
-          <div className="dem-modal">
-            <div className="modal-header modal-header-view">
-              <div className="modal-header-left">
-                <div className="modal-header-icon">👁</div>
-                <div><h3>Détail de la demande</h3><p>Lecture seule — Responsable</p></div>
-              </div>
-              <button className="modal-close" onClick={()=>setViewDemande(null)}>✕</button>
-            </div>
-            <div className="modal-body">
-              {[
-                ["Déposant",           viewDemande.deposant],
-                ["Titre",              viewDemande.titre],
-                ["Nature",             viewDemande.nature],
-                ["Date",               viewDemande.date],
-                ["Statut",             viewDemande.statut],
-                ["Inventeur",          [viewDemande.data?.inventeur_nom,viewDemande.data?.inventeur_prenom].filter(Boolean).join(" ")],
-                ["Adresse déposant",   viewDemande.data?.deposant_adresse],
-                ["Nationalité",        viewDemande.data?.deposant_nationalite],
-                ["Mandataire",         [viewDemande.data?.mandataire_nom,viewDemande.data?.mandataire_prenom].filter(Boolean).join(" ")],
-                ["Brevet principal",   viewDemande.data?.brevet_principal_num],
-                ["Autres informations",viewDemande.data?.autres_informations],
-              ].filter(([,v])=>v).map(([label,value])=>(
-                <div key={label} className="view-field">
-                  <span className="view-label">{label}</span>
-                  <span className="view-value">{value}</span>
-                </div>
-              ))}
-            </div>
-            <div className="modal-footer">
-              <button className="btn-cancel" onClick={()=>setViewDemande(null)}>Fermer</button>
-              <button className="btn-print"  onClick={()=>buildAndOpen(viewDemande,"print")}><PrintIcon sx={{fontSize:15,mr:.5}}/>Imprimer</button>
-              <button className="btn-dl"     onClick={()=>buildAndOpen(viewDemande,"download")}><DownloadIcon sx={{fontSize:15,mr:.5}}/>Télécharger</button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+    </div>
   );
 }
-
-function Sec({num,label,children}){return(<div className="modal-section"><div className="section-title"><span className="section-num">{num}</span>{label}</div>{children}</div>);}
-function F({label,name,value,onChange,type="text",full,area,rows=2}){return(<div className={`fg${full?" full":""}`}><label>{label}</label>{area?<textarea name={name} value={value} onChange={onChange} rows={rows}/>:<input type={type} name={name} value={value} onChange={onChange}/>}</div>);}
-function CL({name,checked,onChange,label}){return(<label className="chk-label"><input type="checkbox" name={name} checked={checked} onChange={onChange}/><span>{label}</span></label>);}

@@ -338,10 +338,9 @@ export default function AgentDemandes() {
   const handleSave = async () => {
     console.log("handle save")
     console.log("form:", form)
-    const natureLbl = form.nature_brevet ? "Brevet d'invention"
-      : form.nature_pct ? "Extension PCT"
-      : form.nature_certificat ? "Certificat d'addition" : "—";
-     console.log("brevet", natureLbl)
+    const natureLbl = form.nature_brevet ? "Brevet d'invention": ""
+      
+    console.log("brevet", natureLbl)
 
       const payload = {
      titre:             form.titre || "—",
@@ -378,7 +377,8 @@ export default function AgentDemandes() {
        adresse_dep:  form.deposant_adresse,
        nationalite:  form.deposant_nationalite,
     })
-    } else{ await api.post("deposants/", {
+    } else{
+       await api.post("deposants/", {
       nom_dep:      form.deposant_nom,
       prenom_dep:   form.deposant_prenom,
       denomination: form.deposant_denomination,
@@ -404,6 +404,7 @@ export default function AgentDemandes() {
      }}
     else {
       const nouvelleDemande =await addDemandeBrevet(payload)
+      const newId =nouvelleDemande.id_demande
     // pas de déposant donc on en crée un
     await api.post("deposants/", {
       nom_dep:      form.deposant_nom,
@@ -411,13 +412,13 @@ export default function AgentDemandes() {
       denomination: form.deposant_denomination,
       adresse_dep:  form.deposant_adresse,
       nationalite:  form.deposant_nationalite,
-      id_demande:   editId
+      id_demande:   newId
     })
      await api.post("inventeurs/",{
         nom_inv: form.inventeur_nom,
         prenom_inv: form.inventeur_prenom,
         adress_inv: form.inventeur_adresse,
-        id_demande: editId
+        id_demande: newId
       })
     } 
      await load()

@@ -29,3 +29,13 @@ export const getDemandeBrevetById = async (id) => {
   const res = await api.get (`demandes/${id}/`);
   return res.data;
 };
+
+export const validerDemandeBrevet = async (id) => {
+  const res = await api.post(`demandes/${id}/valider_demande/`);
+  return res.data;
+};
+
+export const refuserDemandeBrevet = async (id) => {
+  const res = await api.post(`demandes/${id}/refuser_demande/`);
+  return res.data;
+};

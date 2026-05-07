@@ -223,7 +223,7 @@
 }
 
 .act-btn.edit  { background: #fff4d6 !important; color: #92620a !important; }
-.act-btn.print { background: #fff0e6 !important; color: #EA6113 !important; }
+.act-btn.print { background: rgb(255, 240, 230) !important; color: rgb(234, 97, 19) !important; }
 .act-btn.dl    { background: #dcfce7 !important; color: #15803d !important; }
 .act-btn.del   { background: #fee2e2 !important; color: #b91c1c !important; }
 
