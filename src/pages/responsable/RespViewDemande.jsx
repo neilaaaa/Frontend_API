@@ -1,10 +1,23 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { getDemandeBrevetById } from "../../features/demande/apiDemande";
-import { buildAndOpen } from "./demandeUtils";
-import "./Demandes.css";
+import { useParams, useNavigate } from "react-router-dom";
+import { getDemandeBrevetById } from "../../features/demande/apiDemande.js";
+import "../agent/ViewDemande.css";
 
-export default function RespViewDemande() {
+const PIECES_LABELS = {
+  piece_copie_int:      "Copie de la demande internationale",
+  piece_memoire_nat:    "Mémoire descriptif en langue nationale",
+  piece_memoire_fr:     "Mémoire descriptif original (français)",
+  piece_memoire_fr_dup: "Mémoire descriptif duplicata (français)",
+  piece_dessins_orig:   "Dessin(s) original(aux)",
+  piece_dessins_dup:    "Dessin(s) duplicata(aux)",
+  piece_abrege:         "Abrégé descriptif",
+  piece_pouvoir:        "Pouvoir",
+  piece_priorite:       "Document de priorité",
+  piece_cession:        "Cession de priorité",
+  piece_titre:          "Titre / justification paiement taxes",
+};
+
+export default function ViewDemande() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [data, setData] = useState(null);
@@ -12,47 +25,138 @@ export default function RespViewDemande() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetch = async () => {
-      try {
-        setData(await getDemandeBrevetById(id));
-      } catch {
-        setError("Demande introuvable.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetch();
+    getDemandeBrevetById(id)
+      .then(setData)
+      .catch(() => setError("Demande introuvable."))
+      .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <p className="page-state">Chargement...</p>;
-  if (error || !data) return <p className="page-state error">{error || "Demande introuvable."}</p>;
+  if (loading) return <p style={{ padding: 24 }}>Chargement…</p>;
+  if (error)   return <p style={{ padding: 24, color: "red" }}>{error}</p>;
+  if (!data)   return null;
+
+  const initiales = (a, b) => `${a?.[0] ?? ""}${b?.[0] ?? ""}`.toUpperCase();
+  const badgeCls  = data.statut === "valider" ? "vd-badge green" : "vd-badge red";
+  const deposedPieces = Object.entries(PIECES_LABELS).filter(([key]) => data[key]);
 
   return (
-    <div className="dem-page">
-      <div className="dem-card demand-form-shell">
-        <div className="dem-page-header">
-          <h2 className="dem-title">Détails de la demande</h2>
-          <p className="dem-sub">Consultation responsable — demande #{data.id_demande}</p>
+    <div className="vd-page">
+      <div className="vd-card">
+
+        {/* Header */}
+        <div className="vd-header">
+          <div className="vd-header-left">
+            <div className="vd-icon">📋</div>
+            <div>
+              <h2>Demande #{data.id_demande}</h2>
+              <p>Formulaire INAPI — R2-FO-03</p>
+            </div>
+          </div>
+          <div className="vd-header-actions">
+            <span className={badgeCls}>{data.statut === "valider" ? "✓ Validée" : "✗ Non validée"}</span>
+            <button className="vd-btn print" onClick={() => buildAndOpen(data, "print")}>🖨 Imprimer</button>
+            <button className="vd-btn dl"    onClick={() => buildAndOpen(data, "download")}>⬇ Télécharger</button>
+          </div>
         </div>
 
-        <Section num="01" label="Nature de la demande"><ViewField label="Nature" value={data.nature} /></Section>
-        <Section num="71" label="[71] — Déposant">{Array.isArray(data.deposant) && data.deposant.length > 0 ? data.deposant.map((dep) => <div key={dep.id_dep ?? `${dep.nom_dep}-${dep.prenom_dep}`} className="view-field-stack"><ViewField label="Nom" value={dep.nom_dep} /><ViewField label="Prénom" value={dep.prenom_dep} /><ViewField label="Dénomination" value={dep.denomination} /><ViewField label="Adresse" value={dep.adresse_dep} /><ViewField label="Nationalité" value={dep.nationalite} /></div>) : <ViewField label="Déposant" value="Aucun déposant" />}</Section>
-        <Section num="72" label="[72] — Inventeur(s)">{Array.isArray(data.inventeur) && data.inventeur.length > 0 ? data.inventeur.map((inv) => <div key={inv.id_inv ?? `${inv.nom_inv}-${inv.prenom_inv}`} className="view-field-stack"><ViewField label="Nom" value={inv.nom_inv} /><ViewField label="Prénom" value={inv.prenom_inv} /><ViewField label="Adresse" value={inv.adress_inv} /></div>) : <ViewField label="Inventeur" value="Aucun inventeur" />}</Section>
-        <Section num="54" label="[54] — Titre de l'invention"><ViewField label="Titre" value={data.titre} /></Section>
-        <Section num="30" label="[30] — Revendication de priorité"><ViewField label="N° dépôt" value={data.num_depo} /><ViewField label="Date dépôt" value={data.date_depo} /><ViewField label="Pays d'origine" value={data.pays_origine} /></Section>
-        <Section num="74" label="[74] — Mandataire"><ViewField label="Mandataire" value={data.mandataire} /><ViewField label="Date pouvoir" value={data.date_pouvoir} /></Section>
-        <Section num="ℹ" label="Autres informations"><ViewField label="Informations" value={data.autre_info} /></Section>
+        {/* Nature */}
+        <Section label="Nature de la demande">
+          <div className="vd-nature-badge">{data.nature || "—"}</div>
+        </Section>
 
-        <div className="modal-footer demand-form-actions">
-          <button className="btn-cancel" onClick={() => navigate("/responsable/demandes")}>Retour</button>
-          <button className="btn-print" onClick={() => buildAndOpen(data, "print")}>Imprimer</button>
-          <button className="btn-dl" onClick={() => buildAndOpen(data, "download")}>Télécharger</button>
-          <button className="btn-save" onClick={() => navigate(`/responsable/demandes/edit/${data.id_demande}`)}>Modifier</button>
+        {/* Identification */}
+        <Section label="Identification">
+          <div className="vd-info-grid">
+            <Info label="Titre" value={data.titre} full />
+            <Info label="N° de dépôt"    value={data.num_depo} />
+            <Info label="Date de dépôt"  value={data.date_depo} />
+            <Info label="Pays d'origine" value={data.pays_origine} />
+            <Info label="N° demande CA"  value={data.numdemande_CA} />
+            <Info label="Date CA"        value={data.date_CA} />
+            <Info label="Mandataire"     value={data.mandataire} />
+            <Info label="Date pouvoir"   value={data.date_pouvoir} />
+          </div>
+        </Section>
+
+        {/* Déposants */}
+        <Section label={`Déposant(s) ${data.deposant?.length ? `(${data.deposant.length})` : ""}`}>
+          {Array.isArray(data.deposant) && data.deposant.length > 0 ? (
+            <div className="vd-personnes">
+              {data.deposant.map(dep => (
+                <div key={dep.id_dep} className="vd-personne-card">
+                  <div className="vd-avatar">{initiales(dep.nom_dep, dep.prenom_dep)}</div>
+                  <div className="vd-personne-info">
+                    <div className="vd-personne-name">{dep.nom_dep} {dep.prenom_dep}</div>
+                    {dep.denomination && <div className="vd-personne-sub">{dep.denomination}</div>}
+                    {dep.adresse_dep  && <div className="vd-personne-sub">📍 {dep.adresse_dep}</div>}
+                    {dep.nationalite  && <div className="vd-personne-sub">🌐 {dep.nationalite}</div>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : <p className="vd-empty">Aucun déposant enregistré</p>}
+        </Section>
+
+        {/* Inventeurs */}
+        <Section label={`Inventeur(s) ${data.inventeur?.length ? `(${data.inventeur.length})` : ""}`}>
+          {Array.isArray(data.inventeur) && data.inventeur.length > 0 ? (
+            <div className="vd-personnes">
+              {data.inventeur.map(inv => (
+                <div key={inv.id_inv} className="vd-personne-card">
+                  <div className="vd-avatar inv">{initiales(inv.nom_inv, inv.prenom_inv)}</div>
+                  <div className="vd-personne-info">
+                    <div className="vd-personne-name">{inv.nom_inv} {inv.prenom_inv}</div>
+                    {inv.adress_inv && <div className="vd-personne-sub">📍 {inv.adress_inv}</div>}
+                    <div className="vd-personne-role">Inventeur</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : <p className="vd-empty">Aucun inventeur enregistré</p>}
+        </Section>
+
+        {/* Autres infos */}
+        {data.autre_info && (
+          <Section label="Autres informations">
+            <p className="vd-autres">{data.autre_info}</p>
+          </Section>
+        )}
+
+        {/* Pièces */}
+        <Section label="Bordereau des pièces déposées">
+          {deposedPieces.length > 0 ? (
+            <div className="vd-pieces">
+              {deposedPieces.map(([, lbl]) => (
+                <div key={lbl} className="vd-piece-item">✓ {lbl}</div>
+              ))}
+            </div>
+          ) : <p className="vd-empty">Aucune pièce cochée</p>}
+        </Section>
+
+        {/* Actions */}
+        <div className="vd-footer">
+          <button className="vd-btn-back" onClick={() => navigate(-1)}>← Retour</button>
+          <button className="vd-btn edit" onClick={() => navigate(`/responsable/demandes/edit/${id}`)}>✏ Modifier</button>
         </div>
       </div>
     </div>
   );
 }
 
-function Section({ num, label, children }) { return <div className="modal-section"><div className="section-title"><span className="section-num">{num}</span>{label}</div>{children}</div>; }
-function ViewField({ label, value }) { return <div className="view-field"><div className="view-label">{label}</div><div className="view-value">{value || "—"}</div></div>; }
+function Section({ label, children }) {
+  return (
+    <div className="vd-section">
+      <div className="vd-section-title">{label}</div>
+      {children}
+    </div>
+  );
+}
+
+function Info({ label, value, full }) {
+  return (
+    <div className={`vd-info-item${full ? " full" : ""}`}>
+      <div className="vd-info-label">{label}</div>
+      <div className="vd-info-value">{value || "—"}</div>
+    </div>
+  );
+}

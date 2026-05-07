@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "/src/contexts/AuthContext.jsx";
-import { addDemandeBrevet } from "../../features/demandes/demandeApi";
-import "../agent/AddDemande.css";
+import { addDemandeBrevet } from "../../features/demande/apiDemande.js";
+
 
 const EMPTY_FORM = {
   nature_brevet: false, nature_pct: false, nature_certificat: false,
