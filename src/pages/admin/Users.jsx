@@ -154,7 +154,7 @@ export default function Users() {
         )}
       </div>
 
-      {error && <p style={{ color: "red", marginBottom: "16px" }}>{error}</p>}
+      {error && <p className="page-state error">{error}</p>}
 
       <Datatable2
         title="Utilisateurs"

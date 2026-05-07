@@ -135,7 +135,7 @@ export default function DocumentForm({
     <form className="user-form" onSubmit={handleSubmit}>
       <h3>{editData ? "Modifier document" : "Ajouter document"}</h3>
 
-      {error && <p style={{ color: "red", fontSize: "13px" }}>{error}</p>}
+      {error && <p className="form-error-inline">{error}</p>}
 
       <label className="field-label">Brevet lié</label>
       <select name="id_brevet" value={form.id_brevet} onChange={handleChange} >
@@ -189,25 +189,25 @@ export default function DocumentForm({
         type="file"
         id="file-upload"
         accept="*/*"
-        style={{ display: "none" }}
+        className="file-input-hidden"
         onChange={handleFile}
       />
 
       {!fileName ? (
         <>
         {existingFile && (
-          <p style={{ fontSize: "12px", color: "#666", margin: "4px 0" }}>
+          <p className="form-note">
               Fichier actuel : <strong>{existingFile}</strong>
             </p>
         )}
         <label htmlFor="file-upload" className="file-select-btn">
-          <AttachFileIcon style={{ fontSize: 16 }} />
+          <AttachFileIcon className="inline-icon-accent" />
            {existingFile ? "Remplacer le fichier" : "Sélectionner un fichier"}
         </label>
         </>
       ) : (
         <div className="file-selected-row">
-          <AttachFileIcon style={{ fontSize: 15, color: "#EA6113" }} />
+          <AttachFileIcon className="inline-icon-accent small" />
 
           <span className="file-selected-name">{fileName}</span>
 

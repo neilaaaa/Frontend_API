@@ -8,14 +8,14 @@ import { useAuth } from "../contexts/AuthContext";
 import { useNotifications } from "../contexts/NotificationContext";
 
 const TYPE_CONFIG = {
-  user: { emoji: "\u{1F464}", color: "#7c3aed", bg: "#f3e8ff" },
-  warning: { emoji: "\u26A0\uFE0F", color: "#f59e0b", bg: "#fef3c7" },
-  role: { emoji: "\u{1F504}", color: "#2196f3", bg: "#e3f2fd" },
+  user: { emoji: "\u{1F464}", color: "#8d7d6f", bg: "#f8f5f0" },
+  warning: { emoji: "\u26A0\uFE0F", color: "#a16207", bg: "#fff4d6" },
+  role: { emoji: "\u{1F504}", color: "#EA6113", bg: "#fff0e6" },
   success: { emoji: "\u2705", color: "#10b981", bg: "#d1fae5" },
-  document: { emoji: "\u{1F4C4}", color: "#2196f3", bg: "#e3f2fd" },
-  recours: { emoji: "\u2696\uFE0F", color: "#ef5350", bg: "#ffeaea" },
-  brevet: { emoji: "\u{1F3C5}", color: "#ff7a18", bg: "#fff3e0" },
-  demande: { emoji: "\u{1F4CB}", color: "#7c3aed", bg: "#f3e8ff" },
+  document: { emoji: "\u{1F4C4}", color: "#F88F22", bg: "#fff4e6" },
+  recours: { emoji: "\u2696\uFE0F", color: "#dc2626", bg: "#fef2f2" },
+  brevet: { emoji: "\u{1F3C5}", color: "#EA6113", bg: "#fff3e0" },
+  demande: { emoji: "\u{1F4CB}", color: "#92620a", bg: "#fff4d6" },
 };
 
 function formatRole(role) {

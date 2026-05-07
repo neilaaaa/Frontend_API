@@ -111,7 +111,7 @@ export default function App() {
         <Route path="/directeur/recours"   element={<ProtectedRoute roles={["directeur"]}><Layout><DirRecours /></Layout></ProtectedRoute>} />
 
         {/* ERRORS */}
-        <Route path="/unauthorized" element={<div style={{ padding: 40 }}>Accès refusé</div>} />
+            <Route path="/unauthorized" element={<div className="page-state">Accès refusé</div>} />
         <Route path="*"             element={<Navigate to="/" replace />} />
 
       </Routes>

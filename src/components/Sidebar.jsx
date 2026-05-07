@@ -71,8 +71,8 @@ export default function Sidebar({ collapsed, mobileOpen, onNavigate }) {
               `sidebarItem ${isActive ? "active" : ""}`
             }
           >
-            {item.icon}
-            {!collapsed && <span>{item.label}</span>}
+            <span className="sidebarItemIcon">{item.icon}</span>
+            <span className="sidebarItemLabel">{item.label}</span>
           </NavLink>
         ))}
       </div>
@@ -87,8 +87,10 @@ export default function Sidebar({ collapsed, mobileOpen, onNavigate }) {
             navigate("/login");
           }}
         >
-          <LogoutIcon />
-          {!collapsed && <span>Déconnexion</span>}
+          <span className="sidebarItemIcon">
+            <LogoutIcon />
+          </span>
+          <span className="sidebarItemLabel">Déconnexion</span>
         </div>
       </div>
     </div>

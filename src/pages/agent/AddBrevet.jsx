@@ -56,7 +56,7 @@ export default function AddBrevet() {
   return (
     <div className="form-container">
       <h2>Ajouter Brevet</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p className="page-state error">{error}</p>}
 
       <div className="brevet-grid">
         <div className="brevet-section-label">Identification</div>

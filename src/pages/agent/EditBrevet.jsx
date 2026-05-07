@@ -150,8 +150,8 @@ const handleFile = async (e) => {
     (d) => String(d.id_demande) === String(form?.id_demande)
   );
 
-  if (loading) return <p>Chargement...</p>
-  if (error)   return <p style={{ color: "red" }}>{error}</p>
+  if (loading) return <p className="page-state">Chargement...</p>
+  if (error)   return <p className="page-state error">{error}</p>
   if (!form)   return <p>Brevet introuvable</p>
 
   return (

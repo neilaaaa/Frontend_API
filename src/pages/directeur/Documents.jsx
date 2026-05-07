@@ -13,9 +13,9 @@ const TYPE_LABEL = { brevet: "Brevet", demande: "Demande", recours: "Recours", p
 
 const TYPE_ICON = {
   ".pdf":  <PictureAsPdfIcon style={{ fontSize: 15, color: "#dc2626" }} />,
-  ".docx": <ArticleIcon      style={{ fontSize: 15, color: "#2563eb" }} />,
-  ".png":  <ImageIcon        style={{ fontSize: 15, color: "#7c3aed" }} />,
-  ".jpg":  <ImageIcon        style={{ fontSize: 15, color: "#7c3aed" }} />,
+  ".docx": <ArticleIcon      style={{ fontSize: 15, color: "#EA6113" }} />,
+  ".png":  <ImageIcon        style={{ fontSize: 15, color: "#FBB931" }} />,
+  ".jpg":  <ImageIcon        style={{ fontSize: 15, color: "#FBB931" }} />,
 };
 
 
@@ -26,7 +26,7 @@ function getExt(fichier) {
 
 function FileIcon({ fichier }) {
   const ext = getExt(fichier);
-  return TYPE_ICON[ext] || <InsertDriveFileOutlinedIcon style={{ fontSize: 15, color: "#888" }} />;
+  return TYPE_ICON[ext] || <InsertDriveFileOutlinedIcon style={{ fontSize: 15, color: "#8d7d6f" }} />;
 }
 
 async function handleDownload(row) {
@@ -57,16 +57,16 @@ const COLUMNS = [
     label: "Type",
     sortable: true,
     render: (r) => TYPE_LABEL[r.type_document] ?? r.type_document,  },
-  { key: "description",   label: "Description",   sortable: false, render: (r) => <span style={{ fontSize: 12, color: "#666" }} title={r.description}>{r.description.length > 45 ? r.description.slice(0, 45) + "…" : r.description}</span> },
+{ key: "description",   label: "Description",   sortable: false, render: (r) => <span className="text-muted-xs" title={r.description}>{r.description.length > 45 ? r.description.slice(0, 45) + "…" : r.description}</span> },
   { key: "date_ajout",    label: "Date ajout",    sortable: true  },
   {
     key: "fichier",
     label: "Fichier",
     sortable: false,
     render: (r) => r.fichier ? (
-      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+<div className="inline-row">
         <FileIcon fichier={r.fichier} />
-        <span style={{ fontSize: 12, color: "#555" }}>{r.fichier.split("/").pop()}</span>
+<span className="muted-inline-text">{r.fichier.split("/").pop()}</span>
       </div>
     )  : <span className="dt3-muted">—</span>,
   },
@@ -97,8 +97,8 @@ export default function DirDocuments() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p style={{ padding: 24 }}>Chargement des documents…</p>;
-  if (error)   return <p style={{ padding: 24, color: "red" }}>{error}</p>;
+  if (loading) return <p className="page-state">Chargement des documents…</p>;
+  if (error)   return <p className="page-state error">{error}</p>;
 
   return (
     <DataTable3

@@ -61,15 +61,15 @@ export default function Dashboard() {
     <div className="dash-page">
       <div className="dash-filter-bar">
         <div>
-          <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#1a1a2e", margin: 0, letterSpacing: "-0.3px" }}>
+          <h1 className="dash-heading">
             Tableau de bord
           </h1>
-          <h3 style={{ fontSize: "13px", fontWeight: 400, color: "#a0826d", margin: 0, padding: 0 }}>
+          <h3 className="dash-subheading">
             Vue d'ensemble de vos brevets et paiements
           </h3>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginLeft: "auto", flexWrap: "wrap" }}>
+        <div className="dash-filter-actions">
           <span className="dash-filter-label">Filtrer par</span>
 
           <div className="dash-filter-modes">
@@ -102,8 +102,8 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {loading && <p style={{ padding: "16px" }}>Chargement...</p>}
-      {error && <p style={{ padding: "16px", color: "red" }}>{error}</p>}
+      {loading && <p className="dash-state">Chargement...</p>}
+      {error && <p className="dash-state error">{error}</p>}
 
       <div className="stats-grid">
         <StatCard icon={IconBrevet} value={stats.total_brevets ?? 0} label="Total Brevets" />
@@ -125,7 +125,7 @@ export default function Dashboard() {
           title="Statut des brevets"
           labels={["Acceptés", "Refusés", "En attente"]}
           data={[donut.acceptes ?? 0, donut.refuses ?? 0, donut.en_attente ?? 0]}
-          colors={["#81e728", "#EA6113", "#FBB931"]}
+          colors={["#22c55e", "#EA6113", "#FBB931"]}
         />
       </div>
 

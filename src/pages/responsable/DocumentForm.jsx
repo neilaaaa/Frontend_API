@@ -3,17 +3,17 @@ import AttachFileIcon from "@mui/icons-material/AttachFile";
 import ChangeCircleOutlinedIcon from "@mui/icons-material/ChangeCircleOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import "./documents.css";
-import { api } from "/src/contexts/AuthContext.jsx";
 import { getTousBrevets } from "../../features/brevets/brevetApi";
 
 export default function DocumentForm({ onSubmit, editData, onCancel }) {
   const fileRef = useRef();
 
- const emptyForm = {
+  const emptyForm = {
     id_brevet: "",
     nom_document: "",
     type_document: "",
     description: "",
+    autre_type: "",
     fichier: null,
   };
 
@@ -24,30 +24,34 @@ export default function DocumentForm({ onSubmit, editData, onCancel }) {
 
   useEffect(() => {
     const fetchBrevets = async () => {
-    try {
-      const res = await getTousBrevets()
-      const unique = [...new Map(res.map(b => [b.id_brevet, b])).values()]
-      setBrevets(unique)
-    } catch {
-      console.error("Erreur chargement brevets")
-    }
-  }
-  fetchBrevets()
+      try {
+        const res = await getTousBrevets();
+        const unique = [...new Map(res.map((b) => [b.id_brevet, b])).values()];
+        setBrevets(unique);
+      } catch {
+        console.error("Erreur chargement brevets");
+      }
+    };
+
+    fetchBrevets();
+
     if (editData) {
       setForm({
-        id_brevet:     editData.id_brevet?.id_brevet ?? editData.id_brevet ?? "",
-        nom_document:  editData.nom_document  ?? "",
+        id_brevet: editData.id_brevet?.id_brevet ?? editData.id_brevet ?? "",
+        nom_document: editData.nom_document ?? "",
         type_document: editData.type_document ?? "",
-        description:   editData.description   ?? "",
-        fichier:       null, // ← ne pas pré-charger le fichier serveur
+        description: editData.description ?? "",
+        autre_type: editData.autre_type ?? "",
+        fichier: null,
       });
     } else {
       setForm(emptyForm);
     }
   }, [editData]);
 
-  const handleChange = (e) =>
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleFile = (e) => {
     const file = e.target.files[0];
@@ -64,16 +68,18 @@ export default function DocumentForm({ onSubmit, editData, onCancel }) {
     setError("");
     setLoading(true);
     try {
-      const formData = new FormData()
-       formData.append("nom_document",  form.nom_document)
-       formData.append("type_document", form.type_document)
-       formData.append("autre_type",    form.autre_type || "")
-       formData.append("description",   form.description || "")
-       formData.append("id_brevet",     form.id_brevet || "")
-        if (form.fichier instanceof File) {
-       formData.append("fichier", form.fichier)
+      const formData = new FormData();
+      formData.append("nom_document", form.nom_document);
+      formData.append("type_document", form.type_document);
+      formData.append("autre_type", form.autre_type || "");
+      formData.append("description", form.description || "");
+      formData.append("id_brevet", form.id_brevet || "");
+      if (form.fichier instanceof File) {
+        formData.append("fichier", form.fichier);
       }
+
       await onSubmit(formData);
+
       if (!editData) {
         setForm(emptyForm);
         if (fileRef.current) fileRef.current.value = "";
@@ -91,11 +97,7 @@ export default function DocumentForm({ onSubmit, editData, onCancel }) {
     if (onCancel) onCancel();
   };
 
-  const fileName =
-    form.fichier instanceof File
-      ? form.fichier.name
-      : null;
-
+  const fileName = form.fichier instanceof File ? form.fichier.name : null;
   const existingFile =
     editData?.fichier && typeof editData.fichier === "string"
       ? editData.fichier.split("/").pop()
@@ -105,16 +107,16 @@ export default function DocumentForm({ onSubmit, editData, onCancel }) {
     <form className="user-form" onSubmit={handleSubmit}>
       <h3>{editData ? "Modifier document" : "Ajouter document"}</h3>
 
-      {error && <p style={{ color: "red", fontSize: "13px" }}>{error}</p>}
+      {error && <p className="form-error-inline">{error}</p>}
 
       <label className="field-label">Brevet lié</label>
-      <select
-        name="id_brevet"
-        value={form.id_brevet}
-        onChange={handleChange}
-      >
-        <option value=""> Aucun brevet </option>
-          {brevets.map((b) => <option key={b.id_brevet} value={b.id_brevet}>{b.titre}-N°{b.num_brevet}</option>)}
+      <select name="id_brevet" value={form.id_brevet} onChange={handleChange}>
+        <option value="">Aucun brevet</option>
+        {brevets.map((b) => (
+          <option key={b.id_brevet} value={b.id_brevet}>
+            {b.titre} - N°{b.num_brevet}
+          </option>
+        ))}
       </select>
 
       <label className="field-label">Nom document</label>
@@ -150,31 +152,27 @@ export default function DocumentForm({ onSubmit, editData, onCancel }) {
         type="file"
         id="file-upload"
         accept="*/*"
-        style={{ display: "none" }}
+        className="file-input-hidden"
         onChange={handleFile}
       />
 
       {!fileName ? (
         <>
           {existingFile && (
-            <p style={{ fontSize: "12px", color: "#666", margin: "4px 0" }}>
+            <p className="form-note">
               Fichier actuel : <strong>{existingFile}</strong>
             </p>
           )}
           <label htmlFor="file-upload" className="file-select-btn">
-            <AttachFileIcon style={{ fontSize: 16 }} />
+            <AttachFileIcon className="inline-icon-accent" />
             {existingFile ? "Remplacer le fichier" : "Sélectionner un fichier"}
           </label>
         </>
       ) : (
         <div className="file-selected-row">
-          <AttachFileIcon style={{ fontSize: 15, color: "#EA6113" }} />
+          <AttachFileIcon className="inline-icon-accent small" />
           <span className="file-selected-name">{fileName}</span>
-          <label
-            htmlFor="file-upload"
-            className="file-change-btn"
-            title="Changer le fichier"
-          >
+          <label htmlFor="file-upload" className="file-change-btn" title="Changer le fichier">
             <ChangeCircleOutlinedIcon style={{ fontSize: 16 }} />
             Changer
           </label>

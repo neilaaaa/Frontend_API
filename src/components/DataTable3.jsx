@@ -191,7 +191,7 @@ export default function DataTable3({
         headStyles: { fillColor: [255, 122, 0], textColor: 255 },
         alternateRowStyles: { fillColor: [255, 250, 243] },
       });
-      doc.save(`${exportName || title}.pdf`);  // ✅ n'oubliez pas de sauvegarder
+      doc.save(`${fileName || title}.pdf`);
     });
   });
 };
@@ -200,16 +200,9 @@ export default function DataTable3({
     <div className="dt3-page">
       {/* ── HEADER ── */}
       <div className="dt3-header">
-        <div className="dt3-title-block">
-          <div className="dt3-icon-box">{icon}</div>
-          <div>
-            <h1>{title}</h1>
-            {subtitle && <p>{subtitle}</p>}
-          </div>
-        </div>
         <div className="dt3-actions">
           <button className="dt3-btn dt3-btn-pdf" onClick={handlePDF}>
-            <PictureAsPdfIcon style={{ fontSize: 16 }} /> Exporter PDF
+            <PictureAsPdfIcon style={{ fontSize: 16 }} /> PDF
           </button>
         </div>
       </div>

@@ -34,8 +34,8 @@ export default function ViewBrevet() {
   }, [id]);
 
 
-  if(loading) return <p> Loading </p>
-  if (error)   return <p style={{ color: "red" }}>{error}</p>
+  if(loading) return <p className="page-state">Loading</p>
+  if (error)   return <p className="page-state error">{error}</p>
   if (!data) return <p>Brevet Introuvable</p>;
   console.log("data", data);
 

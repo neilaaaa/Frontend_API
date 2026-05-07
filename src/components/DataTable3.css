@@ -6,7 +6,7 @@
 
 .dt3-page {
   padding: 28px 32px;
-  background: #f4f0ea;
+  background: transparent;
   min-height: 100vh;
   font-family: "DM Sans", "Segoe UI", sans-serif;
   box-sizing: border-box;
@@ -20,7 +20,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 22px;
+  margin-bottom: 18px;
   flex-wrap: wrap;
   gap: 12px;
 }
@@ -28,21 +28,21 @@
 .dt3-title-block {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   min-width: 0;
 }
 
 .dt3-icon-box {
-  width: 48px; height: 48px;
+  width: 44px; height: 44px;
   background: linear-gradient(135deg, #EA6113, #F88F22);
   border-radius: 14px;
   display: flex; align-items: center; justify-content: center;
   color: #fff; font-size: 22px;
-  box-shadow: 0 4px 14px rgba(234,97,19,.35);
+  box-shadow: 0 8px 16px rgba(234,97,19,.12);
 }
 
 .dt3-title-block h1 {
-  font-size: 21px;
+  font-size: 19px;
   font-weight: 700;
   color: #1a1a2e;
   margin: 0;
@@ -57,37 +57,62 @@
 
 /* ── EXPORT BUTTONS ─────────────────────────────────────── */
 .dt3-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.dt3-actions { margin-left: auto; justify-content: flex-end; }
 
 .dt3-btn {
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 8px 16px; border-radius: 9px; border: none !important;
+  padding: 8px 16px; border-radius: 12px; border: 1px solid rgba(219,200,181,0.5) !important;
   cursor: pointer; font-size: 13px; font-weight: 600;
   font-family: inherit;
-  transition: opacity .18s;
+  transition: opacity .18s, transform .18s ease, box-shadow .18s ease;
   justify-content: center;
   min-width: max-content;
 }
 
-.dt3-btn:hover { opacity: .85; }
+.dt3-btn:hover { opacity: .96; transform: translateY(-1px); box-shadow: 0 8px 16px rgba(45,29,14,0.05); }
 .dt3-btn-pdf   { background: #fee2e2 !important; color: #b91c1c !important; }
 .dt3-btn-excel { background: #dcfce7 !important; color: #15803d !important; }
 .dt3-btn-dl    { background: #fff0e6 !important; color: #EA6113 !important; }
+
+.dt3-actions .dt3-btn-pdf {
+  padding: 10px 16px;
+  border: none !important;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ea6113 0%, #f88f22 100%) !important;
+  color: #ffffff !important;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1px;
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+  box-shadow: 0 10px 20px rgba(234, 97, 19, 0.16);
+}
+
+.dt3-actions .dt3-btn-pdf:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, #f06d1b 0%, #fb9d2f 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 14px 24px rgba(234, 97, 19, 0.18);
+  filter: saturate(1.02);
+}
 
 /* ── STAT CARDS ─────────────────────────────────────────── */
 .dt3-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 14px;
-  margin-bottom: 22px;
+  gap: 12px;
+  margin-bottom: 18px;
 }
 
 .dt3-stat {
-  background: #fff;
-  border-radius: 14px;
-  padding: 16px 18px;
-  box-shadow: 0 2px 10px rgba(234,97,19,.06);
-  border: 1px solid #f0e0cc;
-  border-left: 4px solid #F88F22;
+  background: rgba(255,255,255,0.92);
+  border-radius: 16px;
+  padding: 14px 18px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: 0 10px 20px rgba(45,29,14,.045);
+  border: 1px solid rgba(219,200,181,0.6);
+  border-left: 3px solid #F88F22;
   position: relative;
   overflow: hidden;
 }
@@ -99,7 +124,7 @@
   width: 56px; height: 56px;
   border-radius: 50%;
   background: linear-gradient(135deg, #F88F22, #FBB931);
-  opacity: .08;
+  opacity: .05;
 }
 
 .dt3-stat.green  { border-left-color: #22c55e; }
@@ -117,8 +142,8 @@
 }
 
 .dt3-stat-val {
-  font-size: 26px;
-  font-weight: 800;
+  font-size: 24px;
+  font-weight: 700;
   color: #1a1a2e;
   margin-top: 4px;
   line-height: 1;
@@ -126,13 +151,13 @@
 
 /* ── CARD ───────────────────────────────────────────────── */
 .dt3-card {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow:
-    0 4px 6px rgba(234,97,19,.05),
-    0 10px 28px rgba(0,0,0,.08);
+  background: rgba(255,255,255,0.94);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border-radius: 18px;
+  box-shadow: 0 12px 24px rgba(45,29,14,.055);
   overflow: hidden;
-  border: 1px solid #f0e0cc;
+  border: 1px solid rgba(219,200,181,0.6);
   min-width: 0;
   max-width: 100%;
 }
@@ -141,8 +166,8 @@
 .dt3-toolbar {
   display: flex; align-items: center;
   justify-content: space-between;
-  padding: 14px 18px;
-  border-bottom: 1px solid #faf0e8;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(219,200,181,0.32);
   flex-wrap: wrap; gap: 10px;
 }
 
@@ -173,13 +198,13 @@
 
 .dt3-search {
   padding: 8px 12px 8px 36px !important;
-  border: 1.5px solid #f5dcc4 !important;
-  border-radius: 9px;
+  border: 1px solid rgba(219,200,181,0.72) !important;
+  border-radius: 12px;
   font-size: 13px;
   width: 220px;
   outline: none !important;
   color: #2d2013;
-  background: #fdf8f3 !important;
+  background: rgba(252,248,243,0.92) !important;
   font-family: inherit;
   transition: border-color .18s, box-shadow .18s;
 }
@@ -187,16 +212,16 @@
 .dt3-search:focus {
   border-color: #F88F22 !important;
   background: #fff !important;
-  box-shadow: 0 0 0 3px rgba(248,143,34,0.18) !important;
+  box-shadow: 0 0 0 4px rgba(248,143,34,0.11) !important;
 }
 
 /* Select */
 .dt3-select {
   padding: 8px 12px;
-  border: 1.5px solid #f5dcc4 !important;
-  border-radius: 9px;
+  border: 1px solid rgba(219,200,181,0.72) !important;
+  border-radius: 12px;
   font-size: 13px;
-  background: #fdf8f3 !important;
+  background: rgba(252,248,243,0.92) !important;
   color: #2d2013;
   outline: none !important;
   cursor: pointer;
@@ -211,7 +236,7 @@
   font-size: 12px;
   color: #bbb;
   white-space: nowrap;
-  background: #fdf5ec;
+  background: rgba(248,245,240,0.94);
   padding: 5px 12px;
   border-radius: 99px;
   font-weight: 500;
@@ -242,7 +267,7 @@ table.dt3-table {
   font-size: 11.5px !important;
   font-weight: 600 !important;
   text-transform: uppercase !important;
-  letter-spacing: .5px;
+  letter-spacing: .45px;
   color: #fff !important;
   border: none !important;
   background: transparent !important;
