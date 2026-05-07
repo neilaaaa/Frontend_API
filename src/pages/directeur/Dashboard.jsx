@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback} from "react";
+import { useState, useEffect, useCallback } from "react";
 import StatCard from "../../components/dashboard/StatCard";
 import BarChartCard from "../../components/dashboard/BarChartCard";
 import DonutChartCard from "../../components/dashboard/DonutChartCard";
@@ -6,10 +6,10 @@ import RecentTable from "../../components/dashboard/RecentTable";
 import "../../components/dashboard/dashboard.css";
 import { api } from "/src/contexts/AuthContext.jsx";
 
-const IconBrevet  = <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>;
-const IconAccepte = <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>;
-const IconDoc     = <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>;
-const IconRecours = <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
+const IconBrevet = <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" /></svg>;
+const IconAccepte = <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12" /></svg>;
+const IconDoc = <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>;
+const IconRecours = <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>;
 
 const MODES = ["Jour", "Mois", "Année"];
 
@@ -20,25 +20,28 @@ const formatDate = (iso) => {
 };
 
 export default function DirDashboard() {
-  const [mode, setMode]       = useState("Mois");
+  const [mode, setMode] = useState("Mois");
   const [selected, setSelected] = useState("");
   const [dashData, setDashData] = useState(null);
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-   const fetchDash = useCallback(async (currentMode, currentSelected) => {
+  const fetchDash = useCallback(async (currentMode, currentSelected) => {
     try {
       setLoading(true);
       setError("");
+
       const params = {};
       if (currentSelected) {
-        params.mode     = currentMode;
+        params.mode = currentMode;
         params.selected = currentSelected;
       }
+
       const res = await api.get("dashboard/stats/", { params });
       setDashData(res.data);
-    } catch {
-      setError("Erreur chargement du tableau de bord.");
+    } catch (err) {
+      console.error(err);
+      setError("Erreur de chargement du tableau de bord.");
     } finally {
       setLoading(false);
     }
@@ -49,35 +52,34 @@ export default function DirDashboard() {
   }, [mode, selected, fetchDash]);
 
   const inputType = mode === "Jour" ? "date" : mode === "Mois" ? "month" : "number";
-
-  const stats     = dashData?.stats              ?? {};
-  const donut     = dashData?.donut              ?? {};
-  const barData   = dashData?.bar_data           ?? { labels: [], revenus: [], paiements: [] };
-  const brevets   = dashData?.derniers_brevets   ?? [];
+  const stats = dashData?.stats ?? {};
+  const donut = dashData?.donut ?? {};
+  const barData = dashData?.bar_data ?? { labels: [], revenus: [], paiements: [] };
+  const brevets = dashData?.derniers_brevets ?? [];
   const paiements = dashData?.derniers_paiements ?? [];
 
   return (
     <div className="dash-page">
-
-      {/* FILTRE */}
       <div className="dash-filter-bar">
         <div>
-          <h1 className="dash-heading">
-            Tableau de bord
-          </h1>
+          <h1 className="dash-heading">Tableau de bord</h1>
+          <h3 className="dash-subheading">Vue d&apos;ensemble des brevets, demandes et paiements</h3>
         </div>
 
         <div className="dash-filter-actions">
           <span className="dash-filter-label">Filtrer par</span>
 
           <div className="dash-filter-modes">
-            {MODES.map((m) => (
+            {MODES.map((currentMode) => (
               <button
-                key={m}
-                className={`dash-filter-mode ${mode === m ? "active" : ""}`}
-                onClick={() => { setMode(m); setSelected(""); }}
+                key={currentMode}
+                className={`dash-filter-mode ${mode === currentMode ? "active" : ""}`}
+                onClick={() => {
+                  setMode(currentMode);
+                  setSelected("");
+                }}
               >
-                {m}
+                {currentMode}
               </button>
             ))}
           </div>
@@ -88,47 +90,38 @@ export default function DirDashboard() {
             value={selected}
             min={inputType === "number" ? 2000 : undefined}
             max={inputType === "number" ? 2100 : undefined}
-            placeholder={mode === "Année" ? "ex: 2024" : ""}
+            placeholder={mode === "Année" ? "ex : 2024" : ""}
             onChange={(e) => setSelected(e.target.value)}
           />
 
           {selected && (
             <button className="dash-filter-reset" onClick={() => setSelected("")}>
-              ✕ Réinitialiser
+              × Réinitialiser
             </button>
           )}
         </div>
       </div>
 
       {loading && <p className="dash-state">Chargement...</p>}
-      {error   && <p className="dash-state error">{error}</p>}
+      {error && <p className="dash-state error">{error}</p>}
 
-      {/* STATS */}
-     <div className="stats-grid">
-        <StatCard icon={IconBrevet}  value={stats.total_brevets    ?? 0} label="Total Brevets" />
+      <div className="stats-grid">
+        <StatCard icon={IconBrevet} value={stats.total_brevets ?? 0} label="Total brevets" />
         <StatCard icon={IconAccepte} value={stats.brevets_acceptes ?? 0} label="Brevets acceptés" />
-        <StatCard icon={IconDoc}     value={stats.total_demandes   ?? 0} label="Total Demandes" />
-        <StatCard icon={IconRecours} value={stats.total_recours    ?? 0} label="Total Recours" />
+        <StatCard icon={IconDoc} value={stats.total_demandes ?? 0} label="Total demandes" />
+        <StatCard icon={IconRecours} value={stats.total_recours ?? 0} label="Total recours" />
       </div>
 
-      {/* CHARTS */}
       <div className="charts-row">
-       <BarChartCard
-          title="Revenus & Paiements"
+        <BarChartCard
+          title="Revenus et paiements"
           labels={barData.labels.length > 0 ? barData.labels : ["Aucune donnée"]}
           datasets={[
-            {
-              label: "Revenus",
-              data: barData.revenus.length > 0 ? barData.revenus : [0],
-              borderRadius: 6,
-            },
-            {
-              label: "Paiements",
-              data: barData.paiements.length > 0 ? barData.paiements : [0],
-              borderRadius: 6,
-            },
+            { label: "Revenus", data: barData.revenus.length > 0 ? barData.revenus : [0], borderRadius: 6 },
+            { label: "Paiements", data: barData.paiements.length > 0 ? barData.paiements : [0], borderRadius: 6 },
           ]}
         />
+
         <DonutChartCard
           title="Statut des brevets"
           labels={["Acceptés", "Refusés", "En attente"]}
@@ -137,34 +130,33 @@ export default function DirDashboard() {
         />
       </div>
 
-      {/* TABLES */}
       <div className="tables-row">
         <RecentTable
           title="Derniers brevets"
           columns={[
-            { key: "num_brevet", label: "N° Brevet"  },
-            { key: "titre",      label: "Titre"       },
-            { key: "date_depot", label: "Date dépôt", render: (v) => formatDate(v) },
-            { key: "statut",     label: "Statut"      },
+            { key: "num_brevet", label: "N° brevet" },
+            { key: "titre", label: "Titre" },
+            { key: "date_depot", label: "Date de dépôt", render: (value) => formatDate(value) },
+            { key: "statut", label: "Statut" },
           ]}
           rows={brevets}
           badgeKey="statut"
           badgeMap={{ EN_ATTENTE: "b-pending", ACCEPTER: "b-delivered", REFUSER: "b-refused" }}
         />
+
         <RecentTable
           title="Derniers paiements"
           columns={[
-            { key: "titre_brevet",  label: "Titre brevet"  },
-            { key: "montant_total", label: "Montant total"  },
-            { key: "date_paiement", label: "Date paiement", render: (v) => formatDate(v) },
-            { key: "statut",        label: "Statut"         },
+            { key: "titre_brevet", label: "Titre du brevet" },
+            { key: "montant_total", label: "Montant total" },
+            { key: "date_paiement", label: "Date de paiement", render: (value) => formatDate(value) },
+            { key: "statut", label: "Statut" },
           ]}
           rows={paiements}
           badgeKey="statut"
-          badgeMap={{ "Payé": "b-delivered", "Non payé": "b-pending" }}
+          badgeMap={{ Payé: "b-delivered", "Non payé": "b-pending" }}
         />
       </div>
-
     </div>
   );
 }

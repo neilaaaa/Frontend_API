@@ -113,17 +113,21 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="dash-page">
-      <div className="dash-topbar">
+    <div className="dash-page dash-page-admin">
+      <div className="dash-topbar dash-topbar-admin">
         <h2 className="dash-page-title">Tableau de bord Admin</h2>
-        <button className="filter-btn active" type="button" onClick={() => goToUsers("dt-form")}>
+        <button
+          className="filter-btn active admin-manage-btn"
+          type="button"
+          onClick={() => goToUsers("dt-form")}
+        >
           Gerer les utilisateurs
         </button>
       </div>
 
       <div className="stats-grid">
         {focusCards.map((card) => (
-          <div className="stat-card" key={card.label}>
+          <div className="stat-card admin-focus-card" key={card.label}>
             <span className="stat-accent-bar" />
             <div className="stat-info">
               <div className="stat-val">{card.value}</div>
@@ -134,8 +138,8 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div className="charts-row">
-        <section className="dash-card">
+      <div className="charts-row admin-panels-grid">
+        <section className="dash-card admin-roles-card">
           <div className="dash-card-header">
             <span className="dash-card-title">Roles du systeme</span>
           </div>
@@ -158,7 +162,7 @@ export default function Dashboard() {
           </table>
         </section>
 
-        <section className="dash-card">
+        <section className="dash-card admin-actions-card">
           <div className="dash-card-header">
             <span className="dash-card-title">Actions rapides</span>
           </div>

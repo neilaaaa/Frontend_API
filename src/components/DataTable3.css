@@ -27,21 +27,15 @@
 
 .dt3-title-block {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  align-items: flex-start;
   min-width: 0;
 }
 
-.dt3-icon-box {
-  width: 44px; height: 44px;
-  background: linear-gradient(135deg, #EA6113, #F88F22);
-  border-radius: 14px;
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 22px;
-  box-shadow: 0 8px 16px rgba(234,97,19,.12);
+.dt3-title-copy {
+  min-width: 0;
 }
 
-.dt3-title-block h1 {
+.dt3-title-copy h1 {
   font-size: 19px;
   font-weight: 700;
   color: #1a1a2e;
@@ -49,7 +43,7 @@
   overflow-wrap: anywhere;
 }
 
-.dt3-title-block p {
+.dt3-title-copy p {
   font-size: 13px;
   color: #a0826d;
   margin: 3px 0 0;
@@ -402,6 +396,10 @@ table.dt3-table {
   }
 
   .dt3-title-block h1 {
+    font-size: 19px;
+  }
+
+  .dt3-title-copy h1 {
     font-size: 19px;
   }
 

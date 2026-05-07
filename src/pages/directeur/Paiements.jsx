@@ -53,7 +53,7 @@ export default function DirPaiements() {
   return (
     <DataTable3
       icon={<PaymentIcon />}
-      title="Paiements"
+      title="Gestion des paiements"
       stats={[]}
       columns={COLUMNS}
       data={data}

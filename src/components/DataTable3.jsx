@@ -200,6 +200,15 @@ export default function DataTable3({
     <div className="dt3-page">
       {/* ── HEADER ── */}
       <div className="dt3-header">
+        {(title || subtitle) && (
+          <div className="dt3-title-block">
+            <div className="dt3-title-copy">
+              {title && <h1>{title}</h1>}
+              {subtitle && <p>{subtitle}</p>}
+            </div>
+          </div>
+        )}
+
         <div className="dt3-actions">
           <button className="dt3-btn dt3-btn-pdf" onClick={handlePDF}>
             <PictureAsPdfIcon style={{ fontSize: 16 }} /> PDF
