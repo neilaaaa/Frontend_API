@@ -77,7 +77,6 @@ export default function RecoursForm({ onSubmit, editData, onCancel }) {
 
       {error && <p style={{ color: "red", fontSize: "13px" }}>{error}</p>}
 
-      {/* ✅ Select brevet depuis l'API */}
       <label>Brevet</label>
       <select
         name="id_brevet"
@@ -85,7 +84,7 @@ export default function RecoursForm({ onSubmit, editData, onCancel }) {
         onChange={handleChange}
         required
       >
-        <option value="">-- Sélectionner un brevet --</option>
+        <option value=""> Sélectionner un brevet </option>
         {brevets.map((b) => (
           <option key={b.id_brevet} value={b.id_brevet}>
             {b.titre} — N°{b.num_brevet}

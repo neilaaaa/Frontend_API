@@ -194,17 +194,13 @@ export default function DocumentForm({
       />
 
       {!fileName ? (
-        <>
-        {existingFile && (
+    
+        existingFile && (
           <p className="form-note">
               Fichier actuel : <strong>{existingFile}</strong>
             </p>
-        )}
-        <label htmlFor="file-upload" className="file-select-btn">
-          <AttachFileIcon className="inline-icon-accent" />
-           {existingFile ? "Remplacer le fichier" : "Sélectionner un fichier"}
-        </label>
-        </>
+        )
+
       ) : (
         <div className="file-selected-row">
           <AttachFileIcon className="inline-icon-accent small" />

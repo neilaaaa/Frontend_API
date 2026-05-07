@@ -426,7 +426,7 @@ export default function AgentDemandes() {
      console.log("inventeur:", form.inventeur_nom, form.inventeur_prenom)
     } catch (err){
        if (err.response?.data?.id_brevet) {
-    window.alert("⚠️ Ce brevet est déjà lié à une autre demande. Choisissez un autre.")
+       window.alert("⚠️ Ce brevet est déjà lié à une autre demande. Choisissez un autre.")
     return
   }
       console.log("ERREUR: ",err)

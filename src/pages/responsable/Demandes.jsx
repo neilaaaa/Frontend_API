@@ -41,6 +41,13 @@ export default function RespDemandes() {
       ""
     ).toLowerCase();
 
+    console.log({
+      currentUserId,
+      currentUserEmail,
+      creatorId,
+      creatorIdentity,
+});
+
     return (
       (creatorId && currentUserId && creatorId === currentUserId) ||
       (creatorIdentity &&
@@ -54,9 +61,22 @@ export default function RespDemandes() {
       setLoading(true);
       setError("");
       const res = await getDemandeBrevets();
-      const all = Array.isArray(res?.results) ? res.results : Array.isArray(res) ? res : [];
-      setMesData(all.filter(isOwnDemande));
-      setAgentsData(all.filter((demande) => !isOwnDemande(demande)));
+      const all = res.results || res;
+      console.log("USER:", user);
+console.log("ALL DATA:", all);
+     setMesData(
+  all.filter(d => String(d.createur_id) === String(user.id))
+);
+     setAgentsData(
+  all.filter(
+    d =>
+      String(d.createur_id) !== String(user.id) &&
+      d.createur_groupe === "agent"
+  )
+);
+      console.log(all)
+      console.log("USER ID :", user.id);
+      console.log("ALL :", all);
     } catch {
       setError("Erreur chargement des demandes.");
     } finally {
@@ -65,10 +85,8 @@ export default function RespDemandes() {
   };
 
   useEffect(() => {
-    if (user) {
-      load();
-    }
-  }, [user]);
+      load(); 
+  }, []);
 
   const handleDelete = async (row) => {
     try {
@@ -81,7 +99,7 @@ export default function RespDemandes() {
 
   const handleValider = async (row) => {
     try {
-      await updateDemandeBrevet(row.id_demande, { statut: "valider" });
+      await validerDemande(row.id_demande, { statut: "valider" });
       load();
     } catch {
       setError("Erreur validation.");
@@ -90,7 +108,7 @@ export default function RespDemandes() {
 
   const handleRefuser = async (row) => {
     try {
-      await updateDemandeBrevet(row.id_demande, { statut: "refuser" });
+      await refuserDemande(row.id_demande, { statut: "refuser" });
       load();
     } catch {
       setError("Erreur refus.");

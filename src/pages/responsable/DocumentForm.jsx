@@ -129,13 +129,23 @@ export default function DocumentForm({ onSubmit, editData, onCancel }) {
       />
 
       <label className="field-label">Type de document</label>
-      <input
-        name="type_document"
-        value={form.type_document}
-        onChange={handleChange}
-        placeholder="Ex: Contrat, Rapport..."
-        required
-      />
+      <select name="type_document" value={form.type_document} onChange={handleChange} required>
+       <option value="">Choisir un type</option>
+       <option value="brevet">Brevet</option>
+       <option value="paiement">Bon de paiement</option>
+       <option value="Memoire Descriptif">Memoire Descriptif</option>
+       <option value="autre">Autre</option>
+      </select>
+      {form.type_document === "autre" && (
+        <input name="autre_type" value={form.autre_type|| ""} onChange={handleChange} placeholder="Preciser le type..." type="text"/>
+      )}
+
+      {form.type_document === "brevet" && (
+        <>
+        <label className="field-label">Date Officiel sortie brevet</label>
+        <input type="date" name=" date_sortie_officielle" value={form.date_sortie_officielle} onChange={handleChange} required />
+      </>
+      )}
 
       <label className="field-label">Description</label>
       <textarea
