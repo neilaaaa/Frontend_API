@@ -1,21 +1,8 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { api } from "/src/contexts/AuthContext.jsx";
-import { addDemandeBrevet } from "../../features/demande/apiDemande.js";
-
-
-const EMPTY_FORM = {
-  nature_brevet: false, nature_pct: false, nature_certificat: false,
-  titre: "",
-  num_depot: "", priorite_date: "", priorite_pays: "", priorite_nature: "",
-  brevet_principal_num: "", brevet_principal_date: "",
-  mandataire_nom: "", mandataire_date_pouvoir: "",
-  autres_informations: "",
-  piece_copie_int: false, piece_memoire_nat: false, piece_memoire_fr: false,
-  piece_memoire_fr_dup: false, piece_dessins_orig: false, piece_dessins_dup: false,
-  piece_abrege: false, piece_pouvoir: false, piece_priorite: false,
-  piece_cession: false, piece_titre: false,
-};
+import { getDemandeBrevetById, updateDemandeBrevet } from "../../features/demande/apiDemande.js";
+import "../agent/EditDemande.css";
 
 const PIECES = [
   ["piece_copie_int",      "Copie de la demande internationale"],
@@ -31,19 +18,84 @@ const PIECES = [
   ["piece_titre",          "Titre / justification paiement taxes"],
 ];
 
-export default function AddDemande() {
+export default function EditDemande() {
+  const { id } = useParams();
   const navigate = useNavigate();
-  const [form, setForm]       = useState({ ...EMPTY_FORM });
-  const [loading, setLoading] = useState(false);
+  const [form, setForm]     = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving]   = useState(false);
   const [error, setError]     = useState("");
 
+  // ✅ Un seul déposant
   const [deposant, setDeposant] = useState({
-    nom_dep: "", prenom_dep: "", denomination: "", adresse_dep: "", nationalite: ""
+    id_dep: null, nom_dep: "", prenom_dep: "", denomination: "", adresse_dep: "", nationalite: ""
   });
 
-  const [inventeurs, setInventeurs] = useState([
-    { nom_inv: "", prenom_inv: "", adress_inv: "" }
-  ]);
+  // Plusieurs inventeurs
+  const [inventeurs, setInventeurs] = useState([]);
+
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        const d = await getDemandeBrevetById(id);
+        setForm({
+          nature_brevet:           d.nature === "Brevet d'invention",
+          nature_pct:              d.nature === "Extension PCT",
+          nature_certificat:       d.nature === "Certificat d'addition",
+          titre:                   d.titre         || "",
+          num_depot:               d.num_depo      || "",
+          priorite_date:           d.date_depo     || "",
+          priorite_pays:           d.pays_origine  || "",
+          priorite_nature:         d.nature        || "",
+          brevet_principal_num:    d.numdemande_CA || "",
+          brevet_principal_date:   d.date_CA       || "",
+          mandataire_nom:          d.mandataire    || "",
+          mandataire_date_pouvoir: d.date_pouvoir  || "",
+          autres_informations:     d.autre_info    || "",
+          piece_copie_int:         d.piece_copie_int      || false,
+          piece_memoire_nat:       d.piece_memoire_nat    || false,
+          piece_memoire_fr:        d.piece_memoire_fr     || false,
+          piece_memoire_fr_dup:    d.piece_memoire_fr_dup || false,
+          piece_dessins_orig:      d.piece_dessins_orig   || false,
+          piece_dessins_dup:       d.piece_dessins_dup    || false,
+          piece_abrege:            d.piece_abrege         || false,
+          piece_pouvoir:           d.piece_pouvoir        || false,
+          piece_priorite:          d.piece_priorite       || false,
+          piece_cession:           d.piece_cession        || false,
+          piece_titre:             d.piece_titre          || false,
+        });
+
+        if (Array.isArray(d.deposant) && d.deposant.length > 0) {
+          const dep = d.deposant[0];
+          setDeposant({
+            id_dep:       dep.id_dep        || null,
+            nom_dep:      dep.nom_dep       || "",
+            prenom_dep:   dep.prenom_dep    || "",
+            denomination: dep.denomination  || "",
+            adresse_dep:  dep.adresse_dep   || "",
+            nationalite:  dep.nationalite   || "",
+          });
+        }
+
+        // Inventeurs — plusieurs possibles
+        if (Array.isArray(d.inventeur) && d.inventeur.length > 0) {
+          setInventeurs(d.inventeur.map(inv => ({
+            id_inv:     inv.id_inv     || null,
+            nom_inv:    inv.nom_inv    || "",
+            prenom_inv: inv.prenom_inv || "",
+            adress_inv: inv.adress_inv || "",
+          })));
+        } else {
+          setInventeurs([{ id_inv: null, nom_inv: "", prenom_inv: "", adress_inv: "" }]);
+        }
+      } catch {
+        setError("Erreur de chargement.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetch();
+  }, [id]);
 
   const setField = (e) => {
     const { name, value, type, checked } = e.target;
@@ -53,14 +105,14 @@ export default function AddDemande() {
   const updateDep = (field, val) =>
     setDeposant(d => ({ ...d, [field]: val }));
 
-  const updateInventeur = (i, field, val) => {
+  const updateInv = (i, field, val) => {
     const arr = [...inventeurs];
     arr[i] = { ...arr[i], [field]: val };
     setInventeurs(arr);
   };
 
   const handleSubmit = async () => {
-    setError(""); setLoading(true);
+    setError(""); setSaving(true);
     const natureLbl = form.nature_brevet ? "Brevet d'invention"
       : form.nature_pct ? "Extension PCT"
       : form.nature_certificat ? "Certificat d'addition" : "—";
@@ -76,7 +128,6 @@ export default function AddDemande() {
       mandataire:    form.mandataire_nom || "",
       date_pouvoir:  form.mandataire_date_pouvoir || null,
       autre_info:    form.autres_informations || "",
-      statut:        "non_valider",
       piece_copie_int:      form.piece_copie_int,
       piece_memoire_nat:    form.piece_memoire_nat,
       piece_memoire_fr:     form.piece_memoire_fr,
@@ -91,39 +142,63 @@ export default function AddDemande() {
     };
 
     try {
-      const nouvelle = await addDemandeBrevet(payload);
-      const currentId = nouvelle?.id_demande;
+      await updateDemande(id, payload);
 
-      if (currentId) {
-        if (deposant.nom_dep || deposant.prenom_dep) {
-          await api.post("deposants/", { ...deposant, id_demande: currentId });
-        }
-        for (const inv of inventeurs) {
-          if (inv.nom_inv || inv.prenom_inv) {
-            await api.post("inventeurs/", { ...inv, id_demande: currentId });
-          }
+      if (deposant.nom_dep || deposant.prenom_dep) {
+        if (deposant.id_dep) {
+          await api.patch(`deposants/${deposant.id_dep}/`, {
+            nom_dep:      deposant.nom_dep,
+            prenom_dep:   deposant.prenom_dep,
+            denomination: deposant.denomination,
+            adresse_dep:  deposant.adresse_dep,
+            nationalite:  deposant.nationalite,
+          });
+        } else {
+          await api.post("deposants/", { ...deposant, id_demande: Number(id) });
         }
       }
+
+      for (const inv of inventeurs) {
+        if (!inv.nom_inv && !inv.prenom_inv) continue;
+        if (inv.id_inv) {
+          await api.patch(`inventeurs/${inv.id_inv}/`, {
+            nom_inv:    inv.nom_inv,
+            prenom_inv: inv.prenom_inv,
+            adress_inv: inv.adress_inv,
+          });
+        } else {
+          await api.post("inventeurs/", {
+            nom_inv:    inv.nom_inv,
+            prenom_inv: inv.prenom_inv,
+            adress_inv: inv.adress_inv,
+            id_demande: Number(id),  
+          });
+        }
+      }
+
       navigate("/responsable/demandes");
     } catch (err) {
       setError(JSON.stringify(err.response?.data) || "Erreur enregistrement.");
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
+  if (loading) return <p style={{ padding: 24 }}>Chargement…</p>;
+  if (!form)   return <p style={{ padding: 24, color: "red" }}>{error || "Demande introuvable."}</p>;
+
   return (
-    <div className="add-dem-page">
-      <div className="add-dem-card">
-        <div className="add-dem-header">
-          <div className="add-dem-header-icon">📋</div>
+    <div className="edit-dem-page">
+      <div className="edit-dem-card">
+        <div className="edit-dem-header">
+          <div className="edit-dem-header-icon">✏️</div>
           <div>
-            <h2>Nouvelle demande de protection</h2>
-            <p>Formulaire officiel INAPI — R2-FO-03</p>
+            <h2>Modifier la demande</h2>
+            <p>Formulaire officiel INAPI — R2-FO-03 — #{id}</p>
           </div>
         </div>
 
-        {error && <div className="add-dem-error">{error}</div>}
+        {error && <div className="edit-dem-error">{error}</div>}
 
         {/* Nature */}
         <Section num="01" label="Nature de la demande *">
@@ -153,6 +228,7 @@ export default function AddDemande() {
           </div>
         </Section>
 
+        {/* Inventeurs — plusieurs possibles */}
         <Section num="72" label="[72] — INVENTEUR(S)">
           {inventeurs.map((inv, i) => (
             <div key={i} className="personne-card">
@@ -166,37 +242,40 @@ export default function AddDemande() {
                 )}
               </div>
               <div className="modal-grid">
-                <F label="Nom"     value={inv.nom_inv}    onChange={e => updateInventeur(i, "nom_inv", e.target.value)} />
-                <F label="Prénom"  value={inv.prenom_inv} onChange={e => updateInventeur(i, "prenom_inv", e.target.value)} />
-                <F label="Adresse" value={inv.adress_inv} onChange={e => updateInventeur(i, "adress_inv", e.target.value)} full area />
+                <F label="Nom"     value={inv.nom_inv}    onChange={e => updateInv(i, "nom_inv", e.target.value)} />
+                <F label="Prénom"  value={inv.prenom_inv} onChange={e => updateInv(i, "prenom_inv", e.target.value)} />
+                <F label="Adresse" value={inv.adress_inv} onChange={e => updateInv(i, "adress_inv", e.target.value)} full area />
               </div>
             </div>
           ))}
           <button type="button" className="btn-add-more"
-            onClick={() => setInventeurs([...inventeurs, { nom_inv: "", prenom_inv: "", adress_inv: "" }])}>
+            onClick={() => setInventeurs([...inventeurs, { id_inv: null, nom_inv: "", prenom_inv: "", adress_inv: "" }])}>
             + Ajouter un inventeur
           </button>
         </Section>
 
+        {/* Titre */}
         <Section num="54" label="[54] — TITRE DE L'INVENTION">
           <div className="modal-grid">
             <F label="Titre complet" name="titre" value={form.titre} onChange={setField} full area />
           </div>
         </Section>
 
+        {/* Priorité */}
         <Section num="30" label="[30] — REVENDICATION DE PRIORITÉ">
           <div className="modal-grid">
-            <F label="N° de dépôt"    name="num_depot"       value={form.num_depot}       onChange={setField} type="number" />
-            <F label="Date de dépôt"  name="priorite_date"   value={form.priorite_date}   onChange={setField} type="date" />
-            <F label="Pays d'origine" name="priorite_pays"   value={form.priorite_pays}   onChange={setField} />
-            <F label="Nature"         name="priorite_nature" value={form.priorite_nature} onChange={setField} />
+            <F label="N° de dépôt"    name="num_depot"       value={String(form.num_depot)}           onChange={setField} type="number" />
+            <F label="Date de dépôt"  name="priorite_date"   value={form.priorite_date}               onChange={setField} type="date" />
+            <F label="Pays d'origine" name="priorite_pays"   value={form.priorite_pays}               onChange={setField} />
+            <F label="Nature"         name="priorite_nature" value={form.priorite_nature}             onChange={setField} />
           </div>
         </Section>
 
+        {/* Brevet principal */}
         <Section num="+" label="Certificat d'addition — Brevet principal">
           <div className="modal-grid">
-            <F label="N° brevet principal" name="brevet_principal_num"  value={form.brevet_principal_num}  onChange={setField} />
-            <F label="Date"                name="brevet_principal_date" value={form.brevet_principal_date} onChange={setField} type="date" />
+            <F label="N° brevet principal" name="brevet_principal_num"  value={String(form.brevet_principal_num)}  onChange={setField} />
+            <F label="Date"                name="brevet_principal_date" value={form.brevet_principal_date}         onChange={setField} type="date" />
           </div>
         </Section>
 
@@ -227,10 +306,10 @@ export default function AddDemande() {
           </div>
         </Section>
 
-        <div className="add-dem-actions">
+        <div className="edit-dem-actions">
           <button className="btn-cancel" onClick={() => navigate("/responsable/demandes")}>Annuler</button>
-          <button className="btn-save" onClick={handleSubmit} disabled={loading}>
-            {loading ? "Enregistrement…" : " Enregistrer la demande"}
+          <button className="btn-save" onClick={handleSubmit} disabled={saving}>
+            {saving ? "Enregistrement…" : " Enregistrer les modifications"}
           </button>
         </div>
       </div>
@@ -252,8 +331,8 @@ function F({ label, name, value, onChange, type = "text", full, area, rows = 2 }
     <div className={`fg${full ? " full" : ""}`}>
       <label>{label}</label>
       {area
-        ? <textarea name={name} value={value} onChange={onChange} rows={rows} />
-        : <input type={type} name={name} value={value} onChange={onChange} />
+        ? <textarea name={name} value={value ?? ""} onChange={onChange} rows={rows} />
+        : <input type={type} name={name} value={value ?? ""} onChange={onChange} />
       }
     </div>
   );

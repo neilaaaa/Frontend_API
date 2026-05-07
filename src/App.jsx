@@ -30,6 +30,9 @@ import RespAddBrevet  from "./pages/responsable/AddBrevet";
 import RespEditBrevet from "./pages/responsable/EditBrevet";
 import RespViewBrevet from "./pages/responsable/ViewBrevet";
 import RespDemandes   from "./pages/responsable/Demandes";
+import RespAddDemande  from "./pages/responsable/resAddDemande";
+import RespEditDemande from "./pages/responsable/RespEditDemande";
+import RespViewDemande from "./pages/responsable/RespViewDemande";
 import RespPaiements  from "./pages/responsable/Paiements";
 import RespRecours    from "./pages/responsable/Recours";
 import RespDocuments  from "./pages/responsable/Documents";
@@ -89,6 +92,9 @@ export default function App() {
         {/* ── RESPONSABLE ── */}
         <Route path="/responsable"           element={<ProtectedRoute roles={["responsable"]}><Layout><RespDashboard /></Layout></ProtectedRoute>} />
         <Route path="/responsable/demandes"  element={<ProtectedRoute roles={["responsable"]}><Layout><RespDemandes /></Layout></ProtectedRoute>} />
+        <Route path="/responsable/demandes/add"       element={<ProtectedRoute roles={["responsable"]}><Layout><RespAddDemande /></Layout></ProtectedRoute>} />
+        <Route path="/responsable/demandes/edit/:id"  element={<ProtectedRoute roles={["responsable"]}><Layout><RespEditDemande /></Layout></ProtectedRoute>} />
+        <Route path="/responsable/demandes/view/:id"  element={<ProtectedRoute roles={["responsable"]}><Layout><RespViewDemande /></Layout></ProtectedRoute>} />
         <Route path="/responsable/paiements" element={<ProtectedRoute roles={["responsable"]}><Layout><RespPaiements /></Layout></ProtectedRoute>} />
         <Route path="/responsable/recours"   element={<ProtectedRoute roles={["responsable"]}><Layout><RespRecours /></Layout></ProtectedRoute>} />
         <Route path="/responsable/documents" element={<ProtectedRoute roles={["responsable"]}><Layout><RespDocuments /></Layout></ProtectedRoute>} />
