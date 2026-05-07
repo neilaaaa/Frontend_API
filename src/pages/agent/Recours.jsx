@@ -59,8 +59,8 @@ export default function Recours() {
     }
   };
 
-   if (loading) return <p>Chargement...</p>;
-   if (error) return <p style={{ color: "red", padding: "8px 16px" }}>{error}</p>
+   if (loading) return <p className="page-state">Chargement...</p>;
+   if (error) return <p className="page-state error">{error}</p>
 
   return (
     <Datatable2

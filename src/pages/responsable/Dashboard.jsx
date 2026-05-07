@@ -69,15 +69,15 @@ useEffect(() => {
       {/* FILTRE */}
       <div className="dash-filter-bar">
         <div>
-          <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#1a1a2e", margin: 0, letterSpacing: "-0.3px" }}>
+          <h1 className="dash-heading">
             Tableau de bord
           </h1>
-          <h3 style={{ fontSize: "13px", fontWeight: 400, color: "#a0826d", margin: 0, padding: 0 }}>
+          <h3 className="dash-subheading">
             Vue d'ensemble de vos brevets et paiements
           </h3>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginLeft: "auto", flexWrap: "wrap" }}>
+        <div className="dash-filter-actions">
           <span className="dash-filter-label">Filtrer par</span>
 
           <div className="dash-filter-modes">

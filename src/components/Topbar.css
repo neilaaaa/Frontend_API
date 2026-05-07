@@ -1,17 +1,21 @@
 /* ── TOPBAR ─────────────────────────────────────── */
 .topbar {
   height: 60px;
-  background: #ffffff;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(6px) saturate(125%);
+  -webkit-backdrop-filter: blur(6px) saturate(125%);
+  border: 1px solid rgba(219, 200, 181, 0.52);
+  border-radius: 16px;
   position: fixed;
   top: var(--shell-gap);
   left: calc(var(--sidebar-width) + var(--shell-gap));
   right: var(--shell-gap);
   width: auto;
   margin: 0;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 12px 28px rgba(45, 29, 14, 0.06);
   z-index: 1000;
   max-width: none;
+  transition: left 0.38s var(--ease-soft), box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .topbar.collapsed {
@@ -42,18 +46,26 @@
   width: 38px;
   height: 38px;
   border: 0;
-  border-radius: 10px;
-  background: #fff3e0;
-  color: #ff7a00;
+  border-radius: 12px;
+  background: rgba(255, 241, 230, 0.96);
+  color: var(--sun-dark);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
   cursor: pointer;
   flex-shrink: 0;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.menuButton:hover {
+  background: rgba(255, 236, 220, 1);
+  box-shadow: 0 6px 14px rgba(234, 97, 19, 0.1);
+  transform: translateY(-1px);
 }
 
 .menuIcon { color: inherit; cursor: pointer; }
 .logo {
-  font-weight: 600;
+  font-weight: 650;
   font-size: 18px;
-  color: #333;
+  color: var(--text-strong);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -77,19 +89,20 @@
 .topbarIconsContainer {
   position: relative;
   cursor: pointer;
-  color: #555;
+  color: #6b6258;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 38px;
   height: 38px;
-  border-radius: 10px;
-  transition: background 0.2s, color 0.2s;
+  border-radius: 12px;
+  transition: background 0.2s, color 0.2s, transform 0.2s ease;
 }
 .topbarIconsContainer:hover,
 .topbarIconsContainer.active {
-  background: #fff3e0;
-  color: #ff7a00;
+  background: rgba(255, 241, 230, 0.96);
+  color: var(--sun-dark);
+  transform: translateY(-1px);
 }
 
 /* Badge rouge */
@@ -97,7 +110,7 @@
   position: absolute;
   top: -4px;
   right: -4px;
-  background: #ef5350;
+  background: linear-gradient(135deg, #ea6113, #f88f22);
   color: #fff;
   font-size: 10px;
   font-weight: 700;
@@ -108,7 +121,7 @@
   align-items: center;
   justify-content: center;
   padding: 0 4px;
-  border: 2px solid #fff;
+  border: 2px solid rgba(255,255,255,0.94);
   animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 @keyframes popIn {
@@ -123,10 +136,12 @@
   right: 0;
   width: 360px;
   max-width: calc(100vw - 96px);
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.14);
-  border: 1px solid #f0f0f0;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(6px) saturate(125%);
+  -webkit-backdrop-filter: blur(6px) saturate(125%);
+  border-radius: 18px;
+  box-shadow: 0 18px 38px rgba(45, 29, 14, 0.1);
+  border: 1px solid rgba(219, 200, 181, 0.52);
   overflow: hidden;
   animation: slideDown 0.2s ease;
   z-index: 9999;
@@ -142,7 +157,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #f5f5f5;
+  border-bottom: 1px solid rgba(219, 200, 181, 0.36);
 }
 .notifPanelTitle {
   display: flex;
@@ -154,10 +169,10 @@
 .notifPanelTitle > span:first-child {
   font-weight: 700;
   font-size: 15px;
-  color: #1a1a1a;
+  color: var(--text-strong);
 }
 .notifBadgeCount {
-  background: #ff7a18;
+  background: linear-gradient(135deg, var(--sun-dark), var(--sun-mid));
   color: #fff;
   font-size: 10px;
   font-weight: 600;
@@ -166,8 +181,8 @@
 }
 .markAllBtn {
   background: none;
-  border: 1px solid #ff7a18;
-  color: #ff7a18;
+  border: 1px solid rgba(248, 143, 34, 0.24);
+  color: var(--sun-dark);
   font-size: 12px;
   font-weight: 600;
   padding: 4px 10px;
@@ -176,7 +191,7 @@
   transition: background 0.15s, color 0.15s;
 }
 .markAllBtn:hover {
-  background: #ff7a18;
+  background: linear-gradient(135deg, var(--sun-dark), var(--sun-mid));
   color: #fff;
 }
 
@@ -187,7 +202,7 @@
   padding: 6px 0;
 }
 .notifList::-webkit-scrollbar { width: 4px; }
-.notifList::-webkit-scrollbar-thumb { background: #eee; border-radius: 4px; }
+.notifList::-webkit-scrollbar-thumb { background: #e7ddd1; border-radius: 4px; }
 
 /* Empty */
 .notifEmpty {
@@ -195,7 +210,7 @@
   flex-direction: column;
   align-items: center;
   padding: 36px 20px;
-  color: #aaa;
+  color: #a59788;
   gap: 8px;
 }
 .notifEmptyIcon { font-size: 32px; }
@@ -210,11 +225,11 @@
   padding: 12px 18px 12px 22px;
   cursor: pointer;
   transition: background 0.15s;
-  border-bottom: 1px solid #fafafa;
+  border-bottom: 1px solid rgba(219, 200, 181, 0.2);
 }
 .notifItem:last-child { border-bottom: none; }
-.notifItem.unread { background: #fffbf7; }
-.notifItem:hover { background: #f9f9f9; }
+.notifItem.unread { background: #fffaf6; }
+.notifItem:hover { background: #fcf8f3; }
 
 /* Point orange non-lu */
 .unreadDot {
@@ -224,7 +239,7 @@
   transform: translateY(-50%);
   width: 6px;
   height: 6px;
-  background: #ff7a18;
+  background: var(--sun-mid);
   border-radius: 50%;
 }
 
@@ -245,7 +260,7 @@
 .notifTitle {
   font-size: 13px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--text-strong);
   margin: 0 0 2px;
   white-space: nowrap;
   overflow: hidden;
@@ -253,7 +268,7 @@
 }
 .notifMessage {
   font-size: 12px;
-  color: #666;
+  color: #71685e;
   margin: 0 0 4px;
   line-height: 1.4;
   display: -webkit-box;
@@ -264,7 +279,7 @@
 }
 .notifTime {
   font-size: 11px;
-  color: #aaa;
+  color: #a59788;
   margin: 0;
 }
 
@@ -285,11 +300,11 @@
 /* Footer */
 .notifPanelFooter {
   padding: 10px 18px;
-  border-top: 1px solid #f5f5f5;
+  border-top: 1px solid rgba(219, 200, 181, 0.36);
   text-align: center;
   font-size: 12px;
-  color: #aaa;
-  background: #fafafa;
+  color: #9b8c7d;
+  background: rgba(248, 245, 240, 0.86);
 }
 
 /* ── USER ───────────────────────────────────────── */
@@ -299,22 +314,22 @@
   gap: 8px;
   cursor: pointer;
   padding: 5px 10px;
-  border-radius: 10px;
+  border-radius: 12px;
   min-width: 0;
   max-width: 180px;
 }
-.userContainer:hover { background: #f5f5f5; }
+.userContainer:hover { background: rgba(248, 245, 240, 0.9); }
 .userInfo { display: flex; flex-direction: column; }
 .username {
   font-size: 13px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-strong);
   max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.userRole { font-size: 11px; color: #aaa; text-transform: capitalize; }
+.userRole { font-size: 11px; color: #9b8c7d; text-transform: capitalize; }
 
 @media (max-width: 900px) {
   .topbar,

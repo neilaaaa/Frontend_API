@@ -1,22 +1,6 @@
 import { useEffect, useState } from "react";
 import { getTousBrevets } from "../../features/brevets/brevetApi";
 
-const LABEL_STYLE = {
-  fontSize: 11,
-  fontWeight: 600,
-  color: "#a0826d",
-  textTransform: "uppercase",
-  letterSpacing: ".3px",
-  marginBottom: 4,
-  display: "block",
-};
-
-const FIELD_WRAP = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 2,
-};
-
 export default function PaiementForm({ onSubmit, editData, onCancel }) {
   const emptyForm = {
     id_brevet: "",
@@ -86,11 +70,11 @@ export default function PaiementForm({ onSubmit, editData, onCancel }) {
       <h3>{editData ? " Modifier paiement" : "+ Nouveau paiement"}</h3>
       
       {error && (
-        <p style={{ color: "red", fontSize: 13, margin: "4px 0" }}>{error}</p>
+        <p className="form-error-inline">{error}</p>
       )}
 
-      <div style={FIELD_WRAP}>
-        <label style={LABEL_STYLE}>Titre du brevet</label>
+      <div className="field-stack">
+        <label className="field-label-soft">Titre du brevet</label>
         <select
           name="id_brevet"
           placeholder="Ex : Brevet"
@@ -107,8 +91,8 @@ export default function PaiementForm({ onSubmit, editData, onCancel }) {
         </select>
       </div>
 
-      <div style={FIELD_WRAP}>
-        <label style={LABEL_STYLE}>Date de paiement</label>
+      <div className="field-stack">
+        <label className="field-label-soft">Date de paiement</label>
         <input
           type="date"
           name="date_paiement"
@@ -118,8 +102,8 @@ export default function PaiementForm({ onSubmit, editData, onCancel }) {
         />
       </div>
 
-      <div style={FIELD_WRAP}>
-        <label style={LABEL_STYLE}>Montant total (DA)</label>
+      <div className="field-stack">
+        <label className="field-label-soft">Montant total (DA)</label>
         <input
           type="number"
           name="montant_total"
@@ -132,8 +116,8 @@ export default function PaiementForm({ onSubmit, editData, onCancel }) {
         />
       </div>
 
-      <div style={FIELD_WRAP}>
-        <label style={LABEL_STYLE}>Statut</label>
+      <div className="field-stack">
+        <label className="field-label-soft">Statut</label>
         <select name="statut" value={form.statut} onChange={handleChange}>
           <option value="non_payer">Non payé</option>
           <option value="payer">Payé</option>

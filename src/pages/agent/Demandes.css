@@ -739,3 +739,58 @@
     padding: 18px 14px !important;
   }
 }
+
+/* Soft Apple overrides */
+.dem-page {
+  background: transparent;
+}
+
+.dem-card,
+.dem-modal {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(219, 200, 181, 0.6);
+  box-shadow: 0 16px 32px rgba(45, 29, 14, 0.06);
+}
+
+.dem-add-btn,
+.dem-refresh-btn,
+.btn-save,
+.btn-print,
+.btn-dl,
+.btn-cancel {
+  border-radius: 12px !important;
+  box-shadow: 0 10px 18px rgba(45, 29, 14, 0.06) !important;
+}
+
+.dem-search,
+.modal-grid input,
+.modal-grid textarea,
+.modal-grid select,
+.fg input,
+.fg textarea,
+.fg select {
+  border: 1px solid rgba(219, 200, 181, 0.72) !important;
+  border-radius: 12px !important;
+  background: rgba(252, 248, 243, 0.94) !important;
+}
+
+.dem-search:focus,
+.modal-grid input:focus,
+.modal-grid textarea:focus,
+.modal-grid select:focus,
+.fg input:focus,
+.fg textarea:focus,
+.fg select:focus {
+  box-shadow: 0 0 0 4px rgba(248, 143, 34, 0.11) !important;
+}
+
+.dem-count,
+.agent-tag,
+.piece-item,
+.check-row {
+  background: rgba(248, 245, 240, 0.94) !important;
+}
+
+.dem-table td {
+  border-bottom-color: rgba(219, 200, 181, 0.24) !important;
+}

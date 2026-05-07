@@ -62,12 +62,12 @@ export default function DirDashboard() {
       {/* FILTRE */}
       <div className="dash-filter-bar">
         <div>
-          <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#1a1a2e", margin: 0, letterSpacing: "-0.3px" }}>
+          <h1 className="dash-heading">
             Tableau de bord
           </h1>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginLeft: "auto", flexWrap: "wrap" }}>
+        <div className="dash-filter-actions">
           <span className="dash-filter-label">Filtrer par</span>
 
           <div className="dash-filter-modes">
@@ -100,8 +100,8 @@ export default function DirDashboard() {
         </div>
       </div>
 
-      {loading && <p style={{ padding: "16px" }}>Chargement...</p>}
-      {error   && <p style={{ padding: "16px", color: "red" }}>{error}</p>}
+      {loading && <p className="dash-state">Chargement...</p>}
+      {error   && <p className="dash-state error">{error}</p>}
 
       {/* STATS */}
      <div className="stats-grid">

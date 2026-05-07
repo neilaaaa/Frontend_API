@@ -78,10 +78,10 @@ export default function AgentDocuments() {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <p className="page-state">Chargement...</p>;
 
   if (error) {
-    return <p style={{ color: "red" }}>{error}</p>;
+    return <p className="page-state error">{error}</p>;
   }
 
   return (
@@ -209,9 +209,7 @@ function ViewDocumentModal({ doc, onClose }) {
 
               {fileName ? (
                 <div className="view-file-row">
-                  <InsertDriveFileOutlinedIcon
-                    style={{ fontSize: 16, color: "#EA6113" }}
-                  />
+                  <InsertDriveFileOutlinedIcon className="inline-icon-accent" />
 
                   <span className="view-file-name">{fileName}</span>
 

@@ -27,9 +27,9 @@ body, html {
   padding: 24px;
 
   /* ✨ overlay clair au lieu de sombre */
-  background: rgba(190, 188, 188, 0.4);
-
-  backdrop-filter: blur(0px); /* effet moderne glass */
+  background: rgba(248, 245, 240, 0.58);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 
 @media (max-width: 768px) {

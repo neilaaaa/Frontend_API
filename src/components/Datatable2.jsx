@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
-import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import "./datatable.css";
-import SearchIcon       from "@mui/icons-material/Search";
-import VisibilityIcon   from "@mui/icons-material/Visibility";
-import EditIcon         from "@mui/icons-material/Edit";
-import DeleteIcon       from "@mui/icons-material/Delete";
+import SearchIcon from "@mui/icons-material/Search";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 export default function Datatable2({
   columns = [],
@@ -18,22 +18,12 @@ export default function Datatable2({
   title = "Table",
   exportName = "export",
 }) {
-  const getRowKey = (row, index) =>
-    row.id ??
-    row.id_brevet ??
-    row.id_document ??
-    row.id_paiement ??
-    row.id_recours ??
-    row.id_demande ??
-    index;
-
-  const [search, setSearch]   = useState("");
+  const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
-  const [page, setPage]       = useState(1);
+  const [page, setPage] = useState(1);
   const perPage = 5;
 
-  /* ── Search ── */
   const filtered = useMemo(() => {
     if (!search) return data;
     return data.filter((row) =>
@@ -43,7 +33,6 @@ export default function Datatable2({
     );
   }, [search, data, columns]);
 
-  /* ── Sort ── */
   const sorted = useMemo(() => {
     if (!sortKey) return filtered;
     return [...filtered].sort((a, b) => {
@@ -52,18 +41,22 @@ export default function Datatable2({
     });
   }, [filtered, sortKey, sortDir]);
 
-  /* ── Pagination ── */
   const totalPages = Math.ceil(sorted.length / perPage);
-  const pageData   = sorted.slice((page - 1) * perPage, page * perPage);
+  const pageData = sorted.slice((page - 1) * perPage, page * perPage);
 
   const handleSort = (key) => {
     if (sortKey === key) setSortDir(sortDir === "asc" ? "desc" : "asc");
-    else { setSortKey(key); setSortDir("asc"); }
+    else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
   };
 
-  const handleSearch = (e) => { setSearch(e.target.value); setPage(1); };
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+    setPage(1);
+  };
 
-  /* ── Export PDF ── */
   const exportPDF = () => {
     const doc = new jsPDF();
     doc.text(title, 10, 10);
@@ -80,36 +73,37 @@ export default function Datatable2({
     doc.save(`${exportName}.pdf`);
   };
 
-  /* ── Page numbers ── */
   const getPageNumbers = () => {
     const delta = 2;
     const range = [];
-    const left  = Math.max(1, page - delta);
+    const left = Math.max(1, page - delta);
     const right = Math.min(totalPages, page + delta);
-    for (let i = left; i <= right; i++) range.push(i);
-    if (left > 1)           { range.unshift("..."); range.unshift(1); }
-    if (right < totalPages) { range.push("...");    range.push(totalPages); }
+    for (let i = left; i <= right; i += 1) range.push(i);
+    if (left > 1) {
+      range.unshift("...");
+      range.unshift(1);
+    }
+    if (right < totalPages) {
+      range.push("...");
+      range.push(totalPages);
+    }
     return range;
   };
 
   return (
     <div className="dt-layout">
-
-      {/* ── LEFT : formulaire ── */}
       <div className="dt-left">{form}</div>
 
-      {/* ── RIGHT : table ── */}
       <div className="dt-right">
-
-        {/* Header */}
         <div className="dt-header">
           <h2 className="dt-title">{title}</h2>
           <div className="dt-actions">
-            <button className="dt-btn-pdf"   onClick={exportPDF}>⬇ PDF</button>
+            <button className="dt-btn-pdf" onClick={exportPDF}>
+              <PictureAsPdfIcon fontSize="small" /> PDF
+            </button>
           </div>
         </div>
 
-        {/* Search */}
         <div className="dt-search-wrap">
           <SearchIcon
             sx={{
@@ -130,7 +124,6 @@ export default function Datatable2({
           />
         </div>
 
-        {/* Table card */}
         <div className="dt-table-card">
           <table className="dt-table">
             <thead>
@@ -145,61 +138,50 @@ export default function Datatable2({
               </tr>
             </thead>
 
-          <tbody>
-            {pageData.length === 0 ? (
-              <tr>
-                <td colSpan={columns.length + 1} className="dt-empty">
-                  Aucun résultat trouvé
-                </td>
-              </tr>
-            ) : (
-              pageData.map((row, index) => (
-                <tr key={index}>
-                  {columns.map((c) => (
-                  <td key={c.key} data-label={c.label}>
-                    {c.render ? c.render(row[c.key]): row[c.key]}
-                  </td>
-                  ))}
-                  <td className="dt-actions-cell" data-label="Actions">
-                    {onView && (
-                      <button
-                        className="dt-btn-icon dt-btn-view"
-                        onClick={() => onView(row)}
-                        title="Voir"
-                      >
-                        <VisibilityIcon fontSize="small" />
-                      </button>
-                    )}
-                    {onEdit && (
-                      <button
-                        className="dt-btn-icon dt-btn-edit"
-                        onClick={() => onEdit(row)}
-                        title="Modifier"
-                      >
-                        <EditIcon fontSize="small" />
-                      </button>
-                    )}
-                    {onDelete && (
-                      <button
-                        className="dt-btn-icon dt-btn-delete"
-                        onClick={() => {
-                          if (window.confirm("Voulez-vous vraiment supprimer cet élément ?")) {
-                            onDelete(row);
-                          }
-                        }}
-                        title="Supprimer"
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </button>
-                    )}
+            <tbody>
+              {pageData.length === 0 ? (
+                <tr>
+                  <td colSpan={columns.length + 1} className="dt-empty">
+                    Aucun résultat trouvé
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                pageData.map((row, index) => (
+                  <tr key={row.id ?? row.id_brevet ?? row.id_document ?? row.id_paiement ?? row.id_recours ?? row.id_demande ?? index}>
+                    {columns.map((c) => (
+                      <td key={c.key} data-label={c.label}>
+                        {c.render ? c.render(row[c.key]) : row[c.key]}
+                      </td>
+                    ))}
+                    <td className="dt-actions-cell" data-label="Actions">
+                      {onView && (
+                        <button className="dt-btn-icon dt-btn-view" onClick={() => onView(row)} title="Voir">
+                          <VisibilityIcon fontSize="small" />
+                        </button>
+                      )}
+                      {onEdit && (
+                        <button className="dt-btn-icon dt-btn-edit" onClick={() => onEdit(row)} title="Modifier">
+                          <EditIcon fontSize="small" />
+                        </button>
+                      )}
+                      {onDelete && (
+                        <button
+                          className="dt-btn-icon dt-btn-delete"
+                          onClick={() => {
+                            if (window.confirm("Voulez-vous vraiment supprimer cet élément ?")) onDelete(row);
+                          }}
+                          title="Supprimer"
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
 
-          {/* Pagination */}
           {sorted.length > 0 && (
             <div className="dt-pagination">
               <span className="dt-pg-info">
@@ -213,11 +195,7 @@ export default function Datatable2({
                 p === "..." ? (
                   <span key={`e-${i}`} className="dt-pg-ellipsis">…</span>
                 ) : (
-                  <button
-                    key={p}
-                    className={`dt-pg-btn${p === page ? " active" : ""}`}
-                    onClick={() => setPage(p)}
-                  >
+                  <button key={p} className={`dt-pg-btn${p === page ? " active" : ""}`} onClick={() => setPage(p)}>
                     {p}
                   </button>
                 )
@@ -228,7 +206,6 @@ export default function Datatable2({
             </div>
           )}
         </div>
-
       </div>
     </div>
   );

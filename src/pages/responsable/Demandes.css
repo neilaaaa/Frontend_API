@@ -109,6 +109,49 @@
     0 10px 28px rgba(0, 0, 0, 0.07);
 }
 
+/* Soft Apple polish */
+.dem-page {
+  background: transparent;
+}
+
+.dem-card,
+.dem-modal {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border: 1px solid rgba(219, 200, 181, 0.6) !important;
+  box-shadow: 0 16px 32px rgba(45, 29, 14, 0.06) !important;
+}
+
+.dem-refresh-btn,
+.dem-add-btn,
+.btn-save,
+.btn-cancel,
+.btn-print,
+.btn-dl {
+  border-radius: 12px !important;
+}
+
+.dem-search,
+.fg input,
+.fg textarea,
+.fg select,
+.modal-grid input,
+.modal-grid textarea,
+.modal-grid select {
+  border: 1px solid rgba(219, 200, 181, 0.72) !important;
+  border-radius: 12px !important;
+  background: rgba(252, 248, 243, 0.94) !important;
+}
+
+.dem-search:focus,
+.fg input:focus,
+.fg textarea:focus,
+.fg select:focus,
+.modal-grid input:focus,
+.modal-grid textarea:focus,
+.modal-grid select:focus {
+  box-shadow: 0 0 0 4px rgba(248, 143, 34, 0.11) !important;
+}
+
 .dem-toolbar {
   display: flex;
   align-items: center;
@@ -292,6 +335,14 @@
   opacity: 0.85;
   transform: translateY(-1px);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.09);
+}
+
+.act-btn:disabled,
+.act-btn.is-disabled {
+  opacity: 0.58;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
 }
 
 .act-btn.edit {
@@ -597,6 +648,52 @@
   padding: 14px 24px;
   border-top: 1.5px solid #f5ece0;
   background: #fff;
+}
+
+.demand-form-shell {
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+.demand-form-actions {
+  margin-top: 16px;
+}
+
+.dem-person-card {
+  margin-bottom: 12px;
+  padding: 14px 16px;
+  border: 1px solid #f5ece0;
+  border-radius: 12px;
+  background: #fffdf9;
+}
+
+.dem-person-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.dem-person-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 99px;
+  background: #fff4e6;
+  color: #ea6113;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dem-remove-btn {
+  width: auto;
+  margin-top: 0;
+  padding: 8px 14px;
+}
+
+.view-field-stack {
+  padding: 8px 0;
 }
 
 .btn-cancel,

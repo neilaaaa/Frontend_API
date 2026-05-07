@@ -5,12 +5,33 @@
   box-sizing: border-box;
 }
 
+:root {
+  --sun-dark: #EA6113;
+  --sun-mid: #F88F22;
+  --sun-gold: #FBB931;
+  --surface-bg: #f8f5f0;
+  --surface-soft: #fcfaf7;
+  --surface-card: rgba(255, 255, 255, 0.92);
+  --surface-card-strong: #ffffff;
+  --border-soft: rgba(219, 200, 181, 0.62);
+  --border-accent: rgba(248, 143, 34, 0.16);
+  --text-strong: #1f1d1a;
+  --text-muted: #8d7d6f;
+  --shadow-soft: 0 10px 28px rgba(45, 29, 14, 0.05);
+  --shadow-float: 0 16px 40px rgba(45, 29, 14, 0.08);
+  --apple-blur: blur(6px) saturate(125%);
+  --radius-card: 18px;
+  --radius-control: 12px;
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 body {
   margin: 0;
   padding: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   min-height: 100vh;
-  background: white;
+  background: linear-gradient(180deg, #fbf8f4 0%, #f6f1ea 100%);
+  color: var(--text-strong);
   overflow-x: hidden;
 }
 
@@ -26,7 +47,10 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(#e6b251, #6c3800);
+  background:
+    radial-gradient(circle at top left, rgba(251, 185, 49, 0.12), transparent 30%),
+    radial-gradient(circle at top right, rgba(234, 97, 19, 0.06), transparent 26%),
+    linear-gradient(180deg, #fbf8f4 0%, #f6f1ea 100%);
 }
 
 .contenu {
@@ -42,6 +66,303 @@ body {
   width: 100%;
   max-width: 100%;
   overflow-x: auto;
+}
+
+.container,
+.contenu {
+  color: var(--text-strong);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+input,
+select,
+textarea {
+  border-radius: var(--radius-control);
+  border: 1px solid var(--border-soft);
+  background: rgba(255, 255, 255, 0.84);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+input[type="file"] {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px dashed rgba(219, 200, 181, 0.82);
+  background: rgba(252, 248, 243, 0.94);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+input[type="file"]:hover {
+  border-color: rgba(248, 143, 34, 0.38);
+  background: rgba(255, 255, 255, 0.96);
+}
+
+input[type="file"]::file-selector-button {
+  margin-right: 12px;
+  padding: 8px 14px;
+  border: 1px solid rgba(219, 200, 181, 0.68);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--text-strong);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background: rgba(255, 244, 236, 1);
+  color: var(--sun-dark);
+  box-shadow: 0 8px 16px rgba(45, 29, 14, 0.05);
+}
+
+input[type="file"]::-webkit-file-upload-button {
+  margin-right: 12px;
+  padding: 8px 14px;
+  border: 1px solid rgba(219, 200, 181, 0.68);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--text-strong);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.file-select-btn,
+.file-change-btn,
+.file-remove-btn,
+.view-dl-btn,
+.fichier-add,
+.fichier-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 12px !important;
+  border: 1px solid rgba(219, 200, 181, 0.68) !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  color: var(--text-strong) !important;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.file-select-btn:hover,
+.file-change-btn:hover,
+.view-dl-btn:hover,
+.fichier-add:hover {
+  background: rgba(255, 244, 236, 1) !important;
+  color: var(--sun-dark) !important;
+  border-color: rgba(248, 143, 34, 0.28) !important;
+  box-shadow: 0 8px 16px rgba(45, 29, 14, 0.05);
+}
+
+.file-remove-btn,
+.fichier-remove {
+  background: rgba(255, 249, 249, 0.96) !important;
+  color: #b42318 !important;
+  border-color: rgba(240, 160, 160, 0.6) !important;
+}
+
+.file-remove-btn:hover,
+.fichier-remove:hover {
+  background: rgba(254, 242, 242, 1) !important;
+  color: #991b1b !important;
+  box-shadow: 0 8px 16px rgba(45, 29, 14, 0.05);
+}
+
+.docs-box,
+.view-docs-box,
+.fichiers-section {
+  border-radius: 14px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: rgba(248, 143, 34, 0.48);
+  box-shadow: 0 0 0 4px rgba(248, 143, 34, 0.11);
+  background: #fff;
+}
+
+[class*="card"],
+[class*="Card"],
+[class*="table-card"] {
+  border-color: var(--border-soft);
+  box-shadow: var(--shadow-soft);
+}
+
+.page-state {
+  padding: 16px 20px;
+  color: var(--text-muted);
+}
+
+.page-state.error {
+  color: #b42318;
+}
+
+.field-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label-soft {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: #a0826d;
+}
+
+.form-note,
+.text-note {
+  margin: 4px 0;
+  font-size: 12px;
+  color: #8d7d6f;
+}
+
+.form-error-inline {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #b42318;
+}
+
+.file-input-hidden {
+  display: none;
+}
+
+.inline-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.inline-icon-accent {
+  font-size: 16px;
+  color: var(--sun-dark);
+}
+
+.inline-icon-accent.small {
+  font-size: 15px;
+}
+
+.muted-inline-text,
+.text-muted-xs {
+  font-size: 12px;
+  color: #7f6f60;
+}
+
+.brevet-page,
+.dem-page,
+.view-page,
+.dt3-page,
+.brevets-page {
+  background: transparent !important;
+}
+
+.brevet-card,
+.form-container,
+.edit-container,
+.view-container,
+.view-card-wrapper,
+.dem-card,
+.dem-modal,
+.table-card,
+.modal-box,
+.user-form {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border: 1px solid rgba(219, 200, 181, 0.6) !important;
+  box-shadow: 0 16px 32px rgba(45, 29, 14, 0.06) !important;
+}
+
+.view-card,
+.view-info-item,
+.view-docs-box,
+.docs-box,
+.doc-card,
+.dt3-stat,
+.piece-item,
+.check-row {
+  background: rgba(252, 248, 243, 0.94) !important;
+  border-color: rgba(219, 200, 181, 0.72) !important;
+}
+
+.form-group input,
+.form-group select,
+.edit-form input,
+.edit-form select,
+.dem-search,
+.modal-grid input,
+.modal-grid textarea,
+.modal-grid select,
+.fg input,
+.fg textarea,
+.fg select,
+.search-input,
+.user-form input,
+.user-form select,
+.user-form textarea,
+.fichier-nom {
+  border: 1px solid rgba(219, 200, 181, 0.72) !important;
+  border-radius: 12px !important;
+  background: rgba(252, 248, 243, 0.94) !important;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.edit-form input:focus,
+.edit-form select:focus,
+.dem-search:focus,
+.modal-grid input:focus,
+.modal-grid textarea:focus,
+.modal-grid select:focus,
+.fg input:focus,
+.fg textarea:focus,
+.fg select:focus,
+.search-input:focus,
+.user-form input:focus,
+.user-form select:focus,
+.user-form textarea:focus {
+  border-color: rgba(248, 143, 34, 0.48) !important;
+  box-shadow: 0 0 0 4px rgba(248, 143, 34, 0.11) !important;
+}
+
+.btn-save,
+.btn-cancel,
+.btn-print,
+.btn-dl,
+.dem-add-btn,
+.dem-refresh-btn,
+.view-btn-back,
+.submit-btn,
+.add-btn,
+.edit-save-btn,
+.edit-cancel-btn,
+.dt-btn,
+.file-select-btn,
+.file-change-btn,
+.file-remove-btn,
+.dl-btn {
+  border-radius: 12px !important;
+}
+
+.modal-overlay {
+  background: rgba(31, 24, 18, 0.22) !important;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
 }
 
 @media (max-width: 768px) {

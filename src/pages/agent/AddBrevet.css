@@ -63,6 +63,86 @@
   margin-bottom: 16px;
 }
 
+.form-group input:focus,
+.form-group select:focus,
+.brevet-grid > input:focus,
+.brevet-grid > select:focus {
+  border-color: #F88F22 !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 3px rgba(248,143,34,0.18) !important;
+}
+
+.form-group input::placeholder { color: #c4a882; }
+
+.brevet-grid > label {
+  align-self: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #a0826d;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+/* ─── File input ─────────────────────────────────────────── */
+.form-group input[type="file"] {
+  border: 1.5px dashed #f0ddd0 !important;
+  background: #fdf8f3 !important;
+  padding: 10px 12px;
+  cursor: pointer;
+  color: #a0826d;
+}
+
+.form-group input[type="file"]:hover {
+  border-color: #F88F22 !important;
+  background: #fff !important;
+}
+
+/* ─── Docs box ───────────────────────────────────────────── */
+.docs-box {
+  border: 1.5px dashed #f0ddd0;
+  padding: 16px;
+  border-radius: 12px;
+  background: #fdf8f3;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.docs-box input[type="file"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px dashed rgba(219, 200, 181, 0.82) !important;
+  border-radius: 14px !important;
+  background: rgba(252, 248, 243, 0.94) !important;
+  font-size: 13px;
+  color: #8d7d6f;
+  cursor: pointer;
+}
+
+.docs-box input[type="file"]::file-selector-button {
+  margin-right: 12px;
+  padding: 8px 14px;
+  border: 1px solid rgba(219, 200, 181, 0.68);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #1f1d1a;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.docs-box input[type="file"]::-webkit-file-upload-button {
+  margin-right: 12px;
+  padding: 8px 14px;
+  border: 1px solid rgba(219, 200, 181, 0.68);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #1f1d1a;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 /* ═══════════════════════════════════════════════════════════
    SECTION LABEL  (séparateur orange)
    ═══════════════════════════════════════════════════════════ */
@@ -299,3 +379,97 @@
 }
 
 .btn-cancel:hover { background: #fdf5ec; }
+.btn-cancel:hover { background: #fdf5ec !important; }
+
+/* Soft Apple overrides */
+.brevet-page {
+  background: transparent;
+}
+
+.brevet-card,
+.form-container {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(219, 200, 181, 0.6);
+  box-shadow: 0 16px 32px rgba(45, 29, 14, 0.06);
+}
+
+.form-group input,
+.form-group select,
+.brevet-grid > input,
+.brevet-grid > select,
+.form-group input[type="file"] {
+  border: 1px solid rgba(219, 200, 181, 0.72) !important;
+  border-radius: 12px;
+  background: rgba(252, 248, 243, 0.94) !important;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.brevet-grid > input:focus,
+.brevet-grid > select:focus {
+  box-shadow: 0 0 0 4px rgba(248, 143, 34, 0.11) !important;
+}
+
+.docs-box {
+  border: 1px dashed rgba(219, 200, 181, 0.9);
+  border-radius: 14px;
+  background: rgba(252, 248, 243, 0.94);
+}
+
+.doc-item {
+  border-radius: 10px;
+  background: rgba(255, 241, 230, 0.92);
+}
+
+.btn-save,
+.btn-cancel {
+  border-radius: 12px;
+  box-shadow: 0 10px 18px rgba(45, 29, 14, 0.06);
+}
+
+@media (max-width: 768px) {
+  .brevet-page {
+    min-height: auto;
+    padding: 16px;
+  }
+
+  .brevet-card,
+  .form-container {
+    padding: 24px 20px;
+    border-radius: 16px;
+  }
+
+  .brevet-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-group.full-width,
+  .brevet-section-label {
+    grid-column: span 1;
+  }
+
+  .brevet-actions,
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .brevet-grid > label {
+    margin-bottom: -10px;
+  }
+}
+
+@media (max-width: 420px) {
+  .brevet-page {
+    padding: 10px;
+  }
+
+  .brevet-card,
+  .form-container {
+    padding: 18px 14px;
+    border-radius: 14px;
+  }
+
+  .brevet-title {
+    font-size: 17px;
+  }
+}

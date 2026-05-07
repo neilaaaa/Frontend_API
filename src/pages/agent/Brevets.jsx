@@ -19,7 +19,7 @@ export default function Brevets() {
       setError("");
       const response = await getTousBrevets();
       setData(response.results || response);
-    } catch{
+    } catch (err) {
       console.error("erreur:", err)
       console.error("response:", err.response?.data)
       setError("Erreur chargement des brevets");
@@ -41,8 +41,8 @@ export default function Brevets() {
     }
   };
 
-  if (loading) return <p>Chargement...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (loading) return <p className="page-state">Chargement...</p>;
+  if (error) return <p className="page-state error">{error}</p>;
 
   return (
     <DataTable
