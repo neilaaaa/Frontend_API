@@ -103,7 +103,7 @@ export default function DirDocuments() {
   return (
     <DataTable3
       icon={<FolderIcon />}
-      title="Documents"
+      title="Gestion des documents"
       stats={[]}
       columns={COLUMNS}
       data={data}

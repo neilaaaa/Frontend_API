@@ -65,7 +65,7 @@ export default function DirBrevets() {
   return (
     <DataTable3
       icon={<DescriptionIcon />}
-      title="Brevets"
+      title="Gestion des brevets"
       stats={[]}
       columns={COLUMNS}
       data={data}

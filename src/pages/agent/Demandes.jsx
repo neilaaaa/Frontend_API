@@ -515,7 +515,7 @@ export default function AgentDemandes() {
                   filtered.map((d) => (
                     <tr key={d.id_demande}>
                       <td data-label="Date">{d.date_CA}</td>               
-                      <td data-label="DÃ©posant">{Array.isArray(d.deposant) ? d.deposant.map(dep => `${dep.nom_dep} ${dep.prenom_dep}`).join(", ") :  "—"}</td>
+                      <td data-label="Déposant">{Array.isArray(d.deposant) ? d.deposant.map(dep => `${dep.nom_dep} ${dep.prenom_dep}`).join(", ") :  "—"}</td>
                       <td className="dem-titre-cell" data-label="Titre">{d.titre}</td>
                       <td data-label="Nature">{d.nature}</td>
                       <td data-label="Statut"><span className={badgeCls(d.statut)}>{d.statut}</span></td>

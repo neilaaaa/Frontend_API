@@ -63,7 +63,7 @@ export default function DirRecour() {
   return (
     <DataTable3
       icon={<GavelIcon />}
-      title="Recours"
+      title="Gestion des recours"
       stats={[]}
       columns={COLUMNS}
       data={data}
