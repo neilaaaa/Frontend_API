@@ -18,7 +18,10 @@ export default function Brevets() {
       setLoading(true);
       setError("");
       const response = await getTousBrevets();
-      setData(response.results || response);
+      console.log("RESPONSE LENGTH:", response.length);
+console.log("RESPONSE DATA:", response);
+      setData(response)
+      console.log("COUNT RECEIVED:", response.length);
     } catch (err) {
       console.error("erreur:", err)
       console.error("response:", err.response?.data)

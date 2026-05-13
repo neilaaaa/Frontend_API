@@ -2,9 +2,17 @@ import {api} from "/src/contexts/AuthContext.jsx";
 
 
 export const getDemandeBrevets = async (id) => {
-  const res = await api.get ("demandes/");
-  return res.data.results ?? res.data;
-};
+  let results = []
+  let url = "demandes/"
+  
+  while (url) {
+    const res = await api.get(url)
+    results = [...results, ...(res.data.results ?? [])]
+    url = res.data.next ? res.data.next.replace("http://127.0.0.1:8000/", "") : null
+  }
+  
+  return results
+}
 
 
 export const addDemandeBrevet =async (demande) => {

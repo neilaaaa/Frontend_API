@@ -5,91 +5,116 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import "./documents.css";
 import { getTousBrevets } from "../../features/brevets/brevetApi";
 
-export default function DocumentForm({ onSubmit, editData, onCancel }) {
+export default function DocumentForm({
+  onSubmit,
+  editData,
+  onCancel,
+  brevetPreselect,
+}) {
   const fileRef = useRef();
 
-  const emptyForm = {
-    id_brevet: "",
-    nom_document: "",
-    type_document: "",
-    description: "",
-    autre_type: "",
-    fichier: null,
-  };
-
-  const [form, setForm] = useState(emptyForm);
+  const [form, setForm] = useState({
+    id_brevet: "", nom_document: "", type_document: "", autre_type:"",
+    description: "", date_ajout: "",  date_sortie_officielle:"", fichier: null,
+  });
   const [brevets, setBrevets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchBrevets = async () => {
-      try {
-        const res = await getTousBrevets();
-        const unique = [...new Map(res.map((b) => [b.id_brevet, b])).values()];
-        setBrevets(unique);
-      } catch {
+    const fetchBrevets = async ()=>{
+      try{
+        const res =await getTousBrevets()
+        console.log("total brevets:", res.length)
+        setBrevets(res)
+
+        if (editData) {
+        setForm({
+        id_brevet:    editData.id_brevet,
+        nom_document:  editData.nom_document  || "",
+        type_document: editData.type_document || "",
+        autre_type: editData.autre_type || "",
+        description:   editData.description   || "",
+        date_ajout:    editData.date_ajout    || "",
+        date_sortie_officielle: editData.date_sortie_officielle    || "",
+        fichier:       editData.fichier       || null,
+      });
+    } else {
+      setForm({ id_brevet: brevetPreselect || "", nom_document: "", type_document: "", description: "", date_ajout: "", fichier: null });
+    }}catch {
         console.error("Erreur chargement brevets");
       }
     };
-
     fetchBrevets();
-
-    if (editData) {
-      setForm({
-        id_brevet: editData.id_brevet?.id_brevet ?? editData.id_brevet ?? "",
-        nom_document: editData.nom_document ?? "",
-        type_document: editData.type_document ?? "",
-        description: editData.description ?? "",
-        autre_type: editData.autre_type ?? "",
-        fichier: null,
-      });
-    } else {
-      setForm(emptyForm);
-    }
-  }, [editData]);
+     }, [editData])
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleFile = (e) => {
     const file = e.target.files[0];
-    if (file) setForm({ ...form, fichier: file });
+
+    if (file) {
+      setForm({
+        ...form,
+        fichier: file,
+      });
+    }
   };
 
   const handleRemoveFile = () => {
-    setForm({ ...form, fichier: null });
-    if (fileRef.current) fileRef.current.value = "";
-  };
+    setForm({
+      ...form,
+      fichier: null,
+    });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append("nom_document", form.nom_document);
-      formData.append("type_document", form.type_document);
-      formData.append("autre_type", form.autre_type || "");
-      formData.append("description", form.description || "");
-      formData.append("id_brevet", form.id_brevet || "");
-      if (form.fichier instanceof File) {
-        formData.append("fichier", form.fichier);
-      }
-
-      await onSubmit(formData);
-
-      if (!editData) {
-        setForm(emptyForm);
-        if (fileRef.current) fileRef.current.value = "";
-      }
-    } catch {
-      setError("Erreur lors de l'enregistrement.");
-    } finally {
-      setLoading(false);
+    if (fileRef.current) {
+      fileRef.current.value = "";
     }
   };
+
+  const resetForm = () => {
+    setForm(emptyForm);
+
+    if (fileRef.current) {
+      fileRef.current.value = "";
+    }
+  };
+
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
+  setLoading(true);
+  try {
+    const formData = new FormData()
+    formData.append("nom_document",  form.nom_document)
+    formData.append("type_document", form.type_document)
+    formData.append("autre_type", form.type_document === "autre" ? form.autre_type || "": "")
+    formData.append("description",   form.description)
+    formData.append("id_brevet",     form.id_brevet)
+    formData.append("date_sortie_officielle", form.date_sortie_officielle)
+    formData.append("date_ajout", form.date_ajout)
+    if (form.fichier instanceof File) {
+      formData.append("fichier", form.fichier) 
+    }
+    console.log("formData autre_type:", form.autre_type)
+     console.log("formData type_document:", form.type_document)
+    await onSubmit(formData)  
+
+    if (!editData) {
+      setForm(emptyForm)
+      if (fileRef.current) fileRef.current.value = ""
+    }
+  } catch {
+    setError("Erreur lors de l'enregistrement.")
+  } finally {
+    setLoading(false)
+  }
+}
 
   const handleCancel = () => {
     setForm(emptyForm);
@@ -97,7 +122,10 @@ export default function DocumentForm({ onSubmit, editData, onCancel }) {
     if (onCancel) onCancel();
   };
 
-  const fileName = form.fichier instanceof File ? form.fichier.name : null;
+  const fileName = form.fichier instanceof File
+    ? form.fichier.name
+    : null;
+
   const existingFile =
     editData?.fichier && typeof editData.fichier === "string"
       ? editData.fichier.split("/").pop()
@@ -110,13 +138,9 @@ export default function DocumentForm({ onSubmit, editData, onCancel }) {
       {error && <p className="form-error-inline">{error}</p>}
 
       <label className="field-label">Brevet lié</label>
-      <select name="id_brevet" value={form.id_brevet} onChange={handleChange}>
-        <option value="">Aucun brevet</option>
-        {brevets.map((b) => (
-          <option key={b.id_brevet} value={b.id_brevet}>
-            {b.titre} - N°{b.num_brevet}
-          </option>
-        ))}
+      <select name="id_brevet" value={form.id_brevet} onChange={handleChange} >
+        <option value="">Sélectionner un brevet</option>
+        {brevets.map((b) => <option key={b.id_brevet} value={b.id_brevet}>{b.titre}-N°{b.num_brevet}</option>)}
       </select>
 
       <label className="field-label">Nom document</label>
@@ -140,6 +164,9 @@ export default function DocumentForm({ onSubmit, editData, onCancel }) {
         <input name="autre_type" value={form.autre_type|| ""} onChange={handleChange} placeholder="Preciser le type..." type="text"/>
       )}
 
+      <label className="field-label">Description</label>
+      <textarea name="description" value={form.description} onChange={handleChange} placeholder="Description du document" rows="3" />
+
       {form.type_document === "brevet" && (
         <>
         <label className="field-label">Date Officiel sortie brevet</label>
@@ -147,13 +174,13 @@ export default function DocumentForm({ onSubmit, editData, onCancel }) {
       </>
       )}
 
-      <label className="field-label">Description</label>
-      <textarea
-        name="description"
-        value={form.description}
+      <label className="field-label">Date ajout</label>
+      <input
+        type="date"
+        name="date_ajout"
+        value={form.date_ajout}
         onChange={handleChange}
-        placeholder="Description du document"
-        rows="3"
+        required
       />
 
       <label className="field-label">Fichier</label>
@@ -167,25 +194,28 @@ export default function DocumentForm({ onSubmit, editData, onCancel }) {
       />
 
       {!fileName ? (
-        <>
-          {existingFile && (
-            <p className="form-note">
+    
+        existingFile && (
+          <p className="form-note">
               Fichier actuel : <strong>{existingFile}</strong>
             </p>
-          )}
-          <label htmlFor="file-upload" className="file-select-btn">
-            <AttachFileIcon className="inline-icon-accent" />
-            {existingFile ? "Remplacer le fichier" : "Sélectionner un fichier"}
-          </label>
-        </>
+        )
+
       ) : (
         <div className="file-selected-row">
           <AttachFileIcon className="inline-icon-accent small" />
+
           <span className="file-selected-name">{fileName}</span>
-          <label htmlFor="file-upload" className="file-change-btn" title="Changer le fichier">
+
+          <label
+            htmlFor="file-upload"
+            className="file-change-btn"
+            title="Changer le fichier"
+          >
             <ChangeCircleOutlinedIcon style={{ fontSize: 16 }} />
             Changer
           </label>
+
           <button
             type="button"
             className="file-remove-btn"
@@ -197,9 +227,7 @@ export default function DocumentForm({ onSubmit, editData, onCancel }) {
         </div>
       )}
 
-      <button type="submit" disabled={loading}>
-        {loading ? "Enregistrement..." : editData ? "Enregistrer" : "Ajouter"}
-      </button>
+      <button type="submit" disabled={loading}>{loading ? "Enregistrement..." : editData ? "Enregistrer": "Ajouter"}</button>
 
       {editData && (
         <button type="button" className="cancel-btn" onClick={handleCancel}>

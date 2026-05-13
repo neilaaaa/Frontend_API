@@ -1,14 +1,14 @@
 import {api} from "/src/contexts/AuthContext.jsx";
 
 
-export const getBrevets = async (id) => {
+export const getBrevets = async () => {
   const res = await api.get ("brevets/");
   return res.data.results ?? res.data;
 // "si res.data.results existe → utilise res.data.results"
 // "si res.data.results est null ou undefined → utilise res.data"
 };
 
-export const getTousBrevets = async (id) => {
+export const getTousBrevets = async () => {
   let results = []
   let url = "brevets/"
 

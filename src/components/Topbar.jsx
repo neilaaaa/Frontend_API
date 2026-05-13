@@ -1,57 +1,92 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import "./Topbar.css";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MenuIcon from "@mui/icons-material/Menu";
+import SearchIcon from "@mui/icons-material/Search";
+import PersonIcon from "@mui/icons-material/Person";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import SyncAltIcon from "@mui/icons-material/SyncAlt";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import DescriptionIcon from "@mui/icons-material/Description";
+import GavelIcon from "@mui/icons-material/Gavel";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import AssignmentIcon from "@mui/icons-material/Assignment";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useNotifications } from "../contexts/NotificationContext";
 
 const TYPE_CONFIG = {
-  user: { emoji: "\u{1F464}", color: "#8d7d6f", bg: "#f8f5f0" },
-  warning: { emoji: "\u26A0\uFE0F", color: "#a16207", bg: "#fff4d6" },
-  role: { emoji: "\u{1F504}", color: "#EA6113", bg: "#fff0e6" },
-  success: { emoji: "\u2705", color: "#10b981", bg: "#d1fae5" },
-  document: { emoji: "\u{1F4C4}", color: "#F88F22", bg: "#fff4e6" },
-  recours: { emoji: "\u2696\uFE0F", color: "#dc2626", bg: "#fef2f2" },
-  brevet: { emoji: "\u{1F3C5}", color: "#EA6113", bg: "#fff3e0" },
-  demande: { emoji: "\u{1F4CB}", color: "#92620a", bg: "#fff4d6" },
+  user:     { icon: PersonIcon,             color: "#7c3aed", bg: "#f3e8ff" },
+  warning:  { icon: WarningAmberIcon,       color: "#f59e0b", bg: "#fef3c7" },
+  role:     { icon: SyncAltIcon,            color: "#2196f3", bg: "#e3f2fd" },
+  success:  { icon: CheckCircleOutlineIcon, color: "#10b981", bg: "#d1fae5" },
+  document: { icon: DescriptionIcon,        color: "#2196f3", bg: "#e3f2fd" },
+  recours:  { icon: GavelIcon,              color: "#ef5350", bg: "#ffeaea" },
+  brevet:   { icon: EmojiEventsIcon,        color: "#ff7a18", bg: "#fff3e0" },
+  demande:  { icon: AssignmentIcon,         color: "#7c3aed", bg: "#f3e8ff" },
 };
 
-function formatRole(role) {
-  if (!role) return "Utilisateur";
-  return role.charAt(0).toUpperCase() + role.slice(1);
-}
+const PAGES_BY_ROLE = {
+  admin: [
+    { label: "Utilisateurs",       path: "/admin/utilisateurs",  emoji: "👤" },
+    { label: "Brevets",            path: "/admin/brevets",        emoji: "🏅" },
+    { label: "Demandes",           path: "/admin/demandes",       emoji: "📋" },
+    { label: "Paiements",          path: "/admin/paiements",      emoji: "💳" },
+    { label: "Recours",            path: "/admin/recours",        emoji: "⚖️" },
+    { label: "Documents",          path: "/admin/documents",      emoji: "📄" },
+  ],
+  directeur: [
+    { label: "Brevets",            path: "/directeur/brevets",    emoji: "🏅" },
+    { label: "Demandes",           path: "/directeur/demandes",   emoji: "📋" },
+    { label: "Paiements",          path: "/directeur/paiements",  emoji: "💳" },
+    { label: "Recours",            path: "/directeur/recours",    emoji: "⚖️" },
+    { label: "Documents",          path: "/directeur/documents",  emoji: "📄" },
+  ],
+  responsable: [
+    { label: "Brevets",            path: "/responsable/brevets",  emoji: "🏅" },
+    { label: "Demandes",           path: "/responsable/demandes", emoji: "📋" },
+    { label: "Paiements",          path: "/responsable/paiements",emoji: "💳" },
+    { label: "Recours",            path: "/responsable/recours",  emoji: "⚖️" },
+    { label: "Documents",          path: "/responsable/documents",emoji: "📄" },
+  ],
+  agent: [
+    { label: "Brevets",            path: "/agent/brevets",        emoji: "🏅" },
+    { label: "Demandes",           path: "/agent/demandes",       emoji: "📋" },
+    { label: "Paiements",          path: "/agent/paiements",      emoji: "💳" },
+    { label: "Recours",            path: "/agent/recours",        emoji: "⚖️" },
+    { label: "Documents",          path: "/agent/documents",      emoji: "📄" },
+  ],
+};
 
-function formatDisplayName(user) {
-  const fullName = [user?.prenom, user?.nom].filter(Boolean).join(" ").trim();
-  if (fullName) return fullName;
-  if (user?.nom) return user.nom;
-  if (user?.username) return user.username;
-  if (user?.email) return user.email.split("@")[0];
-  return "Utilisateur";
-}
-
-export default function Topbar({ collapsed, onMenuToggle }) {
+export default function Topbar({ collapsed, setCollapsed }) {
   const { user } = useAuth();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const navigate = useNavigate();
 
-  const [panelOpen, setPanelOpen] = useState(false);
-  const panelRef = useRef(null);
-  const displayName = formatDisplayName(user);
-  const roleLabel = formatRole(user?.role);
+  const [panelOpen, setPanelOpen]     = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchOpen, setSearchOpen]   = useState(false);
+  const panelRef  = useRef(null);
+  const searchRef = useRef(null);
 
   useEffect(() => {
     function handleClickOutside(e) {
-      if (panelRef.current && !panelRef.current.contains(e.target)) {
+      if (panelRef.current && !panelRef.current.contains(e.target))
         setPanelOpen(false);
-      }
+      if (searchRef.current && !searchRef.current.contains(e.target))
+        setSearchOpen(false);
     }
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim() || !user?.role) return [];
+    const pages = PAGES_BY_ROLE[user.role] || [];
+    const q = searchQuery.toLowerCase();
+    return pages.filter((p) => p.label.toLowerCase().includes(q));
+  }, [searchQuery, user?.role]);
 
   function handleNotifClick(notif) {
     markAsRead(notif.id);
@@ -59,29 +94,64 @@ export default function Topbar({ collapsed, onMenuToggle }) {
     navigate(notif.link);
   }
 
+  function handleSearchSelect(path) {
+    setSearchQuery("");
+    setSearchOpen(false);
+    navigate(path);
+  }
+
   return (
     <div className={`topbar ${collapsed ? "collapsed" : ""}`}>
       <div className="topbarConteneur">
+
         <div className="topleft">
-          <button
-            type="button"
-            className="menuButton"
-            aria-label={collapsed ? "Ouvrir le menu" : "Basculer le menu"}
-            onClick={onMenuToggle}
-          >
-            <MenuIcon className="menuIcon" />
-          </button>
+          <MenuIcon className="menuIcon" onClick={() => setCollapsed(!collapsed)} />
           <span className="logo">Mon espace</span>
         </div>
 
         <div className="topright">
+
+          {/* SEARCH GLOBAL */}
+          <div className="searchContainer" ref={searchRef} style={{ position: "relative" }}>
+            <SearchIcon style={{ color: "#F88F22" }} />
+            <input
+              type="text"
+              placeholder="Rechercher une page..."
+              value={searchQuery}
+              onChange={(e) => { setSearchQuery(e.target.value); setSearchOpen(true); }}
+              onFocus={() => setSearchOpen(true)}
+            />
+            {searchOpen && searchResults.length > 0 && (
+              <div className="searchDropdown">
+                {searchResults.map((p) => (
+                  <div
+                    key={p.path}
+                    className="searchDropdownItem"
+                    onClick={() => handleSearchSelect(p.path)}
+                  >
+                    <span className="searchDropdownEmoji">{p.emoji}</span>
+                    <span>{p.label}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {searchOpen && searchQuery && searchResults.length === 0 && (
+              <div className="searchDropdown">
+                <div className="searchDropdownEmpty">Aucun résultat</div>
+              </div>
+            )}
+          </div>
+
+          {/* CLOCHE NOTIFICATIONS */}
           <div className="notifWrapper" ref={panelRef}>
             <div
               className={`topbarIconsContainer ${panelOpen ? "active" : ""}`}
               onClick={() => setPanelOpen((v) => !v)}
             >
               <NotificationsIcon />
-              {unreadCount > 0 && <span className="topiconBag">{unreadCount}</span>}
+              {unreadCount > 0 && (
+                <span className="topiconBag">{unreadCount}</span>
+              )}
             </div>
 
             {panelOpen && (
@@ -94,21 +164,20 @@ export default function Topbar({ collapsed, onMenuToggle }) {
                     )}
                   </div>
                   {unreadCount > 0 && (
-                    <button className="markAllBtn" onClick={markAllAsRead}>
-                      Tout lire
-                    </button>
+                    <button className="markAllBtn" onClick={markAllAsRead}>Tout lire</button>
                   )}
                 </div>
 
                 <div className="notifList">
                   {notifications.length === 0 ? (
                     <div className="notifEmpty">
-                      <span className="notifEmptyIcon">{TYPE_CONFIG.user.emoji}</span>
+                      <span className="notifEmptyIcon"><NotificationsIcon /></span>
                       <p>Aucune notification</p>
                     </div>
                   ) : (
                     notifications.map((notif) => {
                       const cfg = TYPE_CONFIG[notif.type] || TYPE_CONFIG.success;
+                      const IconComponent = cfg.icon;
                       return (
                         <div
                           key={notif.id}
@@ -116,23 +185,15 @@ export default function Topbar({ collapsed, onMenuToggle }) {
                           onClick={() => handleNotifClick(notif)}
                         >
                           {!notif.read && <div className="unreadDot" />}
-
-                          <div
-                            className="notifIcon"
-                            style={{ background: cfg.bg, color: cfg.color }}
-                          >
-                            <span>{cfg.emoji}</span>
+                          <div className="notifIcon" style={{ background: cfg.bg, color: cfg.color }}>
+                            <IconComponent style={{ fontSize: 20 }} />
                           </div>
-
                           <div className="notifContent">
                             <p className="notifTitle">{notif.title}</p>
                             <p className="notifMessage">{notif.message}</p>
                             <p className="notifTime">{notif.time}</p>
                           </div>
-
-                          <div className="notifArrow" style={{ color: cfg.color }}>
-                            &#8250;
-                          </div>
+                          <div className="notifArrow" style={{ color: cfg.color }}>›</div>
                         </div>
                       );
                     })
@@ -140,21 +201,21 @@ export default function Topbar({ collapsed, onMenuToggle }) {
                 </div>
 
                 <div className="notifPanelFooter">
-                  <span>
-                    {notifications.filter((n) => n.read).length} / {notifications.length} lues
-                  </span>
+                  <span>{notifications.filter((n) => n.read).length} / {notifications.length} lues</span>
                 </div>
               </div>
             )}
           </div>
 
+          {/* USER */}
           <div className="userContainer">
             <AccountCircleIcon className="userIcon" />
             <div className="userInfo">
-              <span className="username">{displayName}</span>
-              <span className="userRole">{roleLabel}</span>
+              <span className="username">{user?.username ?? user?.email}</span>
+              <span className="userRole">{user?.role}</span>
             </div>
           </div>
+
         </div>
       </div>
     </div>

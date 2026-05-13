@@ -1,12 +1,13 @@
-import { useMemo, useState } from "react";
+import { useState, useMemo } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import "./datatable.css";
-import SearchIcon from "@mui/icons-material/Search";
+import SearchIcon       from "@mui/icons-material/Search";
+import PrintIcon        from "@mui/icons-material/Print";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import VisibilityIcon   from "@mui/icons-material/Visibility";
+import EditIcon         from "@mui/icons-material/Edit";
+import DeleteIcon       from "@mui/icons-material/Delete";
 
 export default function Datatable2({
   columns = [],
@@ -18,10 +19,10 @@ export default function Datatable2({
   title = "Table",
   exportName = "export",
 }) {
-  const [search, setSearch] = useState("");
+  const [search, setSearch]   = useState("");
   const [sortKey, setSortKey] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
-  const [page, setPage] = useState(1);
+  const [page, setPage]       = useState(1);
   const perPage = 5;
 
   const filtered = useMemo(() => {
@@ -42,20 +43,14 @@ export default function Datatable2({
   }, [filtered, sortKey, sortDir]);
 
   const totalPages = Math.ceil(sorted.length / perPage);
-  const pageData = sorted.slice((page - 1) * perPage, page * perPage);
+  const pageData   = sorted.slice((page - 1) * perPage, page * perPage);
 
   const handleSort = (key) => {
     if (sortKey === key) setSortDir(sortDir === "asc" ? "desc" : "asc");
-    else {
-      setSortKey(key);
-      setSortDir("asc");
-    }
+    else { setSortKey(key); setSortDir("asc"); }
   };
 
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
-    setPage(1);
-  };
+  const handleSearch = (e) => { setSearch(e.target.value); setPage(1); };
 
   const exportPDF = () => {
     const doc = new jsPDF();
@@ -63,43 +58,82 @@ export default function Datatable2({
     autoTable(doc, {
       head: [columns.map((c) => c.label)],
       body: sorted.map((row) => columns.map((c) => {
-        const val = row[c.key]
-        if (c.pdfFormat) return c.pdfFormat(val) 
-        if (typeof val === "object" && val !== null) return JSON.stringify(val)
-        return val ?? "—"
-      })
-    ),
+        const value = row[c.key];
+      if (c.pdfFormat) {
+          return String(c.pdfFormat(value, row) ?? "");
+        }
+       return String(value ?? "");
+      } )),
     });
     doc.save(`${exportName}.pdf`);
+  };
+
+  const handlePrint = () => {
+    const rows = sorted.map((row) => columns.map((c) => row[c.key] ?? ""));
+
+    const html = `
+      <html>
+        <head>
+          <title>${title}</title>
+          <style>
+            body { font-family: "Segoe UI", Arial, sans-serif; padding: 24px; color: #1a1a2e; }
+            h2 { font-size: 18px; margin-bottom: 16px; }
+            table { width: 100%; border-collapse: collapse; font-size: 12px; }
+            thead tr { background: #EA6113; color: #fff; }
+            th { padding: 10px 12px; text-align: left; font-weight: 600; text-transform: uppercase; font-size: 10.5px; letter-spacing: .4px; }
+            td { padding: 9px 12px; border-bottom: 1px solid #f0e0cc; color: #2d2013; }
+            tr:nth-child(even) td { background: #fdfaf7; }
+            tr:last-child td { border-bottom: none; }
+          </style>
+        </head>
+        <body>
+          <h2>${title}</h2>
+          <table>
+            <thead>
+              <tr>${columns.map((c) => `<th>${c.label}</th>`).join("")}</tr>
+            </thead>
+            <tbody>
+              ${rows.map((r) => `<tr>${r.map((cell) => `<td>${cell}</td>`).join("")}</tr>`).join("")}
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `;
+
+    const win = window.open("", "_blank");
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    win.print();
+    win.close();
   };
 
   const getPageNumbers = () => {
     const delta = 2;
     const range = [];
-    const left = Math.max(1, page - delta);
+    const left  = Math.max(1, page - delta);
     const right = Math.min(totalPages, page + delta);
-    for (let i = left; i <= right; i += 1) range.push(i);
-    if (left > 1) {
-      range.unshift("...");
-      range.unshift(1);
-    }
-    if (right < totalPages) {
-      range.push("...");
-      range.push(totalPages);
-    }
+    for (let i = left; i <= right; i++) range.push(i);
+    if (left > 1)           { range.unshift("..."); range.unshift(1); }
+    if (right < totalPages) { range.push("...");    range.push(totalPages); }
     return range;
   };
 
   return (
     <div className="dt-layout">
+
       <div className="dt-left">{form}</div>
 
       <div className="dt-right">
+
         <div className="dt-header">
           <h2 className="dt-title">{title}</h2>
           <div className="dt-actions">
             <button className="dt-btn-pdf" onClick={exportPDF}>
               <PictureAsPdfIcon fontSize="small" /> PDF
+            </button>
+            <button className="dt-btn-print" onClick={handlePrint}>
+              <PrintIcon fontSize="small" /> Imprimer
             </button>
           </div>
         </div>
@@ -137,7 +171,6 @@ export default function Datatable2({
                 <th>Actions</th>
               </tr>
             </thead>
-
             <tbody>
               {pageData.length === 0 ? (
                 <tr>
@@ -146,14 +179,14 @@ export default function Datatable2({
                   </td>
                 </tr>
               ) : (
-                pageData.map((row, index) => (
-                  <tr key={row.id ?? row.id_brevet ?? row.id_document ?? row.id_paiement ?? row.id_recours ?? row.id_demande ?? index}>
+                pageData.map((row,index) => (
+                  <tr key={index}>
                     {columns.map((c) => (
-                      <td key={c.key} data-label={c.label}>
+                      <td key={c.key}>
                         {c.render ? c.render(row[c.key]) : row[c.key]}
                       </td>
                     ))}
-                    <td className="dt-actions-cell" data-label="Actions">
+                    <td className="dt-actions-cell">
                       {onView && (
                         <button className="dt-btn-icon dt-btn-view" onClick={() => onView(row)} title="Voir">
                           <VisibilityIcon fontSize="small" />
@@ -168,7 +201,9 @@ export default function Datatable2({
                         <button
                           className="dt-btn-icon dt-btn-delete"
                           onClick={() => {
-                            if (window.confirm("Voulez-vous vraiment supprimer cet élément ?")) onDelete(row);
+                            if (window.confirm("Voulez-vous vraiment supprimer cet élément ?")) {
+                              onDelete(row);
+                            }
                           }}
                           title="Supprimer"
                         >
@@ -187,25 +222,27 @@ export default function Datatable2({
               <span className="dt-pg-info">
                 {sorted.length} résultat{sorted.length !== 1 ? "s" : ""} — page {page} / {totalPages || 1}
               </span>
-
               <button className="dt-pg-btn" onClick={() => setPage(1)} disabled={page === 1}>«</button>
               <button className="dt-pg-btn" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>‹</button>
-
               {getPageNumbers().map((p, i) =>
                 p === "..." ? (
                   <span key={`e-${i}`} className="dt-pg-ellipsis">…</span>
                 ) : (
-                  <button key={p} className={`dt-pg-btn${p === page ? " active" : ""}`} onClick={() => setPage(p)}>
+                  <button
+                    key={p}
+                    className={`dt-pg-btn${p === page ? " active" : ""}`}
+                    onClick={() => setPage(p)}
+                  >
                     {p}
                   </button>
                 )
               )}
-
               <button className="dt-pg-btn" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page >= totalPages}>›</button>
               <button className="dt-pg-btn" onClick={() => setPage(totalPages)} disabled={page >= totalPages}>»</button>
             </div>
           )}
         </div>
+
       </div>
     </div>
   );

@@ -6,6 +6,8 @@ import {
   getDemandeBrevets,
   deleteDemandeBrevet,
   updateDemandeBrevet,
+ validerDemandeBrevet,
+  refuserDemandeBrevet
 } from "../../features/demande/apiDemande";
 import { buildAndOpen } from "./demandeUtils";
 import "./Demandes.css";
@@ -23,60 +25,13 @@ export default function RespDemandes() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const isOwnDemande = (demande) => {
-    const currentUserId = user?.id != null ? String(user.id) : "";
-    const currentUserEmail = (user?.email || "").toLowerCase();
-
-    const creatorId =
-      demande?.createur_id != null
-        ? String(demande.createur_id)
-        : demande?.createur?.id != null
-          ? String(demande.createur.id)
-          : "";
-
-    const creatorIdentity = (
-      demande?.createur_username ||
-      demande?.createur?.username ||
-      demande?.createur?.email ||
-      ""
-    ).toLowerCase();
-
-    console.log({
-      currentUserId,
-      currentUserEmail,
-      creatorId,
-      creatorIdentity,
-});
-
-    return (
-      (creatorId && currentUserId && creatorId === currentUserId) ||
-      (creatorIdentity &&
-        currentUserEmail &&
-        creatorIdentity === currentUserEmail)
-    );
-  };
-
   const load = async () => {
     try {
-      setLoading(true);
-      setError("");
+      setLoading(true); setError("");
       const res = await getDemandeBrevets();
       const all = res.results || res;
-      console.log("USER:", user);
-console.log("ALL DATA:", all);
-     setMesData(
-  all.filter(d => String(d.createur_id) === String(user.id))
-);
-     setAgentsData(
-  all.filter(
-    d =>
-      String(d.createur_id) !== String(user.id) &&
-      d.createur_groupe === "agent"
-  )
-);
-      console.log(all)
-      console.log("USER ID :", user.id);
-      console.log("ALL :", all);
+      setMesData(all.filter(d => d.createur_id === user.id));
+      setAgentsData(all.filter(d => d.createur_groupe === 'agent'));
     } catch {
       setError("Erreur chargement des demandes.");
     } finally {
@@ -84,64 +39,45 @@ console.log("ALL DATA:", all);
     }
   };
 
-  useEffect(() => {
-      load(); 
-  }, []);
+  useEffect(() => { load(); }, []);
 
   const handleDelete = async (row) => {
-    try {
-      await deleteDemandeBrevet(row.id_demande);
-      load();
-    } catch {
-      setError("Erreur suppression.");
-    }
+    try { await deleteDemandeBrevet(row.id_demande); load(); }
+    catch { setError("Erreur suppression."); }
   };
 
   const handleValider = async (row) => {
-    try {
-      await validerDemande(row.id_demande, { statut: "valider" });
-      load();
-    } catch {
-      setError("Erreur validation.");
-    }
+    try { await validerDemandeBrevet(row.id_demande); load(); }
+    catch { setError("Erreur validation."); }
   };
 
   const handleRefuser = async (row) => {
-    try {
-      await refuserDemande(row.id_demande, { statut: "refuser" });
-      load();
-    } catch {
-      setError("Erreur refus.");
-    }
+    try { await refuserDemandeBrevet(row.id_demande); load(); }
+    catch { setError("Erreur refus."); }
   };
 
   const colonnesBase = [
     { key: "date_depo", label: "Date dépôt" },
-    { key: "nature", label: "Nature" },
-    { key: "titre", label: "Titre" },
+    { key: "titre",     label: "Titre" },
     {
       key: "deposant",
       label: "Déposant(s)",
       render: (value) =>
         Array.isArray(value) && value.length > 0
-          ? value.map((item) => `${item.nom_dep} ${item.prenom_dep}`).join(", ")
-          : "—",
-      pdfFormat: (value) =>
-        Array.isArray(value) && value.length > 0
-          ? value.map((item) => `${item.nom_dep} ${item.prenom_dep}`).join(", ")
-          : "—",
+          ? value.map(d => `${d.nom_dep} ${d.prenom_dep}`).join(", ") : "—",
+      pdfFormat: (val) =>
+        Array.isArray(val) && val.length > 0
+          ? val.map(d => `${d.nom_dep} ${d.prenom_dep}`).join(", ") : "—",
     },
     {
       key: "inventeur",
       label: "Inventeur(s)",
       render: (value) =>
         Array.isArray(value) && value.length > 0
-          ? value.map((item) => `${item.nom_inv} ${item.prenom_inv}`).join(", ")
-          : "—",
-      pdfFormat: (value) =>
-        Array.isArray(value) && value.length > 0
-          ? value.map((item) => `${item.nom_inv} ${item.prenom_inv}`).join(", ")
-          : "—",
+          ? value.map(i => `${i.nom_inv} ${i.prenom_inv}`).join(", ") : "—",
+      pdfFormat: (val) =>
+        Array.isArray(val) && val.length > 0
+          ? val.map(i => `${i.nom_inv} ${i.prenom_inv}`).join(", ") : "—",
     },
     { key: "statut", label: "Statut" },
   ];
@@ -151,19 +87,17 @@ console.log("ALL DATA:", all);
     label: "Formulaire",
     pdfExclude: true,
     render: (_, row) => (
-      <div className="dem-actions">
+      <div style={{ display: "flex", gap: 6 }}>
         <button
-          type="button"
-          className="act-btn print"
           title="Imprimer"
+          style={{ background: "rgb(255, 240, 230)", color: "rgb(234, 97, 19)", border: "none", borderRadius: 6, padding: "5px 9px", cursor: "pointer" }}
           onClick={() => buildAndOpen(row, "print")}
         >
           <PrintIcon sx={{ fontSize: 16 }} />
         </button>
         <button
-          type="button"
-          className="act-btn dl"
           title="Télécharger"
+          style={{ background: "rgb(255, 244, 214)", color: "rgb(146, 98, 10)", border: "none", borderRadius: 6, padding: "5px 9px", cursor: "pointer" }}
           onClick={() => buildAndOpen(row, "download")}
         >
           <DownloadIcon sx={{ fontSize: 16 }} />
@@ -177,21 +111,29 @@ console.log("ALL DATA:", all);
     label: "Décision",
     pdfExclude: true,
     render: (_, row) => (
-      <div className="dem-actions">
+      <div style={{ display: "flex", gap: 6 }}>
         <button
-          type="button"
           title="Valider"
           disabled={row.statut === "valider"}
-          className={`act-btn valider${row.statut === "valider" ? " is-disabled" : ""}`}
+          style={{
+            background: row.statut === "valider" ? "#86efac" : "#16a34a",
+            color: "#fff", border: "none", borderRadius: 6,
+            padding: "5px 9px",
+            cursor: row.statut === "valider" ? "default" : "pointer",
+          }}
           onClick={() => handleValider(row)}
         >
           <CheckCircleIcon sx={{ fontSize: 16 }} />
         </button>
         <button
-          type="button"
           title="Refuser"
           disabled={row.statut === "refuser"}
-          className={`act-btn refuser${row.statut === "refuser" ? " is-disabled" : ""}`}
+          style={{
+            background: row.statut === "refuser" ? "#fca5a5" : "#dc2626",
+            color: "#fff", border: "none", borderRadius: 6,
+            padding: "5px 9px",
+            cursor: row.statut === "refuser" ? "default" : "pointer",
+          }}
           onClick={() => handleRefuser(row)}
         >
           <CancelIcon sx={{ fontSize: 16 }} />
@@ -200,32 +142,36 @@ console.log("ALL DATA:", all);
     ),
   };
 
-  if (loading) return <p className="page-state">Chargement...</p>;
-  if (error) return <p className="page-state error">{error}</p>;
+  if (loading) return <p style={{ padding: 20 }}>Chargement…</p>;
+  if (error)   return <p style={{ padding: 20, color: "red" }}>{error}</p>;
 
   return (
-    <div className="dem-page">
+    <div style={{ background: "#faf7f2", minHeight: "100vh" }}>
+
+      {/* ── TABLE 1 : Mes demandes ── */}
       <DataTable
         title="Mes Demandes de Protection"
         data={mesData}
         columns={[...colonnesBase, colonneFormulaire]}
-        onAdd={() => navigate("/responsable/demandes/add")}
+        onAdd={()     => navigate("/responsable/demandes/add")}
         onEdit={(row) => navigate(`/responsable/demandes/edit/${row.id_demande}`)}
         onView={(row) => navigate(`/responsable/demandes/view/${row.id_demande}`)}
         onDelete={handleDelete}
       />
 
+      {/* ── TABLE 2 : Demandes des agents uniquement ── */}
       <DataTable
         title="Demandes des Agents"
         data={agentsData}
         columns={[
-          { key: "createur_username", label: "Agent", render: (value) => value || "—" },
+          { key: "createur_username", label: "Agent", render: (val) => val || "—" },
           ...colonnesBase,
           colonneFormulaire,
           colonneDecision,
         ]}
         onView={(row) => navigate(`/responsable/demandes/view/${row.id_demande}`)}
       />
+
     </div>
   );
 }

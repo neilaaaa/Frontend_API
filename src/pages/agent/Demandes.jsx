@@ -470,17 +470,17 @@ export default function AgentDemandes() {
           <div className="dem-toolbar">
 
             {/* ── Search avec icône MUI ── */}
-<div className="dem-search-wrap">
-  <span style={{
-    position: "absolute",
-    left: 11,
-    top: "50%",
-    transform: "translateY(-50%)",
-    display: "flex",
-    alignItems: "center",
-    pointerEvents: "none",
-    color: "#F88F22",
-  }}>
+              <div className="dem-search-wrap">
+                <span style={{
+                  position: "absolute",
+                  left: 11,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  display: "flex",
+                  alignItems: "center",
+                  pointerEvents: "none",
+                  color: "#F88F22",
+                }}>
     <SearchIcon sx={{ fontSize: 18 }} />
   </span>
   <input
@@ -585,6 +585,10 @@ export default function AgentDemandes() {
                   <F label="Prénom"  name="inventeur_prenom"  value={form.inventeur_prenom}  onChange={setField} />
                   <F label="Adresse" name="inventeur_adresse" value={form.inventeur_adresse} onChange={setField} full area />
                 </div>
+                 <button type="button" className="btn-add-more"
+            onClick={() => setInventeurs([...inventeurs, { id_inv: null, nom_inv: "", prenom_inv: "", adress_inv: "" }])}>
+            + Ajouter un inventeur
+          </button>
               </Sec>
 
               <Sec num="54" label="[54] — TITRE DE L'INVENTION">

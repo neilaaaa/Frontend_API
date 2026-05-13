@@ -76,43 +76,34 @@ export default function RespViewBrevet() {
         </div>
 
         <div className="view-section-label">Déposant</div>
-        <div className="view-personnes-grid">
-          {data.id_dep ? (
-            <div className="view-personne-card">
-              <div className="view-personne-avatar">
-                {initiales(data.id_dep.nom_dep, data.id_dep.prenom_dep)}
+         <div className="view-personnes-grid">
+          {Array.isArray(data.deposant) && data.deposant.length > 0 ? (
+            data.deposant.map((dep) => (
+              <div key={dep.id_dep} className="view-personne-card">
+                  <div className="view-personne-name">
+                    {dep.nom_dep} {dep.prenom_dep}
+                  </div>
+                  
+                
               </div>
-              <div>
-                <div className="view-personne-name">
-                  {data.id_dep.nom_dep} {data.id_dep.prenom_dep}
-                </div>
-                <div className="view-personne-sub">Déposant</div>
-              </div>
-            </div>
+            ))
           ) : (
-            <p className="view-empty">Aucun déposant</p>
+            <p className="view-empty">Aucun inventeur</p>
           )}
         </div>
 
         <div className="view-section-label">
           Inventeurs
-          {Array.isArray(data.id_inv) && data.id_inv.length > 0 && (
-            <span className="view-count">{data.id_inv.length}</span>
-          )}
         </div>
         <div className="view-personnes-grid">
-          {Array.isArray(data.id_inv) && data.id_inv.length > 0 ? (
-            data.id_inv.map((inv) => (
+          {Array.isArray(data.inventeur) && data.inventeur.length > 0 ? (
+            data.inventeur.map((inv) => (
               <div key={inv.id_inv} className="view-personne-card">
-                <div className="view-personne-avatar">
-                  {initiales(inv.nom_inv, inv.prenom_inv)}
-                </div>
-                <div>
                   <div className="view-personne-name">
                     {inv.nom_inv} {inv.prenom_inv}
                   </div>
-                  <div className="view-personne-sub">Inventeur</div>
-                </div>
+                  
+                
               </div>
             ))
           ) : (

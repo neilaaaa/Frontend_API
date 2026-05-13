@@ -37,7 +37,10 @@ export default function EditDemande() {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const d = await getDemandeBrevetById(id);
+           console.log("fetch", id)
+        const d = await getDemandeBrevetById(id); 
+        console.log("inventeur depuis API:", d.inventeur) 
+           console.log("getdemande", d)
         setForm({
           nature_brevet:           d.nature === "Brevet d'invention",
           nature_pct:              d.nature === "Extension PCT",
@@ -64,6 +67,7 @@ export default function EditDemande() {
           piece_cession:           d.piece_cession        || false,
           piece_titre:             d.piece_titre          || false,
         });
+        console.log("3-form")
 
         if (Array.isArray(d.deposant) && d.deposant.length > 0) {
           const dep = d.deposant[0];
@@ -76,7 +80,7 @@ export default function EditDemande() {
             nationalite:  dep.nationalite   || "",
           });
         }
-
+console.log("4-deposant", deposant)
         // Inventeurs — plusieurs possibles
         if (Array.isArray(d.inventeur) && d.inventeur.length > 0) {
           setInventeurs(d.inventeur.map(inv => ({
@@ -88,7 +92,10 @@ export default function EditDemande() {
         } else {
           setInventeurs([{ id_inv: null, nom_inv: "", prenom_inv: "", adress_inv: "" }]);
         }
-      } catch {
+        console.log("5-inventeur", inventeurs)
+      } catch (err) {
+  console.error("err complet:", err)
+  console.error("type:", typeof err)
         setError("Erreur de chargement.");
       } finally {
         setLoading(false);
@@ -112,6 +119,7 @@ export default function EditDemande() {
   };
 
   const handleSubmit = async () => {
+    console.log("handleSubmit appelé")
     setError(""); setSaving(true);
     const natureLbl = form.nature_brevet ? "Brevet d'invention"
       : form.nature_pct ? "Extension PCT"
@@ -142,7 +150,10 @@ export default function EditDemande() {
     };
 
     try {
-      await updateDemande(id, payload);
+      console.log("2 - avant updateDemande")
+      await updateDemandeBrevet(id, payload);
+      console.log("3 - après updateDemande")
+
 
       if (deposant.nom_dep || deposant.prenom_dep) {
         if (deposant.id_dep) {
@@ -156,9 +167,11 @@ export default function EditDemande() {
         } else {
           await api.post("deposants/", { ...deposant, id_demande: Number(id) });
         }
+       console.log("4 - avant inventeurs, inventeurs:", inventeurs)
       }
 
       for (const inv of inventeurs) {
+         console.log("5 - inventeur:", inv)
         if (!inv.nom_inv && !inv.prenom_inv) continue;
         if (inv.id_inv) {
           await api.patch(`inventeurs/${inv.id_inv}/`, {
@@ -175,9 +188,11 @@ export default function EditDemande() {
           });
         }
       }
-
+      console.log("inventeurs:",inventeurs)
+      console.log("6 - navigate")
       navigate("/responsable/demandes");
     } catch (err) {
+      console.error("ERREUR:", err.response?.data)
       setError(JSON.stringify(err.response?.data) || "Erreur enregistrement.");
     } finally {
       setSaving(false);

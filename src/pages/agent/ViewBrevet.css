@@ -77,7 +77,7 @@
   border: 1.5px solid #f0ddd0;
   border-radius: 12px;
   padding: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 30px;
 }
 
 .view-card p {
@@ -338,4 +338,8 @@
   .view-btn-back {
     width: 100%;
   }
+}
+
+.view-personnes-grid{
+  margin-bottom: 20px;
 }

@@ -21,7 +21,8 @@ export default function AgentDocuments() {
       setLoading(true);
       setError("");
       const res = await getTousDocuments();
-      setData(res.results || res);
+      const unique = [...new Map(res.map(b => [b.id_document, b])).values()] 
+      setData(unique)
     } catch (error) {
       console.error(error);
       setError("Erreur de chargement des documents");
@@ -34,8 +35,8 @@ export default function AgentDocuments() {
     getTousBrevets().then(res => {
     console.log("brevets reçus:", res)
     const unique = [...new Map(res.map(b => [b.id_brevet, b])).values()]
-    console.log("brevets uniques:", unique)
-    setBrevet(unique)
+    console.log("useEffect appelé")
+    setBrevets(unique)
     console.log("data documents:", data[0])
   })
     load()

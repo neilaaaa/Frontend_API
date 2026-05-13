@@ -148,8 +148,8 @@ export default function DataTable({
                 </td>
               </tr>
             ) : (
-              pageData.map((row) => (
-                <tr key={row.id_brevet ?? row.id ?? JSON.stringify(row)}>
+              pageData.map((row, index) => (
+                <tr key={index}>
                   {columns.map((c) => (
                     <td key={c.key} data-label={c.label}>
                       {c.render ? c.render(row[c.key], row) : row[c.key]}

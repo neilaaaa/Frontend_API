@@ -78,7 +78,7 @@ export default function RespPaiements() {
               typeof val === "object"
                 ? `${val?.titre ?? ""} — N°${val?.num_brevet ?? ""}`.trim()
                 : val,
-            pdfFormat: (val) =>
+             pdfFormat: (val) =>
               typeof val === "object"
                 ? `${val?.titre ?? ""} — N°${val?.num_brevet ?? ""}`.trim()
                 : val,
@@ -92,7 +92,7 @@ export default function RespPaiements() {
                 ? Number(val).toLocaleString("fr-DZ") + " DA"
                 : "—",
             pdfFormat: (val) =>
-              val != null ? Number(val).toLocaleString("fr-DZ") + " DA" : "—",
+              val != null ? `${Number(val).toLocaleString("fr-DZ").replace(/\s/g, " ")}  DA `: "—",
           },
           {
             key: "statut",

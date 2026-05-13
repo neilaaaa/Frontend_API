@@ -111,13 +111,14 @@ export default function DirDocuments() {
       statusKey=""
       statusList={["Tous"]}
       pdfTitle="Registre des Documents — Directeur"
-      pdfColumns={["Brevet lié", "Nom document", "Type", "Description", "Date ajout", "Fichier"]}
+      pdfColumns={["Brevet lié", "Nom document", "Type", "Description", "Date ajout"]}
      pdfRow={(r) => [
-        r.brevet_info?.titre ?? "—",
+        r.brevet?.titre ?? "—",
         r.nom_document,
         TYPE_LABEL[r.type_document] ?? r.type_document,
+        r.description,
         r.date_ajout,
-        r.fichier?.split("/").pop() ?? "—",
+        
       ]}
       fileName="documents"
     />

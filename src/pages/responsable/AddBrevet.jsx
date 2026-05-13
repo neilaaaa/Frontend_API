@@ -100,7 +100,7 @@ export default function RespAddBrevet() {
 
         {error && <p className="add-error">{error}</p>}
 
-        {/* ✅ Sélection de la demande liée */}
+        {/* Sélection de la demande liée */}
         <div className="add-section-label">Demande liée</div>
         <div className="add-grid">
           <div className="form-group">

@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import Topbar  from "./Topbar";
+import Chatbot  from "./Chatbot";
+import { useAuth } from "../contexts/AuthContext";
 
 const Layout = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const{user} = useAuth()
 
   useEffect(() => {
     const media = window.matchMedia("(max-width: 900px)");
@@ -48,6 +51,7 @@ const Layout = ({ children }) => {
           {children}
         </main>
       </div>
+      {user?.role === "agent" && <Chatbot />}
     </div>
   );
 };

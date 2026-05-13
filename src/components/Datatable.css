@@ -10,19 +10,14 @@
    1. LAYOUT — Datatable2  (formulaire gauche | table droite)
    ───────────────────────────────────────────────────────── */
 .dt-layout {
-  display: flex;
+   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
   gap: 24px;
   align-items: flex-start;
   padding: 28px;
-  background: transparent;
-  min-height: 0;
+  background: #ffffff;
   font-family: "DM Sans", "Segoe UI", Arial, sans-serif;
-  width: 100%;
-  overflow-x: auto;
-  max-width: 100%;
-   box-sizing: border-box;
 }
 
 .dt-left {
@@ -42,13 +37,9 @@
    2. LAYOUT — DataTable  (pleine largeur, pas de form)
    ───────────────────────────────────────────────────────── */
 .dt-container {
-  padding: 28px;
-  background: transparent;
-  min-height: 100vh;
+  padding: 20px 28px 8px 28px;
+  background: #faf7f2;
   font-family: "DM Sans", "Segoe UI", Arial, sans-serif;
-  width: 100%;
-  overflow-x: clip;
-  max-width: 100%;
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -91,7 +82,7 @@
 .user-form input,
 .user-form select {
   width: 100%;
-  min-height: 40px;
+  height: 100%;
   padding: 10px 12px;
   border: 1px solid rgba(219, 200, 181, 0.72) !important;
   border-radius: 12px;
@@ -124,7 +115,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: opacity .18s, transform .15s;
-  box-shadow: 0 10px 18px rgba(45, 29, 14, 0.06);
+  box-shadow: 0 2px 10px rgba(248, 143, 34, 0.30);
   font-family: inherit;
   margin-top: 2px;
 }
@@ -157,8 +148,6 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 18px;
-  gap: 12px;
-  flex-wrap: wrap;
 }
 
 .dt-title {
@@ -172,8 +161,6 @@
 .dt-actions {
   display: flex;
   gap: 8px;
-  flex-wrap: wrap;
-  min-width: 0;
 }
 
 .dt-btn {
@@ -187,40 +174,51 @@
   cursor: pointer;
   transition: opacity .18s;
   font-family: inherit;
-  box-shadow: 0 10px 18px rgba(45, 29, 14, 0.06);
-  min-width: max-content;
+  box-shadow: 0 2px 8px rgba(248, 143, 34, 0.28);
 }
 
 .dt-btn:hover { opacity: .88; }
-
-.dt-btn-excel:hover { opacity: .85; }
 
 .dt-btn-pdf {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 10px 16px;
+  padding: 8px 16px;
   border: none !important;
-  border-radius: 16px;
+  border-radius: 9px;
   background: linear-gradient(135deg, #EA6113, #F88F22) !important;
   color: #fff !important;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+  transition: opacity .18s;
   font-family: inherit;
-  min-width: max-content;
   letter-spacing: 0.1px;
-  box-shadow: 0 10px 20px rgba(234, 97, 19, 0.16);
 }
 
 .dt-btn-pdf:hover {
-  opacity: 1;
+  opacity: .85;
   transform: translateY(-1px);
   background: linear-gradient(135deg, #f06d1b 0%, #fb9d2f 100%) !important;
   box-shadow: 0 14px 24px rgba(234, 97, 19, 0.18);
   filter: saturate(1.02);
+}
+
+.dt-btn-print {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none !important;
+  border-radius: 9px;
+  background: #ef8b17 !important;
+  color: #fff !important;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity .18s;
+  font-family: inherit;
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -260,14 +258,13 @@
 }
 
 .dt-table-card {
-  background: rgba(255, 255, 255, 0.94);
-  border-radius: 18px;
-  border: 1px solid rgba(219, 200, 181, 0.6);
-  box-shadow: 0 16px 32px rgba(45, 29, 14, 0.06);
-  overflow-x: auto;
-  overflow-y: hidden;
-  max-width: 100%;
-  -webkit-overflow-scrolling: touch;
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #f0e0cc;
+  box-shadow:
+    0 4px 6px rgba(234,97,19,.05),
+    0 10px 28px rgba(0,0,0,.08);
+  overflow: hidden;
 }
 
 .dt-table {
