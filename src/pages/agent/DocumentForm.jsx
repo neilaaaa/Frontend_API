@@ -36,7 +36,7 @@ export default function DocumentForm({
         autre_type: editData.autre_type || "",
         description:   editData.description   || "",
         date_ajout:    editData.date_ajout    || "",
-        date_sortie_officielle: editData.date_sortie_officielle    || "",
+        date_sortie_officielle: editData.date_sortie_officielle,
         fichier:       editData.fichier       || null,
       });
     } else {
@@ -96,7 +96,15 @@ export default function DocumentForm({
     formData.append("autre_type", form.type_document === "autre" ? form.autre_type || "": "")
     formData.append("description",   form.description)
     formData.append("id_brevet",     form.id_brevet)
-    formData.append("date_sortie_officielle", form.date_sortie_officielle)
+    if (
+  form.type_document === "brevet" &&
+  form.date_sortie_officielle
+) {
+  formData.append(
+    "date_sortie_officielle",
+    form.date_sortie_officielle
+  );
+}
     formData.append("date_ajout", form.date_ajout)
     if (form.fichier instanceof File) {
       formData.append("fichier", form.fichier) 
@@ -170,7 +178,7 @@ export default function DocumentForm({
       {form.type_document === "brevet" && (
         <>
         <label className="field-label">Date Officiel sortie brevet</label>
-        <input type="date" name=" date_sortie_officielle" value={form.date_sortie_officielle} onChange={handleChange} required />
+        <input type="date" name="date_sortie_officielle" value={form.date_sortie_officielle} onChange={handleChange} />
       </>
       )}
 

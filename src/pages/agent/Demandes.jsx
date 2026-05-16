@@ -10,8 +10,6 @@ import DownloadIcon from "@mui/icons-material/Download";
 import DeleteIcon   from "@mui/icons-material/Delete";
 import {api} from "/src/contexts/AuthContext.jsx";
 
-/* ─── Storage ──────────────────────────────────────────────────────────── */
-
 
 /* ─── Empty form ───────────────────────────────────────────────────────── */
 const EMPTY = {
@@ -40,7 +38,7 @@ function buildAndOpen(demande, mode) {
   const f = demande;
   console.log("DEMANDE:", demande);
   
-  const nBrevet     = chk(f.nature === "Brevet d'invention")
+    const nBrevet     = chk(f.nature === "Brevet d'invention")
   const nPct        = chk(f.nature === "Extension PCT")
   const nCertificat = chk(f.nature === "Certificat d'addition")
 
@@ -253,7 +251,6 @@ body{font-family:"Times New Roman",Times,serif;font-size:10pt;color:#000;backgro
   }
 }
 
-/* ════════════════════════════════════════════════════════════════════════ */
 export default function AgentDemandes() {
   const [demandes, setDemandes]   = useState([]);
   const [showModal, setShowModal] = useState(false);
