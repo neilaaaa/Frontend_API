@@ -6,20 +6,14 @@
   -webkit-backdrop-filter: blur(6px) saturate(125%);
   border: 1px solid rgba(219, 200, 181, 0.52);
   border-radius: 16px;
-  position: fixed;
+  position: sticky;
   top: var(--shell-gap);
-  left: calc(var(--sidebar-width) + var(--shell-gap));
-  right: var(--shell-gap);
-  width: auto;
-  margin: 0;
+  width: 100%;
+  margin: var(--shell-gap);
   box-shadow: 0 12px 28px rgba(45, 29, 14, 0.06);
   z-index: 1000;
-  max-width: none;
-  transition: left 0.38s var(--ease-soft), box-shadow 0.2s ease, background 0.2s ease;
-}
-
-.topbar.collapsed {
-  left: calc(var(--sidebar-collapsed-width) + var(--shell-gap));
+  box-sizing: border-box;
+  transition: box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .topbarConteneur {
@@ -29,6 +23,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  min-width: 0;
 }
 
 /* LEFT */
@@ -79,6 +74,7 @@
   min-width: 0;
   justify-content: flex-end;
   flex: 0 0 auto;
+  flex-wrap: nowrap;
 }
 
 /* SEARCH */
@@ -89,12 +85,17 @@
   padding: 6px 12px;
   border-radius: 10px;
   gap: 6px;
+  min-width: 0;
+  flex: 1 1 260px;
+  max-width: 520px;
 }
 .searchContainer input {
   border: none;
   outline: none;
   background: transparent;
   font-size: 13px;
+  width: 100%;
+  min-width: 0;
 }
 
 /* SEARCH */
@@ -105,12 +106,49 @@
   padding: 6px 12px;
   border-radius: 10px;
   gap: 6px;
+  min-width: 0;
+  flex: 1 1 260px;
+  max-width: 520px;
 }
 .searchContainer input {
   border: none;
   outline: none;
   background: transparent;
   font-size: 13px;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .topbar {
+    margin: 10px 10px 0;
+  }
+
+  .topbarConteneur {
+    padding: 0 14px;
+    gap: 12px;
+  }
+
+  .topright {
+    flex: 1 1 auto;
+  }
+
+  .searchContainer {
+    max-width: none;
+    flex: 1 1 220px;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbarConteneur {
+    padding: 0 12px;
+    gap: 10px;
+  }
+
+  .logo {
+    font-size: 16px;
+    max-width: 140px;
+  }
 }
 
 /* ── CLOCHE ─────────────────────────────────────── */
@@ -343,14 +381,25 @@
 .userContainer {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   cursor: pointer;
   padding: 5px 10px;
   border-radius: 12px;
   min-width: 0;
   max-width: 180px;
+  color: #6b6258;
+  transition: background 0.2s, color 0.2s, transform 0.2s ease;
 }
-.userContainer:hover { background: rgba(248, 245, 240, 0.9); }
+.userContainer:hover {
+  background: rgba(255, 241, 230, 0.96);
+  color: var(--sun-dark);
+  transform: translateY(-1px);
+}
+.userIcon {
+  color: inherit;
+  flex-shrink: 0;
+}
 .userInfo { display: flex; flex-direction: column; }
 .username {
   font-size: 13px;
@@ -364,12 +413,6 @@
 .userRole { font-size: 11px; color: #9b8c7d; text-transform: capitalize; }
 
 @media (max-width: 900px) {
-  .topbar,
-  .topbar.collapsed {
-    left: 10px;
-    right: 10px;
-  }
-
   .topbarConteneur {
     padding: 0 14px;
     gap: 12px;
@@ -385,11 +428,9 @@
 }
 
 @media (max-width: 640px) {
-  .topbar,
-  .topbar.collapsed {
-    left: 8px;
-    right: 8px;
+  .topbar {
     top: 8px;
+    margin: 8px 8px 0;
   }
 
   .topbarConteneur {
@@ -410,7 +451,11 @@
 
   .userContainer {
     max-width: none;
-    padding-inline: 8px;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border-radius: 12px;
+    flex-shrink: 0;
   }
 
   .notifPanel {

@@ -849,6 +849,7 @@
 }
 
 .admin-quick-actions .filter-btn.active {
+  color: #fff;
   background: linear-gradient(135deg, var(--sun-dark), var(--sun-mid));
   box-shadow: 0 12px 24px rgba(248, 143, 34, 0.2);
 }

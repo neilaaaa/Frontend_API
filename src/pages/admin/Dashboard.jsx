@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUsers } from "../../features/admin/userApi";
+import StatCard from "../../components/dashboard/StatCard";
 import "../../components/dashboard/dashboard.css";
+
+const IconUsers = <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>;
+const IconRoles = <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 3l7 4v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V7l7-4z" /><path d="M9 12l2 2 4-4" /></svg>;
+const IconAccess = <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="10" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>;
+const IconSecurity = <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="M9 12l2 2 4-4" /></svg>;
 
 const roles = [
   {
@@ -74,11 +80,13 @@ export default function Dashboard() {
       value: String(summary.total),
       label: "Utilisateurs",
       text: "Comptes disponibles dans le systeme.",
+      icon: IconUsers,
     },
     {
       value: String(summary.roles),
       label: "Roles",
       text: "Roles configures pour l'administration.",
+      icon: IconRoles,
     },
     {
       value: summary.sansRole > 0 ? String(summary.sansRole) : "OK",
@@ -86,6 +94,7 @@ export default function Dashboard() {
       text: summary.sansRole > 0
         ? "Des utilisateurs doivent recevoir un role."
         : "Chaque utilisateur a un role attribue.",
+      icon: IconAccess,
     },
     {
       value: summary.disabled > 0 ? String(summary.disabled) : "OK",
@@ -93,6 +102,7 @@ export default function Dashboard() {
       text: summary.disabled > 0
         ? "Des comptes sont desactives."
         : "Aucun compte desactive detecte.",
+      icon: IconSecurity,
     },
   ];
 
@@ -127,14 +137,12 @@ export default function Dashboard() {
 
       <div className="stats-grid">
         {focusCards.map((card) => (
-          <div className="stat-card admin-focus-card" key={card.label}>
-            <span className="stat-accent-bar" />
-            <div className="stat-info">
-              <div className="stat-val">{card.value}</div>
-              <div className="stat-label">{card.label}</div>
-            </div>
-            <span className="stat-deco" />
-          </div>
+          <StatCard
+            key={card.label}
+            value={card.value}
+            label={card.label}
+            icon={card.icon}
+          />
         ))}
       </div>
 

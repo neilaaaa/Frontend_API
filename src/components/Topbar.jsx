@@ -59,7 +59,7 @@ const PAGES_BY_ROLE = {
   ],
 };
 
-export default function Topbar({ collapsed, setCollapsed }) {
+export default function Topbar({ onMenuToggle }) {
   const { user } = useAuth();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const navigate = useNavigate();
@@ -101,11 +101,18 @@ export default function Topbar({ collapsed, setCollapsed }) {
   }
 
   return (
-    <div className={`topbar ${collapsed ? "collapsed" : ""}`}>
+    <div className="topbar">
       <div className="topbarConteneur">
 
         <div className="topleft">
-          <MenuIcon className="menuIcon" onClick={() => setCollapsed(!collapsed)} />
+          <button
+            type="button"
+            className="menuButton"
+            aria-label="Ouvrir le menu"
+            onClick={onMenuToggle}
+          >
+            <MenuIcon className="menuIcon" />
+          </button>
           <span className="logo">Mon espace</span>
         </div>
 
