@@ -5,9 +5,9 @@
 ════════════════════════════════════════════════════════ */
 
 .dt3-page {
- padding: 28px 32px;
-  background: #f4f0ea;
-  min-height: 100vh;
+  padding: 20px 28px 8px;
+  background: transparent;
+  min-height: auto;
   font-family: "DM Sans", "Segoe UI", sans-serif;
   box-sizing: border-box;
 }
@@ -33,6 +33,10 @@
   box-shadow: 0 4px 14px rgba(234,97,19,.35);
 }
 
+.dt3-page .dt3-icon-box {
+  display: none;
+}
+
 .dt3-title-block h1 {
   font-size: 21px;
   font-weight: 700;
@@ -54,11 +58,32 @@
   padding: 8px 16px; border-radius: 9px; border: none !important;
   cursor: pointer; font-size: 13px; font-weight: 600;
   font-family: inherit;
-  transition: opacity .18s;
+  transition: opacity .18s, transform .18s, box-shadow .18s, filter .18s;
 }
 
-.dt3-btn:hover { opacity: .85; }
-.dt3-btn-pdf   { background: #fee2e2 !important; color: #b91c1c !important; }
+.dt3-btn svg {
+  color: inherit !important;
+  fill: currentColor !important;
+}
+
+.dt3-btn:hover {
+  opacity: .85;
+  transform: translateY(-1px);
+}
+
+.dt3-btn-pdf {
+  background: linear-gradient(135deg, #EA6113, #F88F22) !important;
+  color: #fff !important;
+  box-shadow: none;
+  letter-spacing: 0.1px;
+}
+
+.dt3-btn-pdf:hover {
+  background: linear-gradient(135deg, #f06d1b 0%, #fb9d2f 100%) !important;
+  box-shadow: 0 14px 24px rgba(234, 97, 19, 0.18);
+  filter: saturate(1.02);
+}
+
 .dt3-btn-excel { background: #dcfce7 !important; color: #15803d !important; }
 .dt3-btn-dl    { background: #fff0e6 !important; color: #EA6113 !important; }
 
@@ -128,9 +153,10 @@
 .dt3-toolbar {
   display: flex; align-items: center;
   justify-content: space-between;
-  padding: 14px 18px;
+  padding: 16px 18px;
   border-bottom: 1px solid #faf0e8;
   flex-wrap: wrap; gap: 10px;
+  background: #fff;
 }
 
 .dt3-toolbar-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -274,10 +300,11 @@ table.dt3-table {
 .dt3-pagination {
   display: flex; align-items: center;
   justify-content: space-between;
-  padding: 13px 18px;
+  padding: 14px 16px;
   border-top: 1px solid #faf0e8;
   flex-wrap: wrap; gap: 10px;
   font-size: 13px; color: #a0826d;
+  background: #fff;
 }
 
 .dt3-per-page { display: flex; align-items: center; gap: 7px; }
@@ -326,11 +353,24 @@ table.dt3-table {
 
 /* ── BOUTON IMPRIMER ── */
 .dt3-btn-print {
-  background: #dbeafe !important;
-  color: #1d4ed8 !important;
+  background: #ef8b17 !important;
+  color: #fff !important;
+  font-size: 14px;
 }
 
 /* ── IMPRESSION ── */
+@media (max-width: 768px) {
+  .dt3-page {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 520px) {
+  .dt3-page {
+    padding: 10px;
+  }
+}
+
 @media print {
   .dt3-header,
   .dt3-toolbar,

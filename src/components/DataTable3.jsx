@@ -201,7 +201,7 @@ export default function DataTable3({
         </div>
         <div className="dt3-actions">
           <button className="dt3-btn dt3-btn-pdf" onClick={handlePDF}>
-            <PictureAsPdfIcon style={{ fontSize: 16 }} /> Exporter PDF
+            <PictureAsPdfIcon style={{ fontSize: 16 }} /> PDF
           </button>
           <button className="dt3-btn dt3-btn-print" onClick={handlePrint}>
             <PrintIcon style={{ fontSize: 16 }} /> Imprimer
